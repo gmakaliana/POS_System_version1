@@ -6,21 +6,69 @@ from auth.session import create_session
 from auth.permissions import is_admin
 
 
+def center_window(window, width, height):
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    window.geometry(f"{width}x{height}+{x}+{y}")
 
 
 def create_login_window():
 
     root = tk.Tk()
     root.title("POS LOGIN")
-    root.geometry("350x250")
+    root.resizable(False, False)
 
-    tk.Label(root, text="Username").pack()
-    username_entry = tk.Entry(root)
-    username_entry.pack()
+    center_window(root, 500, 350)
 
-    tk.Label(root, text="Password").pack()
-    password_entry = tk.Entry(root, show="*")
-    password_entry.pack()
+    # Fonts
+    title_font = ("Arial", 18, "bold")
+    label_font = ("Arial", 12)
+    entry_font = ("Arial", 12)
+    button_font = ("Arial", 12, "bold")
+
+    # Main Frame
+    frame = tk.Frame(root, padx=30, pady=20)
+    frame.pack(expand=True)
+
+    # Title
+    tk.Label(
+        frame,
+        text="POINT OF SALE SYSTEM",
+        font=title_font
+    ).pack(pady=(0, 25))
+
+    # Username
+    tk.Label(
+        frame,
+        text="Username",
+        font=label_font
+    ).pack(anchor="w")
+
+    username_entry = tk.Entry(
+        frame,
+        font=entry_font,
+        width=30
+    )
+    username_entry.pack(ipady=5, pady=(5, 15))
+
+    # Password
+    tk.Label(
+        frame,
+        text="Password",
+        font=label_font
+    ).pack(anchor="w")
+
+    password_entry = tk.Entry(
+        frame,
+        show="*",
+        font=entry_font,
+        width=30
+    )
+    password_entry.pack(ipady=5, pady=(5, 20))
 
     def login():
 
@@ -28,14 +76,23 @@ def create_login_window():
         from gui.cashier_dashboard import open_cashier_dashboard
         from gui.change_password import open_change_password
 
-        user = authenticate_user(username_entry.get(), password_entry.get())
+        user = authenticate_user(
+            username_entry.get(),
+            password_entry.get()
+        )
 
         if user == "inactive":
-            messagebox.showerror("Error", "Account inactive")
+            messagebox.showerror(
+                "Error",
+                "Account inactive"
+            )
             return
 
         if not user:
-            messagebox.showerror("Error", "Invalid credentials")
+            messagebox.showerror(
+                "Error",
+                "Invalid credentials"
+            )
             return
 
         create_session(user)
@@ -52,14 +109,23 @@ def create_login_window():
         else:
             open_cashier_dashboard()
 
+    # Login Button
     tk.Button(
-    root,
-    text="LOGIN",
-    command=login,
-    bg="#2ecc71",     # green
-    fg="white",
-    width=20,
-    font=("Arial", 10, "bold")
-).pack(pady=20)
+        frame,
+        text="LOGIN",
+        command=login,
+        bg="#2ecc71",
+        fg="white",
+        font=button_font,
+        width=20,
+        height=2,
+        cursor="hand2"
+    ).pack(pady=10)
+
+    # Enter key login
+    root.bind("<Return>", lambda event: login())
+
+    # Focus username automatically
+    username_entry.focus()
 
     root.mainloop()
