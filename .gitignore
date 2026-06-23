@@ -1,0 +1,18 @@
+# Virtual Environment
+venv/
+
+# Python
+__pycache__/
+*.pyc
+
+# Database backups
+*.db-journal
+
+# VS Code
+.vscode/
+
+# Logs
+*.log
+
+# Environment variables
+.env
