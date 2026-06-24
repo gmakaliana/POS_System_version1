@@ -37,4 +37,33 @@ def create_tables():
         ))
         conn.commit()
 
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS suppliers (
+
+        supplier_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        supplier_name TEXT NOT NULL,
+
+        phone TEXT,
+
+        address TEXT
+    )
+    """)  
+    conn.commit()  
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS products (
+        product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        product_name TEXT NOT NULL,
+        barcode TEXT UNIQUE,
+        cost_price REAL NOT NULL,
+        selling_price REAL NOT NULL,
+        quantity_in_stock INTEGER DEFAULT 0,
+        supplier_id INTEGER,
+        created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
+    )
+    """)
+    conn.commit() 
+
     conn.close()

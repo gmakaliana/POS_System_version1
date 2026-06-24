@@ -3,7 +3,10 @@ import tkinter as tk
 from auth.logout import logout_user
 from gui.login_window import create_login_window
 from gui.user_management_window import open_user_management_window
-
+from gui.supplier_management_window import (
+    open_supplier_management_window
+)
+from gui.product_management_window import open_product_management_window
 
 # -----------------------------------
 # CENTER WINDOW
@@ -83,7 +86,8 @@ def open_admin_dashboard():
         height=button_height,
         bg="#3498db",
         fg="white",
-        font=button_font
+        font=button_font,
+        command=lambda: open_product_management_window(root)
     ).grid(row=0, column=1, padx=10, pady=10)
 
     tk.Button(
@@ -93,7 +97,9 @@ def open_admin_dashboard():
         height=button_height,
         bg="#3498db",
         fg="white",
-        font=button_font
+        font=button_font,
+        command=lambda:
+            open_supplier_management_window(root)
     ).grid(row=0, column=2, padx=10, pady=10)
 
     # Row 2
