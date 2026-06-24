@@ -124,3 +124,136 @@ def delete_product(product_id):
 
     conn.commit()
     conn.close()
+
+# -----------------------------------
+# GET PRODUCT BY ID
+# -----------------------------------
+def get_product_by_id(product_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            product_id,
+            product_name,
+            barcode,
+            cost_price,
+            selling_price,
+            quantity_in_stock
+        FROM products
+        WHERE product_id = ?
+    """, (product_id,))
+
+    product = cursor.fetchone()
+
+    conn.close()
+
+    return product
+
+# -----------------------------------
+# GET PRODUCT BY BARCODE
+# -----------------------------------
+def get_product_by_barcode(barcode):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            product_id,
+            product_name,
+            barcode,
+            cost_price,
+            selling_price,
+            quantity_in_stock
+        FROM products
+        WHERE barcode = ?
+    """, (barcode,))
+
+    product = cursor.fetchone()
+
+    conn.close()
+
+    return product
+
+# -----------------------------------
+# SEARCH PRODUCTS
+# -----------------------------------
+def search_products(search_text):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            product_id,
+            product_name,
+            barcode,
+            selling_price,
+            quantity_in_stock
+        FROM products
+        WHERE product_name LIKE ?
+        ORDER BY product_name
+    """, (f"%{search_text}%",))
+
+    products = cursor.fetchall()
+
+    conn.close()
+
+    return products
+
+# -----------------------------------
+# GET PRODUCT STOCK
+# -----------------------------------
+def get_product_stock(product_id):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT quantity_in_stock
+        FROM products
+        WHERE product_id = ?
+    """, (product_id,))
+
+    result = cursor.fetchone()
+
+    conn.close()
+
+    if result:
+        return result[0]
+
+    return 0
+
+# -----------------------------------
+# UPDATE PRODUCT STOCK
+# -----------------------------------
+def update_product_stock(product_id, quantity):
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        UPDATE products
+        SET quantity_in_stock = ?
+        WHERE product_id = ?
+    """, (
+        quantity,
+        product_id
+    ))
+
+    conn.commit()
+    conn.close()
+
+# -----------------------------------
+# CHECK STOCK AVAILABLE
+# -----------------------------------
+def has_sufficient_stock(product_id, quantity_needed):
+
+    current_stock = get_product_stock(product_id)
+
+    return current_stock >= quantity_needed
+
+
+

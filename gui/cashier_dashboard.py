@@ -1,6 +1,8 @@
 import tkinter as tk
+from tkinter import messagebox
 
 from auth.logout import logout_user
+from auth.session import get_session_user
 
 
 # -----------------------------------
@@ -25,46 +27,54 @@ def open_cashier_dashboard():
 
     center_window(root, 700, 500)
 
-    # -----------------------------------
-    # FONTS
-    # -----------------------------------
     title_font = ("Arial", 20, "bold")
     button_font = ("Arial", 11, "bold")
+
+    # -----------------------------------
+    # GET SESSION USER
+    # -----------------------------------
+    user = get_session_user()
+
+    if not user:
+        messagebox.showerror("Error", "Session expired. Please login again.")
+        root.destroy()
+        return
+
+    user_id = user["user_id"]
 
     # -----------------------------------
     # LOGOUT
     # -----------------------------------
     def logout():
         from gui.login_window import create_login_window
-
         logout_user()
         root.destroy()
         create_login_window()
 
     # -----------------------------------
-    # MAIN FRAME
+    # OPEN SALES WINDOW
+    # -----------------------------------
+    def open_new_sale():
+
+        from gui.sales_window import open_sales_window
+        root.destroy()
+        open_sales_window(user_id=user_id, role="cashier")
+
+    # -----------------------------------
+    # UI
     # -----------------------------------
     main_frame = tk.Frame(root, padx=20, pady=20)
     main_frame.pack(expand=True)
 
-    # -----------------------------------
-    # HEADER
-    # -----------------------------------
     tk.Label(
         main_frame,
         text="CASHIER DASHBOARD",
         font=title_font
     ).pack(pady=(0, 30))
 
-    # -----------------------------------
-    # BUTTON FRAME
-    # -----------------------------------
     button_frame = tk.Frame(main_frame)
     button_frame.pack()
 
-    # -----------------------------------
-    # NEW SALE BUTTON
-    # -----------------------------------
     tk.Button(
         button_frame,
         text="NEW SALE",
@@ -73,12 +83,10 @@ def open_cashier_dashboard():
         width=22,
         height=2,
         font=button_font,
-        cursor="hand2"
+        cursor="hand2",
+        command=open_new_sale
     ).pack(pady=10)
 
-    # -----------------------------------
-    # SEARCH PRODUCT BUTTON
-    # -----------------------------------
     tk.Button(
         button_frame,
         text="SEARCH PRODUCT",
@@ -90,9 +98,6 @@ def open_cashier_dashboard():
         cursor="hand2"
     ).pack(pady=10)
 
-    # -----------------------------------
-    # LOGOUT BUTTON
-    # -----------------------------------
     tk.Button(
         main_frame,
         text="LOGOUT",

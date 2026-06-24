@@ -8,6 +8,9 @@ def create_tables():
     conn = get_connection()
     cursor = conn.cursor()
 
+    # =====================================
+    # USERS TABLE
+    # =====================================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS users (
         user_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -22,21 +25,39 @@ def create_tables():
 
     conn.commit()
 
-    # Create default admin
-    cursor.execute("SELECT * FROM users WHERE username='admin'")
+    # =====================================
+    # DEFAULT ADMIN
+    # =====================================
+    cursor.execute(
+        "SELECT * FROM users WHERE username = ?",
+        ("admin",)
+    )
+
     if not cursor.fetchone():
+
         cursor.execute("""
-        INSERT INTO users (username, password_hash, role, must_change_password, created_at)
+        INSERT INTO users (
+            username,
+            password_hash,
+            role,
+            must_change_password,
+            created_at
+        )
         VALUES (?, ?, ?, ?, ?)
-        """, (
+        """,
+        (
             "admin",
             hash_password("admin123"),
             "Admin",
             1,
             datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         ))
+
         conn.commit()
 
+    # =====================================
+    # SUPPLIERS TABLE
+    # =====================================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS suppliers (
 
@@ -48,22 +69,88 @@ def create_tables():
 
         address TEXT
     )
-    """)  
-    conn.commit()  
+    """)
 
+    conn.commit()
+
+    # =====================================
+    # PRODUCTS TABLE
+    # =====================================
     cursor.execute("""
     CREATE TABLE IF NOT EXISTS products (
+
         product_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
         product_name TEXT NOT NULL,
+
         barcode TEXT UNIQUE,
+
         cost_price REAL NOT NULL,
+
         selling_price REAL NOT NULL,
+
         quantity_in_stock INTEGER DEFAULT 0,
+
         supplier_id INTEGER,
+
         created_at TEXT DEFAULT CURRENT_TIMESTAMP,
-        FOREIGN KEY (supplier_id) REFERENCES suppliers(supplier_id)
+
+        FOREIGN KEY (supplier_id)
+        REFERENCES suppliers(supplier_id)
     )
     """)
-    conn.commit() 
+
+    conn.commit()
+
+    # =====================================
+    # SALES TABLE
+    # =====================================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS sales (
+
+        sale_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        user_id INTEGER NOT NULL,
+
+        total_amount REAL NOT NULL,
+
+        discount REAL DEFAULT 0,
+
+        final_amount REAL NOT NULL,
+
+        date_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+        FOREIGN KEY (user_id)
+        REFERENCES users(user_id)
+    )
+    """)
+
+    conn.commit()
+
+    # =====================================
+    # SALES TRANSACTIONS TABLE
+    # =====================================
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS sales_transactions (
+
+        transaction_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        sale_id INTEGER NOT NULL,
+
+        product_id INTEGER NOT NULL,
+
+        quantity INTEGER NOT NULL,
+
+        price REAL NOT NULL,
+
+        FOREIGN KEY (sale_id)
+        REFERENCES sales(sale_id),
+
+        FOREIGN KEY (product_id)
+        REFERENCES products(product_id)
+    )
+    """)
+
+    conn.commit()
 
     conn.close()
