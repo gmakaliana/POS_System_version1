@@ -30,11 +30,6 @@ def center_window(window, width, height):
 # VALIDATION HELPERS
 # -----------------------------------
 def validate_numeric_input(value):
-    """
-    Only allow:
-    - empty string (while typing)
-    - numbers >= 0
-    """
     if value == "":
         return True
     try:
@@ -70,6 +65,17 @@ def open_sales_window(user_id, role="cashier"):
     discount_var = tk.StringVar(value="0")
     paid_var = tk.StringVar(value="0")
 
+    barcode_entry = None  # will be assigned later
+
+    # ===============================
+    # LIVE TOTAL UPDATES (FIX)
+    # ===============================
+    def on_value_change(*args):
+        update_totals()
+
+    discount_var.trace_add("write", on_value_change)
+    paid_var.trace_add("write", on_value_change)
+
     # -------------------------------
     # EXIT
     # -------------------------------
@@ -85,9 +91,10 @@ def open_sales_window(user_id, role="cashier"):
             open_cashier_dashboard()
 
     # -------------------------------
-    # CART REFRESH
+    # REFRESH CART
     # -------------------------------
     def refresh_cart():
+
         for row in tree.get_children():
             tree.delete(row)
 
@@ -105,6 +112,7 @@ def open_sales_window(user_id, role="cashier"):
     # TOTALS
     # -------------------------------
     def update_totals():
+
         total = get_total()
         discount = safe_float(discount_var.get())
         paid = safe_float(paid_var.get())
@@ -116,35 +124,48 @@ def open_sales_window(user_id, role="cashier"):
         final_label.config(text=f"M{final:.2f}")
 
         change_label.config(text=f"M{change:.2f}")
-        change_label.config(fg="green" if paid >= final else "red")
+        change_label.config(
+            fg="green" if paid >= final else "red"
+        )
 
     # -------------------------------
     # ADD BY BARCODE
     # -------------------------------
     def add_by_barcode():
+
         code = barcode_var.get().strip()
+
         if not code:
+            barcode_entry.focus_set()
             return
 
         product = get_product_by_barcode(code)
 
         if not product:
             messagebox.showerror("Error", "Product not found")
+            barcode_var.set("")
+            barcode_entry.focus_set()
             return
 
         success, msg = add_product(product[0], 1)
 
         if not success:
             messagebox.showerror("Error", msg)
+            barcode_var.set("")
+            barcode_entry.focus_set()
+            return
 
         barcode_var.set("")
         refresh_cart()
+        barcode_entry.focus_set()
 
     # -------------------------------
-    # SEARCH PRODUCT
+    # SEARCH
     # -------------------------------
     def search_and_add():
+
         text = search_var.get().strip()
+
         if not text:
             return
 
@@ -163,11 +184,13 @@ def open_sales_window(user_id, role="cashier"):
 
         search_var.set("")
         refresh_cart()
+        barcode_entry.focus_set()
 
     # -------------------------------
-    # REMOVE SELECTED
+    # REMOVE
     # -------------------------------
     def remove_selected():
+
         selected = tree.selection()
 
         if not selected:
@@ -183,11 +206,13 @@ def open_sales_window(user_id, role="cashier"):
                 break
 
         refresh_cart()
+        barcode_entry.focus_set()
 
     # -------------------------------
     # PAY
     # -------------------------------
     def pay():
+
         cart = get_cart_items()
 
         if not cart:
@@ -220,10 +245,13 @@ def open_sales_window(user_id, role="cashier"):
         messagebox.showinfo("Success", f"Sale completed: {result}")
 
         clear_cart()
-        refresh_cart()
 
         discount_var.set("0")
         paid_var.set("0")
+        barcode_var.set("")
+
+        refresh_cart()
+        barcode_entry.focus_set()
 
     # ===============================
     # UI HEADER
@@ -245,12 +273,38 @@ def open_sales_window(user_id, role="cashier"):
     input_frame.pack(pady=10)
 
     tk.Label(input_frame, text="Barcode:").grid(row=0, column=0, padx=5)
-    tk.Entry(input_frame, textvariable=barcode_var, width=25).grid(row=0, column=1)
-    tk.Button(input_frame, text="Add", command=add_by_barcode).grid(row=0, column=2, padx=5)
+
+    barcode_entry = tk.Entry(
+        input_frame,
+        textvariable=barcode_var,
+        width=25
+    )
+    barcode_entry.grid(row=0, column=1)
+
+    barcode_entry.bind("<Return>", lambda e: add_by_barcode())
+
+    tk.Button(
+        input_frame,
+        text="Add",
+        command=add_by_barcode
+    ).grid(row=0, column=2, padx=5)
 
     tk.Label(input_frame, text="Search Product:").grid(row=0, column=3, padx=10)
-    tk.Entry(input_frame, textvariable=search_var, width=25).grid(row=0, column=4)
-    tk.Button(input_frame, text="Add", command=search_and_add).grid(row=0, column=5, padx=5)
+
+    search_entry = tk.Entry(
+        input_frame,
+        textvariable=search_var,
+        width=25
+    )
+    search_entry.grid(row=0, column=4)
+
+    search_entry.bind("<Return>", lambda e: search_and_add())
+
+    tk.Button(
+        input_frame,
+        text="Add",
+        command=search_and_add
+    ).grid(row=0, column=5, padx=5)
 
     # ===============================
     # TABLE
@@ -270,9 +324,6 @@ def open_sales_window(user_id, role="cashier"):
 
     tk.Button(root, text="Remove Selected", command=remove_selected).pack(pady=5)
 
-    # ===============================
-    # SEPARATORS (MATCH TABLE WIDTH)
-    # ===============================
     ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 
     # ===============================
@@ -281,64 +332,77 @@ def open_sales_window(user_id, role="cashier"):
     total_frame = tk.Frame(root)
     total_frame.pack(pady=5)
 
-    tk.Label(total_frame, text="Total:").grid(row=0, column=0, sticky="w", padx=10)
+    tk.Label(total_frame, text="Total:").grid(row=0, column=0, padx=10)
     total_label = tk.Label(total_frame, width=20, relief="solid")
     total_label.grid(row=0, column=1)
 
-    tk.Label(total_frame, text="Discount:").grid(row=1, column=0, sticky="w", padx=10)
+    tk.Label(total_frame, text="Discount:").grid(row=1, column=0, padx=10)
 
-    discount_entry = tk.Entry(total_frame, textvariable=discount_var, width=22,
-                              validate="key")
+    discount_entry = tk.Entry(
+        total_frame,
+        textvariable=discount_var,
+        validate="key"
+    )
     discount_entry.grid(row=1, column=1)
 
-    tk.Label(total_frame, text="Final Total:").grid(row=2, column=0, sticky="w", padx=10)
+    tk.Label(total_frame, text="Final Total:").grid(row=2, column=0, padx=10)
     final_label = tk.Label(total_frame, width=20, relief="solid")
     final_label.grid(row=2, column=1)
 
-    # validation
     vcmd = (root.register(validate_numeric_input), "%P")
     discount_entry.config(validatecommand=vcmd)
 
-    # ===============================
-    # SEPARATOR
-    # ===============================
     ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 
     # ===============================
-    # PAYMENT SECTION
+    # PAYMENT
     # ===============================
     pay_frame = tk.Frame(root)
     pay_frame.pack(pady=5)
 
-    tk.Label(pay_frame, text="Amount Paid:").grid(row=0, column=0, sticky="w", padx=10)
+    tk.Label(pay_frame, text="Amount Paid:").grid(
+        row=0,
+        column=0,
+        padx=10,
+        sticky="w"
+    )
 
-    paid_entry = tk.Entry(pay_frame, textvariable=paid_var, width=22,
-                          validate="key")
+    paid_entry = tk.Entry(
+        pay_frame,
+        textvariable=paid_var,
+        validate="key",
+        width=22
+    )
     paid_entry.grid(row=0, column=1)
 
-    tk.Label(pay_frame, text="Change:").grid(row=1, column=0, sticky="w", padx=10)
-    change_label = tk.Label(pay_frame, width=20, relief="solid")
+    tk.Label(pay_frame, text="Change:").grid(
+        row=1,
+        column=0,
+        padx=10,
+        sticky="w"
+    )
+
+    change_label = tk.Label(
+        pay_frame,
+        width=20,
+        relief="solid"
+    )
     change_label.grid(row=1, column=1)
 
     paid_entry.config(validatecommand=vcmd)
 
-    # LIVE UPDATE
-    discount_var.trace_add("write", lambda *a: update_totals())
-    paid_var.trace_add("write", lambda *a: update_totals())
-
     # ===============================
-    # PAY BUTTON
+    # PAY BUTTON (FIXED LAYOUT)
     # ===============================
-    ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
+    pay_button_frame = tk.Frame(root)
+    pay_button_frame.pack(pady=15)
 
     tk.Button(
-        root,
+        pay_button_frame,
         text="PAY",
         bg="green",
         fg="white",
         font=("Arial", 14, "bold"),
         command=pay,
         width=15
-    ).pack(pady=15)
-
-    return root
+    ).pack()
