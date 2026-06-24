@@ -1,0 +1,25 @@
+=================================
+        POS SYSTEM RECEIPT
+=================================
+
+Receipt No : 24
+Date       : 2026-06-24
+Time       : 22:49
+
+---------------------------------
+PRODUCTS        QTY     AMOUNT (M)
+---------------------------------
+Apples        2     M20.00
+Maize Meal    1     M120.00
+Tray Eggs     1     M55.00
+scones        1     M15.00
+Potatoes      1     M12.00
+---------------------------------
+TOTAL COST      : M222.00
+DISCOUNT        : M5.00
+FINAL TOTAL     : M217.00
+AMOUNT PAID     : M220.00
+CHANGE          : M3.00
+=================================
+      THANK YOU FOR SHOPPING
+=================================
