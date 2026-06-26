@@ -7,14 +7,10 @@ from gui.login_window import create_login_window
 from gui.user_management_window import open_user_management_window
 from gui.supplier_management_window import open_supplier_management_window
 from gui.product_management_window import open_product_management_window
-
 from gui.report_window import open_reports_dashboard
 from modules.inventory.stock_alerts import show_low_stock_alert
 
 
-# -----------------------------------
-# CENTER WINDOW
-# -----------------------------------
 def center_window(window, width, height):
 
     screen_width = window.winfo_screenwidth()
@@ -26,9 +22,6 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
 
 
-# -----------------------------------
-# ADMIN DASHBOARD
-# -----------------------------------
 def open_admin_dashboard():
 
     root = tk.Tk()
@@ -49,38 +42,39 @@ def open_admin_dashboard():
 
     user_id = user["user_id"]
 
-    # -----------------------------------
-    # LOW STOCK ALERT
-    # -----------------------------------
-    root.after(800, lambda: show_low_stock_alert())
+    # safe low stock alert
+    root.after(800, show_low_stock_alert)
 
-    # -----------------------------------
+    # ---------------------------
     # LOGOUT
-    # -----------------------------------
+    # ---------------------------
     def logout():
         logout_user()
         root.destroy()
         create_login_window()
 
-    # -----------------------------------
-    # OPEN SALES (CLOSE ADMIN FIRST)
-    # -----------------------------------
+    # ---------------------------
+    # SALES
+    # ---------------------------
     def open_sales():
         from gui.sales_window import open_sales_window
         root.destroy()
         open_sales_window(user_id=user_id, role="admin")
 
-    # -----------------------------------
-    # OPEN REPORTS (CLOSE ADMIN FIRST)
-    # -----------------------------------
+    # ---------------------------
+    # REPORTS (FIXED SAFELY)
+    # ---------------------------
     def open_reports():
-        from gui.report_window import open_reports_dashboard
-        root.destroy()
-        open_reports_dashboard()
+        try:
+            if root.winfo_exists():
+                open_reports_dashboard(root)
+        except tk.TclError:
+            # fallback safety (if root already destroyed)
+            return
 
-    # -----------------------------------
+    # ---------------------------
     # UI
-    # -----------------------------------
+    # ---------------------------
     main_frame = tk.Frame(root, padx=20, pady=20)
     main_frame.pack(expand=True)
 

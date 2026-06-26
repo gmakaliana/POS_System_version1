@@ -4,7 +4,7 @@ from tkinter import ttk, messagebox
 from modules.products.product_management import (
     get_all_products,
     delete_product
-)
+) 
 
 from gui.product_add_window import open_add_product_window
 from gui.product_edit_window import open_edit_product_window
