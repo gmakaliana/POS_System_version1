@@ -8,6 +8,7 @@ from gui.user_management_window import open_user_management_window
 from gui.supplier_management_window import open_supplier_management_window
 from gui.product_management_window import open_product_management_window
 
+from gui.report_window import open_reports_dashboard
 from modules.inventory.stock_alerts import show_low_stock_alert
 
 
@@ -39,9 +40,6 @@ def open_admin_dashboard():
     title_font = ("Arial", 20, "bold")
     button_font = ("Arial", 11, "bold")
 
-    # -----------------------------------
-    # SESSION USER
-    # -----------------------------------
     user = get_session_user()
 
     if not user:
@@ -52,13 +50,9 @@ def open_admin_dashboard():
     user_id = user["user_id"]
 
     # -----------------------------------
-    # LOW STOCK ALERT (SHOW ONLY ONCE)
+    # LOW STOCK ALERT
     # -----------------------------------
-    def trigger_low_stock_alert():
-        show_low_stock_alert()
-
-    # run after UI is fully loaded
-    root.after(800, trigger_low_stock_alert)
+    root.after(800, lambda: show_low_stock_alert())
 
     # -----------------------------------
     # LOGOUT
@@ -69,17 +63,23 @@ def open_admin_dashboard():
         create_login_window()
 
     # -----------------------------------
-    # OPEN SALES WINDOW
+    # OPEN SALES (CLOSE ADMIN FIRST)
     # -----------------------------------
     def open_sales():
-
         from gui.sales_window import open_sales_window
-
         root.destroy()
         open_sales_window(user_id=user_id, role="admin")
 
     # -----------------------------------
-    # UI FRAME
+    # OPEN REPORTS (CLOSE ADMIN FIRST)
+    # -----------------------------------
+    def open_reports():
+        from gui.report_window import open_reports_dashboard
+        root.destroy()
+        open_reports_dashboard()
+
+    # -----------------------------------
+    # UI
     # -----------------------------------
     main_frame = tk.Frame(root, padx=20, pady=20)
     main_frame.pack(expand=True)
@@ -104,7 +104,6 @@ def open_admin_dashboard():
         bg="#3498db",
         fg="white",
         font=button_font,
-        cursor="hand2",
         command=open_sales
     ).grid(row=0, column=0, padx=10, pady=10)
 
@@ -116,7 +115,6 @@ def open_admin_dashboard():
         bg="#3498db",
         fg="white",
         font=button_font,
-        cursor="hand2",
         command=lambda: open_product_management_window(root)
     ).grid(row=0, column=1, padx=10, pady=10)
 
@@ -128,7 +126,6 @@ def open_admin_dashboard():
         bg="#3498db",
         fg="white",
         font=button_font,
-        cursor="hand2",
         command=lambda: open_supplier_management_window(root)
     ).grid(row=0, column=2, padx=10, pady=10)
 
@@ -140,7 +137,7 @@ def open_admin_dashboard():
         bg="#9b59b6",
         fg="white",
         font=button_font,
-        cursor="hand2"
+        command=open_reports
     ).grid(row=1, column=0, padx=10, pady=10)
 
     tk.Button(
@@ -151,7 +148,6 @@ def open_admin_dashboard():
         bg="#16a085",
         fg="white",
         font=button_font,
-        cursor="hand2",
         command=lambda: open_user_management_window(root)
     ).grid(row=1, column=1, padx=10, pady=10)
 
@@ -162,8 +158,7 @@ def open_admin_dashboard():
         height=button_height,
         bg="#34495e",
         fg="white",
-        font=button_font,
-        cursor="hand2"
+        font=button_font
     ).grid(row=1, column=2, padx=10, pady=10)
 
     tk.Button(
@@ -173,9 +168,7 @@ def open_admin_dashboard():
         width=25,
         height=2,
         bg="#e74c3c",
-        fg="white",
-        font=("Arial", 12, "bold"),
-        cursor="hand2"
+        fg="white"
     ).pack(pady=30)
 
     root.mainloop()
