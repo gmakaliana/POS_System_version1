@@ -2,6 +2,12 @@ from database.db import get_connection
 
 
 # -----------------------------------
+# LOW STOCK LIMIT
+# -----------------------------------
+LOW_STOCK_LIMIT = 5
+
+
+# -----------------------------------
 # GET ALL PRODUCTS
 # -----------------------------------
 def get_all_products():
@@ -26,7 +32,51 @@ def get_all_products():
     """)
 
     products = cursor.fetchall()
+
     conn.close()
+
+    return products
+
+
+# -----------------------------------
+# GET LOW STOCK PRODUCTS
+# -----------------------------------
+def get_low_stock_products():
+
+    """
+    Returns products whose quantity is less
+    than or equal to LOW_STOCK_LIMIT.
+    """
+
+    conn = get_connection()
+    cursor = conn.cursor()
+
+    cursor.execute("""
+        SELECT
+            p.product_id,
+            p.product_name,
+            p.barcode,
+            p.cost_price,
+            p.selling_price,
+            p.quantity_in_stock,
+            s.supplier_id,
+            s.supplier_name
+        FROM products p
+
+        LEFT JOIN suppliers s
+            ON p.supplier_id = s.supplier_id
+
+        WHERE p.quantity_in_stock <= ?
+
+        ORDER BY
+            p.quantity_in_stock ASC,
+            p.product_name ASC
+    """, (LOW_STOCK_LIMIT,))
+
+    products = cursor.fetchall()
+
+    conn.close()
+
     return products
 
 
@@ -125,6 +175,7 @@ def delete_product(product_id):
     conn.commit()
     conn.close()
 
+
 # -----------------------------------
 # GET PRODUCT BY ID
 # -----------------------------------
@@ -150,6 +201,7 @@ def get_product_by_id(product_id):
     conn.close()
 
     return product
+
 
 # -----------------------------------
 # GET PRODUCT BY BARCODE
@@ -177,6 +229,7 @@ def get_product_by_barcode(barcode):
 
     return product
 
+
 # -----------------------------------
 # SEARCH PRODUCTS
 # -----------------------------------
@@ -203,6 +256,7 @@ def search_products(search_text):
 
     return products
 
+
 # -----------------------------------
 # GET PRODUCT STOCK
 # -----------------------------------
@@ -226,6 +280,7 @@ def get_product_stock(product_id):
 
     return 0
 
+
 # -----------------------------------
 # UPDATE PRODUCT STOCK
 # -----------------------------------
@@ -246,6 +301,7 @@ def update_product_stock(product_id, quantity):
     conn.commit()
     conn.close()
 
+
 # -----------------------------------
 # CHECK STOCK AVAILABLE
 # -----------------------------------
@@ -254,6 +310,3 @@ def has_sufficient_stock(product_id, quantity_needed):
     current_stock = get_product_stock(product_id)
 
     return current_stock >= quantity_needed
-
-
-

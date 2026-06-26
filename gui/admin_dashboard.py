@@ -8,6 +8,8 @@ from gui.user_management_window import open_user_management_window
 from gui.supplier_management_window import open_supplier_management_window
 from gui.product_management_window import open_product_management_window
 
+from modules.inventory.stock_alerts import show_low_stock_alert
+
 
 # -----------------------------------
 # CENTER WINDOW
@@ -23,6 +25,9 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
 
 
+# -----------------------------------
+# ADMIN DASHBOARD
+# -----------------------------------
 def open_admin_dashboard():
 
     root = tk.Tk()
@@ -35,7 +40,7 @@ def open_admin_dashboard():
     button_font = ("Arial", 11, "bold")
 
     # -----------------------------------
-    # GET SESSION USER
+    # SESSION USER
     # -----------------------------------
     user = get_session_user()
 
@@ -45,6 +50,15 @@ def open_admin_dashboard():
         return
 
     user_id = user["user_id"]
+
+    # -----------------------------------
+    # LOW STOCK ALERT (SHOW ONLY ONCE)
+    # -----------------------------------
+    def trigger_low_stock_alert():
+        show_low_stock_alert()
+
+    # run after UI is fully loaded
+    root.after(800, trigger_low_stock_alert)
 
     # -----------------------------------
     # LOGOUT
@@ -65,7 +79,7 @@ def open_admin_dashboard():
         open_sales_window(user_id=user_id, role="admin")
 
     # -----------------------------------
-    # UI
+    # UI FRAME
     # -----------------------------------
     main_frame = tk.Frame(root, padx=20, pady=20)
     main_frame.pack(expand=True)

@@ -8,6 +8,13 @@ from modules.products.product_management import (
 
 from gui.product_add_window import open_add_product_window
 from gui.product_edit_window import open_edit_product_window
+from gui.low_stock_window import open_low_stock_window
+
+
+# -----------------------------------
+# LOW STOCK LIMIT
+# -----------------------------------
+LOW_STOCK_LIMIT = 5
 
 
 def open_product_management_window(admin_root):
@@ -26,21 +33,23 @@ def open_product_management_window(admin_root):
         admin_root.deiconify()
 
     # -----------------------------------
-    # TABLE
+    # TABLE FRAME
     # -----------------------------------
     table_frame = tk.Frame(root)
     table_frame.pack(fill="both", expand=True, padx=10, pady=10)
 
+    columns = (
+        "Name",
+        "Barcode",
+        "Cost",
+        "Selling",
+        "Qty",
+        "Supplier"
+    )
+
     tree = ttk.Treeview(
         table_frame,
-        columns=(
-            "Name",
-            "Barcode",
-            "Cost",
-            "Selling",
-            "Qty",
-            "Supplier"
-        ),
+        columns=columns,
         show="headings"
     )
 
@@ -55,7 +64,7 @@ def open_product_management_window(admin_root):
     tree.column("Barcode", width=120)
     tree.column("Cost", width=120)
     tree.column("Selling", width=120)
-    tree.column("Qty", width=100)
+    tree.column("Qty", width=100, anchor="center")
     tree.column("Supplier", width=200)
 
     tree.pack(side="left", fill="both", expand=True)
@@ -77,23 +86,29 @@ def open_product_management_window(admin_root):
         for p in products:
 
             product_id = p[0]
+            name = p[1]
+            barcode = p[2]
+            cost = p[3]
+            selling = p[4]
+            qty = p[5]
+            supplier = p[7]
 
             tree.insert(
                 "",
                 "end",
                 values=(
-                    p[1],
-                    p[2],
-                    p[3],
-                    p[4],
-                    p[5],
-                    p[7]
+                    name,
+                    barcode,
+                    cost,
+                    selling,
+                    qty,
+                    supplier
                 ),
                 tags=(product_id,)
             )
 
     # -----------------------------------
-    # GET SELECTED ID
+    # GET SELECTED PRODUCT ID
     # -----------------------------------
     def get_selected_id():
 
@@ -105,7 +120,7 @@ def open_product_management_window(admin_root):
         return tree.item(selected)["tags"][0]
 
     # -----------------------------------
-    # DELETE
+    # DELETE PRODUCT
     # -----------------------------------
     def delete_selected():
 
@@ -116,12 +131,11 @@ def open_product_management_window(admin_root):
             return
 
         if messagebox.askyesno("Confirm", "Delete product?"):
-
             delete_product(product_id)
             load_products()
 
     # -----------------------------------
-    # EDIT
+    # EDIT PRODUCT
     # -----------------------------------
     def edit_selected():
 
@@ -136,15 +150,21 @@ def open_product_management_window(admin_root):
 
         product_data = (
             product_id,
-            values[0],
-            values[1],
-            values[2],
-            values[3],
-            values[4],
-            values[5]
+            values[0],  # name
+            values[1],  # barcode
+            values[2],  # cost
+            values[3],  # selling
+            values[4],  # qty
+            values[5]   # supplier
         )
 
         open_edit_product_window(product_data, load_products)
+
+    # -----------------------------------
+    # LOW STOCK WINDOW
+    # -----------------------------------
+    def open_low_stock():
+        open_low_stock_window(root)
 
     # -----------------------------------
     # BUTTONS
@@ -172,6 +192,15 @@ def open_product_management_window(admin_root):
 
     tk.Button(
         btn_frame,
+        text="Low Stock Product",
+        bg="#c0392b",
+        fg="white",
+        width=14,
+        command=open_low_stock
+    ).pack(side="left", padx=5)
+
+    tk.Button(
+        btn_frame,
         text="Delete Product",
         bg="#e74c3c",
         fg="white",
@@ -188,4 +217,5 @@ def open_product_management_window(admin_root):
         command=close_window
     ).pack(side="right", padx=5)
 
+    # INITIAL LOAD
     load_products()
