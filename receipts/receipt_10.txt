@@ -1,0 +1,27 @@
+=================================
+        Style Restaurant         
+              Leribe             
+       Tel: +266 5329 0000       
+          rest@gmail.com         
+---------------------------------
+        Restaurant Receipt       
+=================================
+
+Receipt No : 10
+Date       : 2026-07-07
+Time       : 16:21
+
+---------------------------------
+PRODUCTS        QTY     AMOUNT (M)
+---------------------------------
+Apples        1     M10.00
+---------------------------------
+TOTAL COST      : M10.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M10.00
+AMOUNT PAID     : M10.00
+CHANGE          : M0.00
+=================================
+Thank You For Shopping With Us!
+Please Come Again!
+=================================

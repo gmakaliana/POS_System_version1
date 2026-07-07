@@ -128,7 +128,7 @@ def open_daily_sales(parent):
     rows, summary = get_daily_sales(report_date)
 
     for r in rows:
-        tree.insert("", "end", values=r)
+        tree.insert("", "end", values=tuple(r))
 
     # SUMMARY TABLE
     sum_frame = tk.Frame(win)
@@ -199,7 +199,7 @@ def open_monthly_sales(parent):
     rows, summary = get_monthly_sales(month)
 
     for r in rows:
-        tree.insert("", "end", values=r)
+        tree.insert("", "end", values=tuple(r))
 
     sum_frame = tk.Frame(win)
     sum_frame.pack(fill="x", padx=10, pady=10)

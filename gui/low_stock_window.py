@@ -3,6 +3,7 @@ from tkinter import ttk, messagebox
 
 from modules.inventory.stock_alerts import get_low_stock_product_details
 
+from modules.settings.settings import get_low_stock_threshold
 
 # -----------------------------------
 # LOW STOCK WINDOW
@@ -13,6 +14,17 @@ def open_low_stock_window(parent):
 
     root = tk.Toplevel()
     root.title("LOW STOCK PRODUCTS")
+    
+    threshold = get_low_stock_threshold()
+
+    ttk.Label(
+        root,
+        text=f"Low Stock Threshold: {threshold}",
+        font=("Arial", 10, "bold")
+    ).pack(
+        pady=5
+    )
+    
     root.geometry("900x450")
     root.resizable(False, False)
 

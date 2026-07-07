@@ -1,0 +1,33 @@
+=================================
+     'Maliteboho Restaurant      
+              Leribe             
+       Tel: +266 5329 0000       
+       maliteboho@gmail.com      
+---------------------------------
+        Restaurant Receipt       
+=================================
+Served By : neo
+
+Receipt No : 15
+Date       : 2026-07-07
+Time       : 23:56
+
+---------------------------------
+PRODUCTS        QTY     AMOUNT (M)
+---------------------------------
+scones        1     M15.00
+Maize Meal    1     M120.00
+---------------------------------
+TOTAL COST      : M135.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M135.00
+AMOUNT PAID     : M140.00
+CHANGE          : M5.00
+=================================
+Thank You For Shopping With Us!
+Please Come Again!
+
+Developed By:Mpho George Makaliana
+Phone : +266 53239121
+Email : makalianamphogeorge@gmail.com
+=================================

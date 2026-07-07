@@ -5,6 +5,15 @@ from auth.login import authenticate_user
 from auth.session import create_session
 from auth.permissions import is_admin
 
+#settings
+from modules.settings.settings import get_settings
+
+
+settings = get_settings()
+
+business_name = settings["business_name"]
+
+#settings
 
 def center_window(window, width, height):
     screen_width = window.winfo_screenwidth()
@@ -37,7 +46,7 @@ def create_login_window():
     # Title
     tk.Label(
         frame,
-        text="POINT OF SALE SYSTEM",
+        text=f"{business_name}\nPOS System", #business name
         font=title_font
     ).pack(pady=(0, 25))
 

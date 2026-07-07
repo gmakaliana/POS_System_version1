@@ -1,0 +1,29 @@
+=================================
+           Supermarket           
+            Maseru 100           
+        Tel: +266 53239121       
+        business@gmail.com       
+---------------------------------
+           POS Receipt           
+=================================
+
+Receipt No : 1000
+Date       : 2026-07-07
+Time       : 16:17
+
+---------------------------------
+PRODUCTS        QTY     AMOUNT (M)
+---------------------------------
+Maize Meal    1     M120.00
+Apples        1     M10.00
+scones        1     M15.00
+coke          1     M10.00
+---------------------------------
+TOTAL COST      : M155.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M155.00
+AMOUNT PAID     : M200.00
+CHANGE          : M45.00
+=================================
+ Thank You For Shopping With Us! 
+=================================

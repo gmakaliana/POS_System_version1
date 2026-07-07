@@ -1,11 +1,11 @@
 from tkinter import messagebox
+
 from database.db import get_connection
 
+from modules.settings.settings import (
+    get_low_stock_threshold
+)
 
-# -----------------------------------
-# LOW STOCK LIMIT
-# -----------------------------------
-LOW_STOCK_LIMIT = 5
 
 
 # -----------------------------------
@@ -21,7 +21,12 @@ def get_low_stock_products():
     """
 
     conn = get_connection()
+
     cursor = conn.cursor()
+
+
+    threshold = get_low_stock_threshold()
+
 
     cursor.execute("""
         SELECT
@@ -33,13 +38,19 @@ def get_low_stock_products():
         ORDER BY
             quantity_in_stock ASC,
             product_name ASC
-    """, (LOW_STOCK_LIMIT,))
+    """, (threshold,))
+
 
     products = cursor.fetchall()
 
+
     conn.close()
 
+
     return products
+
+
+
 
 
 # -----------------------------------
@@ -53,7 +64,12 @@ def get_low_stock_product_details():
     """
 
     conn = get_connection()
+
     cursor = conn.cursor()
+
+
+    threshold = get_low_stock_threshold()
+
 
     cursor.execute("""
         SELECT
@@ -64,6 +80,7 @@ def get_low_stock_product_details():
             p.selling_price,
             p.quantity_in_stock,
             s.supplier_name
+
         FROM products p
 
         LEFT JOIN suppliers s
@@ -74,13 +91,20 @@ def get_low_stock_product_details():
         ORDER BY
             p.quantity_in_stock ASC,
             p.product_name ASC
-    """, (LOW_STOCK_LIMIT,))
+
+    """, (threshold,))
+
 
     products = cursor.fetchall()
 
+
     conn.close()
 
+
     return products
+
+
+
 
 
 # -----------------------------------
@@ -92,24 +116,41 @@ def show_low_stock_alert():
     all low-stock products.
     """
 
+
     products = get_low_stock_products()
+
 
     if not products:
         return
 
-    message = "The following products need restocking:\n\n"
+
+
+    message = (
+        "The following products need restocking:\n\n"
+    )
+
 
     for product in products:
 
         product_name = product[1]
+
         quantity = product[2]
 
-        message += f"• {product_name} ({quantity} left)\n"
+
+        message += (
+            f"• {product_name} "
+            f"({quantity} left)\n"
+        )
+
+
 
     messagebox.showwarning(
         "Low Stock Alert",
         message
     )
+
+
+
 
 
 # -----------------------------------
@@ -118,20 +159,29 @@ def show_low_stock_alert():
 def has_low_stock_products():
     """
     Returns True if there are products
-    below the stock limit.
+    below the configured stock limit.
     """
 
+
     conn = get_connection()
+
     cursor = conn.cursor()
+
+
+    threshold = get_low_stock_threshold()
+
 
     cursor.execute("""
         SELECT COUNT(*)
         FROM products
         WHERE quantity_in_stock <= ?
-    """, (LOW_STOCK_LIMIT,))
+    """, (threshold,))
+
 
     count = cursor.fetchone()[0]
 
+
     conn.close()
+
 
     return count > 0

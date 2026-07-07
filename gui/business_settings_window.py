@@ -1,0 +1,385 @@
+import tkinter as tk
+from tkinter import ttk, filedialog, messagebox
+
+from modules.settings.settings import (
+    get_settings,
+    update_business_information
+)
+
+
+
+def open_business_settings(parent):
+
+    # =====================================
+    # HIDE PARENT WINDOW
+    # =====================================
+
+    parent.withdraw()
+
+
+
+    # =====================================
+    # CREATE WINDOW
+    # =====================================
+
+    window = tk.Toplevel()
+
+    window.title("Business Information")
+
+    window.geometry("650x650")
+
+    window.resizable(False, False)
+
+
+
+    # =====================================
+    # CLOSE FUNCTION
+    # =====================================
+
+    def close_window():
+
+        window.destroy()
+
+        parent.deiconify()
+
+
+
+    # =====================================
+    # LOAD SETTINGS
+    # =====================================
+
+    settings = get_settings()
+
+
+    try:
+
+        business_name = settings["business_name"]
+        business_address = settings["business_address"]
+        business_phone = settings["business_phone"]
+        business_email = settings["business_email"]
+        company_logo = settings["company_logo"]
+        receipt_header = settings["receipt_header"]
+        receipt_footer = settings["receipt_footer"]
+
+
+    except TypeError:
+
+        business_name = settings[1]
+        business_address = settings[2]
+        business_phone = settings[3]
+        business_email = settings[4]
+        company_logo = settings[5]
+        receipt_header = settings[6]
+        receipt_footer = settings[7]
+
+
+
+    logo_path = tk.StringVar(
+        value=company_logo
+    )
+
+
+
+    # =====================================
+    # TITLE
+    # =====================================
+
+    ttk.Label(
+        window,
+        text="BUSINESS INFORMATION",
+        font=("Arial", 16, "bold")
+    ).pack(
+        pady=15
+    )
+
+
+
+    frame = ttk.Frame(
+        window
+    )
+
+    frame.pack(
+        padx=30,
+        pady=10
+    )
+
+
+
+    fields = {}
+
+
+
+    def add_field(label, value, row):
+
+        ttk.Label(
+            frame,
+            text=label
+        ).grid(
+            row=row,
+            column=0,
+            sticky="w",
+            pady=8
+        )
+
+
+        entry = ttk.Entry(
+            frame,
+            width=40
+        )
+
+        entry.grid(
+            row=row,
+            column=1,
+            padx=10
+        )
+
+
+        entry.insert(
+            0,
+            value or ""
+        )
+
+
+        fields[label] = entry
+
+
+
+    add_field(
+        "Business Name",
+        business_name,
+        0
+    )
+
+
+    add_field(
+        "Business Address",
+        business_address,
+        1
+    )
+
+
+    add_field(
+        "Business Phone",
+        business_phone,
+        2
+    )
+
+
+    add_field(
+        "Business Email",
+        business_email,
+        3
+    )
+
+
+
+    # =====================================
+    # LOGO
+    # =====================================
+
+    ttk.Label(
+        frame,
+        text="Company Logo"
+    ).grid(
+        row=4,
+        column=0,
+        sticky="w",
+        pady=8
+    )
+
+
+
+    ttk.Entry(
+        frame,
+        textvariable=logo_path,
+        width=40
+    ).grid(
+        row=4,
+        column=1
+    )
+
+
+
+    def choose_logo():
+
+        file = filedialog.askopenfilename(
+
+            filetypes=[
+                ("Images", "*.png *.jpg *.jpeg")
+            ]
+
+        )
+
+
+        if file:
+
+            logo_path.set(file)
+
+
+
+    ttk.Button(
+        frame,
+        text="Choose Logo",
+        command=choose_logo
+    ).grid(
+        row=5,
+        column=1,
+        sticky="w"
+    )
+
+
+
+    # =====================================
+    # RECEIPT HEADER
+    # =====================================
+
+    ttk.Label(
+        frame,
+        text="Receipt Header"
+    ).grid(
+        row=6,
+        column=0,
+        sticky="nw"
+    )
+
+
+
+    header_box = tk.Text(
+        frame,
+        width=40,
+        height=4
+    )
+
+    header_box.grid(
+        row=6,
+        column=1
+    )
+
+
+    header_box.insert(
+        "1.0",
+        receipt_header or ""
+    )
+
+
+
+    # =====================================
+    # RECEIPT FOOTER
+    # =====================================
+
+    ttk.Label(
+        frame,
+        text="Receipt Footer"
+    ).grid(
+        row=7,
+        column=0,
+        sticky="nw"
+    )
+
+
+    footer_box = tk.Text(
+        frame,
+        width=40,
+        height=4
+    )
+
+    footer_box.grid(
+        row=7,
+        column=1
+    )
+
+
+    footer_box.insert(
+        "1.0",
+        receipt_footer or ""
+    )
+
+
+
+    # =====================================
+    # SAVE FUNCTION
+    # =====================================
+
+    def save():
+
+        update_business_information(
+
+            fields["Business Name"].get(),
+
+            fields["Business Address"].get(),
+
+            fields["Business Phone"].get(),
+
+            fields["Business Email"].get(),
+
+            logo_path.get(),
+
+            header_box.get(
+                "1.0",
+                "end"
+            ).strip(),
+
+            footer_box.get(
+                "1.0",
+                "end"
+            ).strip()
+
+        )
+
+
+        messagebox.showinfo(
+            "Saved",
+            "Business information saved."
+        )
+
+
+
+    # =====================================
+    # BUTTONS
+    # =====================================
+
+    button_frame = ttk.Frame(
+        window
+    )
+
+    button_frame.pack(
+        pady=25
+    )
+
+
+
+    ttk.Button(
+        button_frame,
+        text="Save",
+        width=15,
+        command=save
+    ).grid(
+        row=0,
+        column=0,
+        padx=20
+    )
+
+
+
+    ttk.Button(
+        button_frame,
+        text="Close",
+        width=15,
+        command=close_window
+    ).grid(
+        row=0,
+        column=1,
+        padx=20
+    )
+
+
+
+    # =====================================
+    # WINDOW CONTROL
+    # =====================================
+
+    # Handle X button
+    window.protocol(
+        "WM_DELETE_WINDOW",
+        close_window
+    )

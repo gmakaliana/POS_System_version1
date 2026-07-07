@@ -8,8 +8,8 @@ from gui.user_management_window import open_user_management_window
 from gui.supplier_management_window import open_supplier_management_window
 from gui.product_management_window import open_product_management_window
 from gui.report_window import open_reports_dashboard
+from gui.settings_window import open_settings_window
 from modules.inventory.stock_alerts import show_low_stock_alert
-
 
 def center_window(window, width, height):
 
@@ -146,13 +146,14 @@ def open_admin_dashboard():
     ).grid(row=1, column=1, padx=10, pady=10)
 
     tk.Button(
-        btn_frame,
-        text="Settings",
-        width=button_width,
-        height=button_height,
-        bg="#34495e",
-        fg="white",
-        font=button_font
+    btn_frame,
+    text="Settings",
+    width=button_width,
+    height=button_height,
+    bg="#34495e",
+    fg="white",
+    font=button_font,
+    command=lambda: open_settings_window(root)
     ).grid(row=1, column=2, padx=10, pady=10)
 
     tk.Button(
