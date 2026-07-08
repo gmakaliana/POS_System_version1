@@ -9,6 +9,16 @@ from gui.system_info_window import open_system_information
 
 from gui.inventory_settings_window import open_inventory_settings 
 
+def center_window(window, width, height):
+
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    window.geometry(f"{width}x{height}+{x}+{y}")
+
 def open_settings_window(parent):
 
     # =====================================
@@ -27,9 +37,13 @@ def open_settings_window(parent):
 
     settings_window.title("Settings")
 
-    settings_window.geometry("450x500")
+    settings_window.resizable(True, True)
 
-    settings_window.resizable(False, False)
+    center_window(
+        settings_window,
+        800,
+        550
+    )
 
 
 

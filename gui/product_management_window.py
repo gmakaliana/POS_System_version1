@@ -10,6 +10,15 @@ from gui.product_add_window import open_add_product_window
 from gui.product_edit_window import open_edit_product_window
 from gui.low_stock_window import open_low_stock_window
 
+def center_window(window, width, height):
+
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    window.geometry(f"{width}x{height}+{x}+{y}")
 
 # -----------------------------------
 # LOW STOCK LIMIT
@@ -23,7 +32,15 @@ def open_product_management_window(admin_root):
 
     root = tk.Toplevel()
     root.title("PRODUCT MANAGEMENT")
-    root.geometry("1050x500")
+    
+
+    root.resizable(True, True)
+
+    center_window(
+        root,
+        1050,
+        500
+    )
 
     # -----------------------------------
     # CLOSE

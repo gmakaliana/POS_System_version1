@@ -3,6 +3,16 @@ from tkinter import ttk
 
 from modules.settings.settings import get_settings
 
+def center_window(window, width, height):
+
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    window.geometry(f"{width}x{height}+{x}+{y}")
+
 
 
 def open_system_information(parent):
@@ -23,11 +33,13 @@ def open_system_information(parent):
 
     window.title("System Information")
 
-    window.geometry("500x550")
+    window.resizable(True, True)
 
-    window.resizable(False, False)
-
-
+    center_window(
+        window,
+        500,
+        550
+    )
 
     # =====================================
     # CLOSE FUNCTION

@@ -1,22 +1,32 @@
 =================================
-        POS SYSTEM RECEIPT
+     'Maliteboho Restaurant      
+              Leribe             
+       Tel: +266 5329 0000       
+       maliteboho@gmail.com      
+---------------------------------
+        Restaurant Receipt       
 =================================
+Served By : Admin
 
 Receipt No : 27
-Date       : 2026-06-24
-Time       : 22:59
+Date       : 2026-07-08
+Time       : 17:59
 
 ---------------------------------
 PRODUCTS        QTY     AMOUNT (M)
 ---------------------------------
-Tv 1          1     M170.00
-Sugar         1     M25.00
+Cabbage       1     M25.00
 ---------------------------------
-TOTAL COST      : M195.00
-DISCOUNT        : M20.00
-FINAL TOTAL     : M175.00
-AMOUNT PAID     : M200.00
-CHANGE          : M25.00
+TOTAL COST      : M25.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M25.00
+AMOUNT PAID     : M25.00
+CHANGE          : M0.00
 =================================
-      THANK YOU FOR SHOPPING
+Thank You For Shopping With Us!
+Please Come Again!
+
+Developed By:Mpho George Makaliana
+Phone : +266 53239121
+Email : makalianamphogeorge@gmail.com
 =================================

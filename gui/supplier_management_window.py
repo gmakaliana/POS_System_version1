@@ -14,6 +14,15 @@ from gui.supplier_edit_window import (
     open_edit_supplier_window
 )
 
+def center_window(window, width, height):
+
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    window.geometry(f"{width}x{height}+{x}+{y}")
 
 def open_supplier_management_window(admin_root):
 
@@ -25,7 +34,14 @@ def open_supplier_management_window(admin_root):
     root = tk.Toplevel()
 
     root.title("SUPPLIER MANAGEMENT")
-    root.geometry("800x450")
+
+    root.resizable(True, True)
+
+    center_window(
+        root,
+        800,
+        450
+    )
 
     # -----------------------------------
     # CLOSE

@@ -9,6 +9,15 @@ from modules.users.user_management import (
 from gui.user_edit_window import open_edit_user_window
 from gui.user_add_window import open_add_user_window
 
+def center_window(window, width, height):
+
+    screen_width = window.winfo_screenwidth()
+    screen_height = window.winfo_screenheight()
+
+    x = (screen_width // 2) - (width // 2)
+    y = (screen_height // 2) - (height // 2)
+
+    window.geometry(f"{width}x{height}+{x}+{y}")
 
 def open_user_management_window(admin_root):
 
@@ -19,7 +28,13 @@ def open_user_management_window(admin_root):
 
     root = tk.Toplevel()
     root.title("USER MANAGEMENT")
-    root.geometry("750x450")
+    root.resizable(True, True)
+
+    center_window(
+        root,
+        750,
+        450
+    )
 
     # -----------------------------------
     # CLOSE FUNCTION (RETURN TO ADMIN)

@@ -274,13 +274,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
     # ===============================
     tk.Label(root, text="SALES", font=("Arial", 18, "bold")).pack(pady=8)
 
-    tk.Button(
-        root,
-        text="EXIT",
-        bg="red",
-        fg="white",
-        command=exit_sales
-    ).place(x=880, y=10)
+   
 
     # ===============================
     # INPUT AREA
@@ -366,17 +360,32 @@ def open_sales_window(user_id, role="cashier",parent=None):
     ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 
     # ===============================
-    # PAY BUTTON
+    # ACTION BUTTONS (PAY and EXIT)
     # ===============================
+    button_frame = tk.Frame(root)
+    button_frame.pack(pady=15)
+
     tk.Button(
-        root,
+        button_frame,
         text="PAY",
         bg="green",
         fg="white",
         font=("Arial", 14, "bold"),
         command=pay,
         width=15
-    ).pack(pady=15)
+    ).grid(row=0, column=0, padx=10)
+
+    tk.Button(
+        button_frame,
+        text="EXIT",
+        bg="red",
+        fg="white",
+        font=("Arial", 14, "bold"),
+        command=exit_sales,
+        width=8
+    ).grid(row=0, column=1, padx=10)
+
+    
 
     root.after(100, lambda: barcode_entry.focus_set())
 
