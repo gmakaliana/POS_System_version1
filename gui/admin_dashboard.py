@@ -22,9 +22,9 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
 
 
-def open_admin_dashboard():
+def open_admin_dashboard(parent):
 
-    root = tk.Tk()
+    root = tk.Toplevel(parent)
     root.title("ADMIN DASHBOARD")
     root.resizable(False, False)
 
@@ -51,15 +51,17 @@ def open_admin_dashboard():
     def logout():
         logout_user()
         root.destroy()
-        create_login_window()
+        
+        if parent and parent.winfo_exists():
+            parent.deiconify()
 
     # ---------------------------
     # SALES
     # ---------------------------
     def open_sales():
         from gui.sales_window import open_sales_window
-        root.destroy()
-        open_sales_window(user_id=user_id, role="admin")
+        root.withdraw()   # Hide dashboard
+        open_sales_window(user_id=user_id, role="admin",parent=root)
 
     # ---------------------------
     # REPORTS (FIXED SAFELY)
@@ -179,4 +181,4 @@ def open_admin_dashboard():
         fg="white"
     ).pack(pady=30)
 
-    root.mainloop()
+    return root

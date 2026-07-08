@@ -54,9 +54,9 @@ def safe_float(value):
 # -----------------------------------
 # SALES WINDOW
 # -----------------------------------
-def open_sales_window(user_id, role="cashier"):
+def open_sales_window(user_id, role="cashier",parent=None):
 
-    root = tk.Tk()
+    root = tk.Toplevel(parent)
     root.title("Sales")
     root.resizable(False, False)
 
@@ -205,12 +205,13 @@ def open_sales_window(user_id, role="cashier"):
         clear_cart()
         root.destroy()
 
-        if role == "admin":
-            from gui.admin_dashboard import open_admin_dashboard
-            open_admin_dashboard()
-        else:
-            from gui.cashier_dashboard import open_cashier_dashboard
-            open_cashier_dashboard()
+        if parent and parent.winfo_exists():
+            parent.deiconify()   # Show dashboard again
+
+    root.protocol(
+    "WM_DELETE_WINDOW",
+    exit_sales
+    )    
 
     # -------------------------------
     # PAY + RECEIPT

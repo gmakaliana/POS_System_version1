@@ -19,9 +19,9 @@ def center_window(window, width, height):
     window.geometry(f"{width}x{height}+{x}+{y}")
 
 
-def open_cashier_dashboard():
+def open_cashier_dashboard(parent):
 
-    root = tk.Tk()
+    root = tk.Toplevel(parent)
     root.title("CASHIER DASHBOARD")
     root.resizable(False, False)
 
@@ -49,7 +49,9 @@ def open_cashier_dashboard():
         from gui.login_window import create_login_window
         logout_user()
         root.destroy()
-        create_login_window()
+        
+        if parent and parent.winfo_exists():
+            parent.deiconify()
 
     # -----------------------------------
     # OPEN SALES WINDOW
@@ -57,8 +59,8 @@ def open_cashier_dashboard():
     def open_new_sale():
 
         from gui.sales_window import open_sales_window
-        root.destroy()
-        open_sales_window(user_id=user_id, role="cashier")
+        root.withdraw()   # Hide dashboard
+        open_sales_window(user_id=user_id, role="cashier",parent=root)
 
     # ---------------------------
     # WINDOW CLOSE (X BUTTON)
@@ -122,4 +124,4 @@ def open_cashier_dashboard():
         command=logout
     ).pack(pady=30)
 
-    root.mainloop()
+    return root

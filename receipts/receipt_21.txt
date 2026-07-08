@@ -8,19 +8,20 @@
 =================================
 Served By : Admin
 
-Receipt No : 25
+Receipt No : 21
 Date       : 2026-07-08
-Time       : 15:08
+Time       : 14:51
 
 ---------------------------------
 PRODUCTS        QTY     AMOUNT (M)
 ---------------------------------
+coke          1     M10.00
 Cabbage       1     M25.00
 ---------------------------------
-TOTAL COST      : M25.00
+TOTAL COST      : M35.00
 DISCOUNT        : M0.00
-FINAL TOTAL     : M25.00
-AMOUNT PAID     : M30.00
+FINAL TOTAL     : M35.00
+AMOUNT PAID     : M40.00
 CHANGE          : M5.00
 =================================
 Thank You For Shopping With Us!

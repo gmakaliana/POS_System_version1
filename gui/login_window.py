@@ -106,17 +106,21 @@ def create_login_window():
 
         create_session(user)
 
+        # Clear login credentials for security
+        username_entry.delete(0, tk.END)
+        password_entry.delete(0, tk.END)
+
         if user["must_change_password"] == 1:
             root.destroy()
             open_change_password(user)
             return
 
-        root.destroy()
+        root.withdraw()
 
         if is_admin(user):
-            open_admin_dashboard()
+            open_admin_dashboard(root)
         else:
-            open_cashier_dashboard()
+            open_cashier_dashboard(root)
 
     # Login Button
     tk.Button(
@@ -137,4 +141,12 @@ def create_login_window():
     # Focus username automatically
     username_entry.focus()
 
-    root.mainloop()
+    def close_login():
+        root.destroy()
+
+    root.protocol(
+        "WM_DELETE_WINDOW",
+        close_login
+    )
+
+    return root    

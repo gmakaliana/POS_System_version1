@@ -1,14 +1,33 @@
 =================================
-        POS SYSTEM RECEIPT
+     'Maliteboho Restaurant      
+              Leribe             
+       Tel: +266 5329 0000       
+       maliteboho@gmail.com      
+---------------------------------
+        Restaurant Receipt       
 =================================
+Served By : Neo
 
-Receipt No: 22
-Date: 2026-06-24 22:25:05.189513
+Receipt No : 22
+Date       : 2026-07-08
+Time       : 14:53
 
 ---------------------------------
-Maize Meal x1 = M120.0
+PRODUCTS        QTY     AMOUNT (M)
 ---------------------------------
-TOTAL: M120.0
+Cabbage       1     M25.00
+Bread         1     M15.00
+---------------------------------
+TOTAL COST      : M40.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M40.00
+AMOUNT PAID     : M40.00
+CHANGE          : M0.00
 =================================
-      THANK YOU FOR SHOPPING
+Thank You For Shopping With Us!
+Please Come Again!
+
+Developed By:Mpho George Makaliana
+Phone : +266 53239121
+Email : makalianamphogeorge@gmail.com
 =================================

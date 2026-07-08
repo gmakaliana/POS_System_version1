@@ -28,4 +28,6 @@ if __name__ == "__main__":
     from gui.login_window import create_login_window
 
 
-    create_login_window()
+    root = create_login_window()
+
+    root.mainloop()

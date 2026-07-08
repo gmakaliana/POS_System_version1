@@ -1,23 +1,32 @@
 =================================
-        POS SYSTEM RECEIPT
+     'Maliteboho Restaurant      
+              Leribe             
+       Tel: +266 5329 0000       
+       maliteboho@gmail.com      
+---------------------------------
+        Restaurant Receipt       
 =================================
+Served By : Admin
 
 Receipt No : 26
-Date       : 2026-06-24
-Time       : 22:56
+Date       : 2026-07-08
+Time       : 15:10
 
 ---------------------------------
 PRODUCTS        QTY     AMOUNT (M)
 ---------------------------------
-Maize Meal    1     M120.00
-Tray Eggs     1     M55.00
-Potatoes      2     M24.00
+Cabbage       1     M25.00
 ---------------------------------
-TOTAL COST      : M199.00
-DISCOUNT        : M10.00
-FINAL TOTAL     : M189.00
-AMOUNT PAID     : M200.00
-CHANGE          : M11.00
+TOTAL COST      : M25.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M25.00
+AMOUNT PAID     : M30.00
+CHANGE          : M5.00
 =================================
-      THANK YOU FOR SHOPPING
+Thank You For Shopping With Us!
+Please Come Again!
+
+Developed By:Mpho George Makaliana
+Phone : +266 53239121
+Email : makalianamphogeorge@gmail.com
 =================================
