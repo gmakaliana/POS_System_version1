@@ -176,4 +176,10 @@ def open_user_management_window(admin_root):
     # -----------------------------------
     load_users()
 
+    # Handle window X button
+    root.protocol(
+        "WM_DELETE_WINDOW",
+        close_window
+    )
+
     root.mainloop()

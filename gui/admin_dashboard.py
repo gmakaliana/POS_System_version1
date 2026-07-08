@@ -73,6 +73,19 @@ def open_admin_dashboard():
             return
 
     # ---------------------------
+    # WINDOW CLOSE (X BUTTON)
+    # ---------------------------
+    def close_dashboard():
+        logout()
+
+
+    root.protocol(
+        "WM_DELETE_WINDOW",
+        close_dashboard
+    )
+
+
+    # ---------------------------
     # UI
     # ---------------------------
     main_frame = tk.Frame(root, padx=20, pady=20)

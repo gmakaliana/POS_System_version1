@@ -219,3 +219,13 @@ def open_product_management_window(admin_root):
 
     # INITIAL LOAD
     load_products()
+
+    # =====================================
+    # WINDOW CONTROL
+    # =====================================
+
+    # Handle window X button
+    root.protocol(
+        "WM_DELETE_WINDOW",
+        close_window
+    )

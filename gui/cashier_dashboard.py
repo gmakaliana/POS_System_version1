@@ -60,6 +60,18 @@ def open_cashier_dashboard():
         root.destroy()
         open_sales_window(user_id=user_id, role="cashier")
 
+    # ---------------------------
+    # WINDOW CLOSE (X BUTTON)
+    # ---------------------------
+    def close_dashboard():
+        logout()
+
+
+    root.protocol(
+        "WM_DELETE_WINDOW",
+        close_dashboard
+    )
+
     # -----------------------------------
     # UI
     # -----------------------------------

@@ -82,6 +82,12 @@ def open_reports_dashboard(admin_root):
               bg="#7f8c8d", fg="white",
               width=30,
               command=close_window).pack(pady=15)
+    
+    # Handle window X button
+    root.protocol(
+        "WM_DELETE_WINDOW",
+        close_window
+    )
 
 
 # ==========================================================
@@ -153,6 +159,12 @@ def open_daily_sales(parent):
 
     tk.Button(win, text="Close", command=close).pack(pady=10)
 
+    # Handle window X button
+    win.protocol(
+        "WM_DELETE_WINDOW",
+        close
+    )
+
 
 # ==========================================================
 # MONTHLY SALES REPORT
@@ -223,6 +235,12 @@ def open_monthly_sales(parent):
 
     tk.Button(win, text="Close", command=close).pack(pady=10)
 
+    # Handle window X button
+    win.protocol(
+        "WM_DELETE_WINDOW",
+        close
+    )
+
 
 # ==========================================================
 # DAILY STOCK BOOK (WITH TOTAL ROW)
@@ -281,6 +299,12 @@ def open_daily_stock(parent):
 
     tk.Button(win, text="Close", command=close).pack(pady=10)
 
+    # Handle window X button
+    win.protocol(
+        "WM_DELETE_WINDOW",
+        close
+    )
+
 
 # ==========================================================
 # MONTHLY STOCK BOOK (WITH TOTAL ROW)
@@ -338,3 +362,13 @@ def open_monthly_stock(parent):
     tree.insert("", "end", values=("TOTAL", total_open, total_sold, total_close))
 
     tk.Button(win, text="Close", command=close).pack(pady=10)
+
+    # =====================================
+    # WINDOW CONTROL
+    # =====================================
+
+    # Handle window X button
+    win.protocol(
+        "WM_DELETE_WINDOW",
+        close
+    )

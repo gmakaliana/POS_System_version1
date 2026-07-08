@@ -280,3 +280,9 @@ def open_supplier_management_window(admin_root):
     )
 
     load_suppliers()
+
+    # Handle window X button
+    root.protocol(
+        "WM_DELETE_WINDOW",
+        close_window
+    )
