@@ -1,0 +1,34 @@
+=================================
+     'Maliteboho Restaurant      
+              Leribe             
+       Tel: +266 5329 0000       
+       maliteboho@gmail.com      
+---------------------------------
+        Restaurant Receipt       
+=================================
+Served By : Neo
+
+Receipt No : 29
+Date       : 2026-07-09
+Time       : 13:52
+
+---------------------------------
+PRODUCTS        QTY     AMOUNT (M)
+---------------------------------
+Cabbage       1     M25.00
+coke          1     M10.00
+---------------------------------
+TOTAL COST      : M35.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M35.00
+AMOUNT PAID     : M35.00
+CHANGE          : M0.00
+=================================
+Thank You For Shopping With Us!
+Please Come Again!
+
+Developed By:
+Mpho George Makaliana
+Phone : +266 53239121
+Email : makalianamphogeorge@gmail.com
+=================================

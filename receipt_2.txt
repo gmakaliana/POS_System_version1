@@ -1,0 +1,33 @@
+=================================
+     'Maliteboho Restaurant      
+             Quthing             
+       Tel: +266 5329 0000       
+       maliteboho@gmail.com      
+---------------------------------
+        Restaurant Receipt       
+=================================
+Served By : Admin
+
+Receipt No : 2
+Date       : 2026-07-09
+Time       : 15:25
+
+---------------------------------
+PRODUCTS        QTY     AMOUNT (M)
+---------------------------------
+scones        1     M15.00
+---------------------------------
+TOTAL COST      : M15.00
+DISCOUNT        : M0.00
+FINAL TOTAL     : M15.00
+AMOUNT PAID     : M15.00
+CHANGE          : M0.00
+=================================
+Thank You For Shopping With Us!
+Please Come Again!
+
+Developed By:
+Mpho George Makaliana
+Phone : +266 53239121
+Email : makalianamphogeorge@gmail.com
+=================================
