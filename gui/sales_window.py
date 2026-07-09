@@ -288,7 +288,8 @@ def open_sales_window(user_id, role="cashier",parent=None):
     barcode_entry.grid(row=0, column=1)
     barcode_entry.bind("<Return>", lambda e: add_by_barcode())
 
-    tk.Button(input_frame, text="Add", command=add_by_barcode).grid(row=0, column=2)
+    tk.Button(input_frame, text="Add",bg="#3498db",
+        fg="white", command=add_by_barcode).grid(row=0, column=2)
 
     tk.Label(input_frame, text="Search Product:").grid(row=0, column=3, padx=10)
 
@@ -296,7 +297,8 @@ def open_sales_window(user_id, role="cashier",parent=None):
     search_entry.grid(row=0, column=4)
     search_entry.bind("<Return>", lambda e: search_and_add())
 
-    tk.Button(input_frame, text="Add", command=search_and_add).grid(row=0, column=5)
+    tk.Button(input_frame, text="Add",bg="#3498db",
+        fg="white", command=search_and_add).grid(row=0, column=5)
 
     # ===============================
     # TABLE
@@ -314,7 +316,8 @@ def open_sales_window(user_id, role="cashier",parent=None):
 
     tree.pack(pady=10)
 
-    tk.Button(root, text="Remove Selected Product", command=remove_selected).pack(pady=5)
+    tk.Button(root, text="Remove Selected Product",bg="#f39c12",
+        fg="white", command=remove_selected).pack(pady=5)
 
     ttk.Separator(root, orient="horizontal").pack(fill="x", padx=20, pady=10)
 

@@ -80,9 +80,9 @@ def open_reports_dashboard(admin_root):
 
     tk.Button(main, text="Close",
               bg="#7f8c8d", fg="white",
-              width=30,
+              width=15,
               command=close_window).pack(pady=15)
-    
+
     # Handle window X button
     root.protocol(
         "WM_DELETE_WINDOW",
@@ -157,7 +157,9 @@ def open_daily_sales(parent):
     sum_tree.insert("", "end", values=("Total Sales", f'M{summary["sales"]:.2f}'))
     sum_tree.insert("", "end", values=("Profit/Loss", f'+M{summary["profit"]:.2f}'))
 
-    tk.Button(win, text="Close", command=close).pack(pady=10)
+    tk.Button(win, text="Close",width=14,
+        bg="#7f8c8d",
+        fg="white", command=close).pack(pady=10)
 
     # Handle window X button
     win.protocol(
@@ -233,7 +235,9 @@ def open_monthly_sales(parent):
     sum_tree.insert("", "end", values=("Total Sales", f'M{summary["sales"]:.2f}'))
     sum_tree.insert("", "end", values=("Gross Profit/Loss", f'+M{summary["profit"]:.2f}'))
 
-    tk.Button(win, text="Close", command=close).pack(pady=10)
+    tk.Button(win, text="Close",width=14,
+        bg="#7f8c8d",
+        fg="white", command=close).pack(pady=10)
 
     # Handle window X button
     win.protocol(
@@ -297,7 +301,9 @@ def open_daily_stock(parent):
     # TOTAL ROW
     tree.insert("", "end", values=("TOTAL", total_open, total_sold, total_close))
 
-    tk.Button(win, text="Close", command=close).pack(pady=10)
+    tk.Button(win, text="Close",width=14,
+        bg="#7f8c8d",
+        fg="white", command=close).pack(pady=10)
 
     # Handle window X button
     win.protocol(
@@ -361,7 +367,9 @@ def open_monthly_stock(parent):
 
     tree.insert("", "end", values=("TOTAL", total_open, total_sold, total_close))
 
-    tk.Button(win, text="Close", command=close).pack(pady=10)
+    tk.Button(win, text="Close",width=14,
+        bg="#7f8c8d",
+        fg="white", command=close).pack(pady=10)
 
     # =====================================
     # WINDOW CONTROL

@@ -1,17 +1,14 @@
 import tkinter as tk
-from tkinter import ttk
-
 
 # Import settings sub-windows
 from gui.business_settings_window import open_business_settings
 from gui.sales_settings_window import open_sales_settings
 from gui.system_info_window import open_system_information
-
-from gui.inventory_settings_window import open_inventory_settings 
-
+from gui.inventory_settings_window import open_inventory_settings
 from gui.backup_recovery_window import (
     open_backup_recovery_window
 )
+
 
 def center_window(window, width, height):
 
@@ -23,6 +20,7 @@ def center_window(window, width, height):
 
     window.geometry(f"{width}x{height}+{x}+{y}")
 
+
 def open_settings_window(parent):
 
     # =====================================
@@ -31,17 +29,14 @@ def open_settings_window(parent):
 
     parent.withdraw()
 
-
-
     # =====================================
     # CREATE SETTINGS WINDOW
     # =====================================
 
-    settings_window = tk.Toplevel()
+    settings_window = tk.Toplevel(parent)
 
-    settings_window.title("Settings")
-
-    settings_window.resizable(True, True)
+    settings_window.title("SETTINGS")
+    settings_window.resizable(False, False)
 
     center_window(
         settings_window,
@@ -49,7 +44,11 @@ def open_settings_window(parent):
         550
     )
 
+    title_font = ("Arial", 20, "bold")
+    button_font = ("Arial", 11, "bold")
 
+    button_width = 18
+    button_height = 2
 
     # =====================================
     # CLOSE FUNCTION
@@ -61,70 +60,84 @@ def open_settings_window(parent):
 
         parent.deiconify()
 
+    # =====================================
+    # WINDOW CONTROL
+    # =====================================
 
+    settings_window.protocol(
+        "WM_DELETE_WINDOW",
+        close_settings
+    )
+
+    # =====================================
+    # MAIN FRAME
+    # =====================================
+
+    main_frame = tk.Frame(
+        settings_window,
+        padx=20,
+        pady=20
+    )
+
+    main_frame.pack(expand=True)
 
     # =====================================
     # TITLE
     # =====================================
 
-    title_label = ttk.Label(
-        settings_window,
+    tk.Label(
+        main_frame,
         text="SETTINGS",
-        font=("Arial", 18, "bold")
+        font=title_font
+    ).pack(
+        pady=(0, 25)
     )
-
-    title_label.pack(
-        pady=20
-    )
-
-
 
     # =====================================
     # BUTTON FRAME
     # =====================================
 
-    button_frame = ttk.Frame(
-        settings_window
-    )
+    btn_frame = tk.Frame(main_frame)
 
-    button_frame.pack(
-        expand=True,
-        pady=10
-    )
-
-
+    btn_frame.pack()
 
     # =====================================
     # BUSINESS INFORMATION
     # =====================================
 
-    business_button = ttk.Button(
-        button_frame,
-        text="Business Information",
-        width=30,
-        command=lambda:
-            open_business_settings(settings_window)
-    )
-
-    business_button.pack(
+    tk.Button(
+        btn_frame,
+        text="Business",
+        width=button_width,
+        height=button_height,
+        bg="#3498db",
+        fg="white",
+        font=button_font,
+        command=lambda: open_business_settings(settings_window)
+    ).grid(
+        row=0,
+        column=0,
+        padx=10,
         pady=10
     )
-
-
 
     # =====================================
     # SALES SETTINGS
     # =====================================
 
-    sales_button = ttk.Button(
-        button_frame,
+    tk.Button(
+        btn_frame,
         text="Sales",
-        width=30,
-        command=lambda:
-            open_sales_settings(settings_window)
-    )
-
-    sales_button.pack(
+        width=button_width,
+        height=button_height,
+        bg="#3498db",
+        fg="white",
+        font=button_font,
+        command=lambda: open_sales_settings(settings_window)
+    ).grid(
+        row=0,
+        column=1,
+        padx=10,
         pady=10
     )
 
@@ -132,83 +145,75 @@ def open_settings_window(parent):
     # INVENTORY SETTINGS
     # =====================================
 
-    inventory_button = ttk.Button(
-        button_frame,
+    tk.Button(
+        btn_frame,
         text="Inventory",
-        width=30,
-        command=lambda:
-            open_inventory_settings(settings_window)
-    )
-
-    inventory_button.pack(
+        width=button_width,
+        height=button_height,
+        bg="#16a085",
+        fg="white",
+        font=button_font,
+        command=lambda: open_inventory_settings(settings_window)
+    ).grid(
+        row=0,
+        column=2,
+        padx=10,
         pady=10
     )
-
 
     # =====================================
     # BACKUP & RECOVERY
     # =====================================
 
-    backup_button = ttk.Button(
-
-        button_frame,
-
+    tk.Button(
+        btn_frame,
         text="Backup & Recovery",
-
-        width=30,
-
-        command=lambda:
-        open_backup_recovery_window(settings_window)
-
-    )
-
-    backup_button.pack(
+        width=button_width,
+        height=button_height,
+        bg="#9b59b6",
+        fg="white",
+        font=button_font,
+        command=lambda: open_backup_recovery_window(settings_window)
+    ).grid(
+        row=1,
+        column=0,
+        padx=10,
         pady=10
     )
-
-
 
     # =====================================
     # SYSTEM INFORMATION
     # =====================================
 
-    system_button = ttk.Button(
-        button_frame,
+    tk.Button(
+        btn_frame,
         text="System Information",
-        width=30,
-        command=lambda:
-            open_system_information(settings_window)
-    )
-
-    system_button.pack(
+        width=button_width,
+        height=button_height,
+        bg="#34495e",
+        fg="white",
+        font=button_font,
+        command=lambda: open_system_information(settings_window)
+    ).grid(
+        row=1,
+        column=1,
+        padx=10,
         pady=10
     )
-
-
 
     # =====================================
     # CLOSE BUTTON
     # =====================================
 
-    close_button = ttk.Button(
-        settings_window,
-        text="Close",
-        width=15,
+    tk.Button(
+        main_frame,
+        text="CLOSE",
+        width=25,
+        height=2,
+        bg="#7f8c8d",
+        fg="white",
+        font=button_font,
         command=close_settings
-    )
-
-    close_button.pack(
-        pady=20
-    )
-
-
-
-    # =====================================
-    # WINDOW CONTROL
-    # =====================================
-
-    # Handle window X button
-    settings_window.protocol(
-        "WM_DELETE_WINDOW",
-        close_settings
+    ).pack(
+        pady=30
     )

@@ -1,8 +1,5 @@
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
-
-
-from pathlib import Path
+from tkinter import filedialog, messagebox
 
 
 from modules.backup.restore_manager import (
@@ -54,11 +51,11 @@ def open_restore_window(parent):
     # CREATE WINDOW
     # =====================================
 
-    window = tk.Toplevel()
+    window = tk.Toplevel(parent)
 
 
     window.title(
-        "Restore Database"
+        "RESTORE DATABASE"
     )
 
 
@@ -70,8 +67,28 @@ def open_restore_window(parent):
 
     center_window(
         window,
-        650,
-        350
+        700,
+        400
+    )
+
+
+    title_font = (
+        "Arial",
+        20,
+        "bold"
+    )
+
+
+    label_font = (
+        "Arial",
+        11
+    )
+
+
+    button_font = (
+        "Arial",
+        11,
+        "bold"
     )
 
 
@@ -88,6 +105,13 @@ def open_restore_window(parent):
 
 
 
+    window.protocol(
+        "WM_DELETE_WINDOW",
+        close_window
+    )
+
+
+
     # =====================================
     # VARIABLES
     # =====================================
@@ -97,92 +121,80 @@ def open_restore_window(parent):
 
 
     # =====================================
-    # TITLE
-    # =====================================
-
-    ttk.Label(
-
-        window,
-
-        text="RESTORE DATABASE",
-
-        font=(
-            "Arial",
-            18,
-            "bold"
-        )
-
-    ).pack(
-        pady=20
-    )
-
-
-
-    # =====================================
     # MAIN FRAME
     # =====================================
 
-    frame = ttk.Frame(
-        window
-    )
-
-
-    frame.pack(
+    main_frame = tk.Frame(
+        window,
         padx=30,
-        pady=10
+        pady=20
+    )
+
+    main_frame.pack(
+        expand=True
     )
 
 
 
     # =====================================
-    # BACKUP FILE SELECTION
+    # TITLE
     # =====================================
 
-    ttk.Label(
+    tk.Label(
+        main_frame,
+        text="RESTORE DATABASE",
+        font=title_font
+    ).pack(
+        pady=(0,25)
+    )
 
+
+
+    # =====================================
+    # FORM FRAME
+    # =====================================
+
+    frame = tk.Frame(
+        main_frame
+    )
+
+    frame.pack()
+
+
+
+    # =====================================
+    # FILE SELECTION
+    # =====================================
+
+    tk.Label(
         frame,
-
-        text="Backup file:"
-
+        text="Backup file:",
+        font=label_font
     ).grid(
-
         row=0,
-
         column=0,
-
-        sticky="w",
-
+        sticky="e",
+        padx=10,
         pady=15
-
     )
 
 
 
-    entry = ttk.Entry(
-
+    entry = tk.Entry(
         frame,
-
-        width=50,
-
+        width=45,
         textvariable=backup_file_var
-
     )
-
 
     entry.grid(
-
         row=0,
-
         column=1,
-
-        padx=10
-
+        ipady=4
     )
 
 
 
     def browse_backup():
-
 
         file = filedialog.askopenfilename(
 
@@ -205,9 +217,7 @@ def open_restore_window(parent):
         )
 
 
-
         if file:
-
 
             backup_file_var.set(
                 file
@@ -215,49 +225,38 @@ def open_restore_window(parent):
 
 
 
-    ttk.Button(
-
+    tk.Button(
         frame,
-
         text="Browse",
-
+        width=10,
+        bg="#3498db",
+        fg="white",
+        font=button_font,
         command=browse_backup
-
     ).grid(
-
         row=0,
-
-        column=2
-
+        column=2,
+        padx=10
     )
 
 
 
     # =====================================
-    # WARNING
+    # WARNING MESSAGE
     # =====================================
 
-    warning = ttk.Label(
-
-        window,
-
+    tk.Label(
+        main_frame,
         text=(
-
-            "WARNING:\n"
-
+            "WARNING:\n\n"
             "Restoring will replace the current database.\n"
-
             "A safety backup will be created automatically."
-
         ),
-
-        justify="center"
-
-    )
-
-
-    warning.pack(
-        pady=20
+        justify="center",
+        font=("Arial",11),
+        fg="#c0392b"
+    ).pack(
+        pady=25
     )
 
 
@@ -268,24 +267,14 @@ def open_restore_window(parent):
 
     def restore_now():
 
-
-        backup_file = (
-
-            backup_file_var.get()
-
-        )
-
+        backup_file = backup_file_var.get()
 
 
         if not backup_file:
 
-
             messagebox.showwarning(
-
                 "No Backup Selected",
-
                 "Please select a backup file."
-
             )
 
             return
@@ -293,18 +282,12 @@ def open_restore_window(parent):
 
 
         if not validate_backup_file(
-
             backup_file
-
         ):
 
-
             messagebox.showerror(
-
                 "Invalid Backup",
-
                 "The selected file is not a valid POS database backup."
-
             )
 
             return
@@ -312,19 +295,12 @@ def open_restore_window(parent):
 
 
         confirm = messagebox.askyesno(
-
             "Confirm Restore",
-
             (
-
                 "Are you sure you want to restore this backup?\n\n"
-
                 "Current data will be replaced."
-
             )
-
         )
-
 
 
         if not confirm:
@@ -334,41 +310,28 @@ def open_restore_window(parent):
 
 
         success = restore_database(
-
             backup_file
-
         )
-
 
 
         if success:
 
 
             restart = messagebox.askyesno(
-
                 "Restore Complete",
-
                 (
-
                     "Database restored successfully.\n\n"
-
                     "Restart application now?"
-
                 )
-
             )
-
 
 
             if restart:
 
-
                 window.quit()
 
 
-
             else:
-
 
                 close_window()
 
@@ -376,13 +339,9 @@ def open_restore_window(parent):
 
         else:
 
-
             messagebox.showerror(
-
                 "Restore Failed",
-
                 "Database restore failed."
-
             )
 
 
@@ -391,69 +350,44 @@ def open_restore_window(parent):
     # BUTTONS
     # =====================================
 
-    button_frame = ttk.Frame(
-        window
+    button_frame = tk.Frame(
+        main_frame
     )
-
 
     button_frame.pack(
-        pady=20
+        pady=10
     )
 
 
 
-    ttk.Button(
-
+    tk.Button(
         button_frame,
-
         text="RESTORE",
-
         width=18,
-
+        height=2,
+        bg="#27ae60",
+        fg="white",
+        font=button_font,
         command=restore_now
-
     ).grid(
-
         row=0,
-
         column=0,
-
         padx=10
-
     )
 
 
 
-    ttk.Button(
-
+    tk.Button(
         button_frame,
-
-        text="Close",
-
+        text="CLOSE",
         width=15,
-
+        height=2,
+        bg="#7f8c8d",
+        fg="white",
+        font=button_font,
         command=close_window
-
     ).grid(
-
         row=0,
-
         column=1,
-
         padx=10
-
-    )
-
-
-
-    # =====================================
-    # WINDOW X BUTTON
-    # =====================================
-
-    window.protocol(
-
-        "WM_DELETE_WINDOW",
-
-        close_window
-
     )

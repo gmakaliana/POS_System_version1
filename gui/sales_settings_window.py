@@ -1,10 +1,11 @@
 import tkinter as tk
-from tkinter import ttk, messagebox
+from tkinter import messagebox
 
 from modules.settings.settings import (
     get_settings,
     update_sales_settings
 )
+
 
 def center_window(window, width, height):
 
@@ -25,23 +26,25 @@ def open_sales_settings(parent):
 
     parent.withdraw()
 
-
-
     # =====================================
     # CREATE WINDOW
     # =====================================
 
-    window = tk.Toplevel()
+    window = tk.Toplevel(parent)
 
-    window.title("Sales Settings")
-
-    window.resizable(True, True)
+    window.title("SALES SETTINGS")
+    window.resizable(False, False)
 
     center_window(
         window,
-        400,
-        250
+        500,
+        300
     )
+
+    title_font = ("Arial", 20, "bold")
+    label_font = ("Arial", 11)
+    entry_font = ("Arial", 11)
+    button_font = ("Arial", 11, "bold")
 
     # =====================================
     # CLOSE FUNCTION
@@ -50,10 +53,12 @@ def open_sales_settings(parent):
     def close_window():
 
         window.destroy()
-
         parent.deiconify()
 
-
+    window.protocol(
+        "WM_DELETE_WINDOW",
+        close_window
+    )
 
     # =====================================
     # GET SETTINGS
@@ -61,72 +66,78 @@ def open_sales_settings(parent):
 
     settings = get_settings()
 
-
     try:
 
         receipt_start = settings["receipt_number_start"]
-
 
     except TypeError:
 
         receipt_start = settings[8]
 
+    # =====================================
+    # MAIN FRAME
+    # =====================================
 
+    main_frame = tk.Frame(
+        window,
+        padx=20,
+        pady=20
+    )
+
+    main_frame.pack(
+        fill="both",
+        expand=True
+    )
 
     # =====================================
     # TITLE
     # =====================================
 
-    ttk.Label(
-        window,
+    tk.Label(
+        main_frame,
         text="SALES SETTINGS",
-        font=("Arial", 16, "bold")
+        font=title_font
     ).pack(
-        pady=20
+        pady=(0, 25)
     )
-
-
 
     # =====================================
     # FORM FRAME
     # =====================================
 
-    frame = ttk.Frame(window)
+    form_frame = tk.Frame(main_frame)
 
-    frame.pack()
+    form_frame.pack()
 
-
-
-    ttk.Label(
-        frame,
-        text="Receipt Number Start"
+    tk.Label(
+        form_frame,
+        text="Receipt Number Start",
+        font=label_font
     ).grid(
         row=0,
         column=0,
-        pady=15
+        sticky="e",
+        padx=(0, 10),
+        pady=10
     )
 
-
-
-    entry = ttk.Entry(
-        frame,
-        width=20
+    entry = tk.Entry(
+        form_frame,
+        width=20,
+        font=entry_font
     )
 
     entry.grid(
         row=0,
         column=1,
-        padx=10
+        ipady=4,
+        pady=10
     )
-
-
 
     entry.insert(
         0,
         receipt_start
     )
-
-
 
     # =====================================
     # SAVE FUNCTION
@@ -140,18 +151,14 @@ def open_sales_settings(parent):
                 entry.get()
             )
 
-
             update_sales_settings(
                 number
             )
-
 
             messagebox.showinfo(
                 "Saved",
                 "Sales settings saved."
             )
-
-
 
         except ValueError:
 
@@ -160,54 +167,43 @@ def open_sales_settings(parent):
                 "Receipt number must be numeric."
             )
 
-
-
     # =====================================
     # BUTTONS
     # =====================================
 
-    button_frame = ttk.Frame(
-        window
+    button_frame = tk.Frame(
+        main_frame
     )
 
     button_frame.pack(
+        fill="x",
         pady=30
     )
 
-
-
-    ttk.Button(
+    tk.Button(
         button_frame,
-        text="Save",
+        text="SAVE",
         width=15,
+        height=2,
+        bg="#27ae60",
+        fg="white",
+        font=button_font,
         command=save
-    ).grid(
-        row=0,
-        column=0,
-        padx=15
+    ).pack(
+        side="left",
+        padx=5
     )
 
-
-
-    ttk.Button(
+    tk.Button(
         button_frame,
-        text="Close",
+        text="CLOSE",
         width=15,
+        height=2,
+        bg="#7f8c8d",
+        fg="white",
+        font=button_font,
         command=close_window
-    ).grid(
-        row=0,
-        column=1,
-        padx=15
-    )
-
-
-
-    # =====================================
-    # WINDOW CONTROL
-    # =====================================
-
-    # Handle X button
-    window.protocol(
-        "WM_DELETE_WINDOW",
-        close_window
+    ).pack(
+        side="right",
+        padx=5
     )

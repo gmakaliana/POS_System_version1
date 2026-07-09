@@ -1,7 +1,7 @@
 import tkinter as tk
-from tkinter import ttk
 
 from modules.settings.settings import get_settings
+
 
 def center_window(window, width, height):
 
@@ -24,22 +24,27 @@ def open_system_information(parent):
     parent.withdraw()
 
 
-
     # =====================================
     # CREATE WINDOW
     # =====================================
 
-    window = tk.Toplevel()
+    window = tk.Toplevel(parent)
 
-    window.title("System Information")
-
-    window.resizable(True, True)
+    window.title("SYSTEM INFORMATION")
+    window.resizable(False, False)
 
     center_window(
         window,
-        500,
+        650,
         550
     )
+
+
+    title_font = ("Arial", 20, "bold")
+    label_font = ("Arial", 11, "bold")
+    value_font = ("Arial", 11)
+
+
 
     # =====================================
     # CLOSE FUNCTION
@@ -49,7 +54,8 @@ def open_system_information(parent):
 
         window.destroy()
 
-        parent.deiconify()
+        if parent and parent.winfo_exists():
+            parent.deiconify()
 
 
 
@@ -63,15 +69,29 @@ def open_system_information(parent):
     try:
 
         installed = settings["installed_datetime"]
-
         backup = settings["last_backup_datetime"]
 
 
     except TypeError:
 
         installed = settings[9]
-
         backup = settings[10]
+
+
+
+    # =====================================
+    # MAIN FRAME
+    # =====================================
+
+    main_frame = tk.Frame(
+        window,
+        padx=30,
+        pady=20
+    )
+
+    main_frame.pack(
+        expand=True
+    )
 
 
 
@@ -79,86 +99,76 @@ def open_system_information(parent):
     # TITLE
     # =====================================
 
-    ttk.Label(
-        window,
+    tk.Label(
+        main_frame,
         text="SYSTEM INFORMATION",
-        font=("Arial", 16, "bold")
+        font=title_font
     ).pack(
-        pady=20
+        pady=(0,25)
     )
 
 
 
     # =====================================
-    # SYSTEM DETAILS
+    # INFORMATION FRAME
     # =====================================
+
+    info_frame = tk.Frame(
+        main_frame
+    )
+
+    info_frame.pack()
+
+
 
     info = [
 
-        ("Software Name",
-         "POS System"),
+        ("Software Name", "POS System"),
 
-        ("Software Version",
-         "1.0"),
+        ("Software Version", "1.0"),
 
-        ("Database Version",
-         "1.0"),
+        ("Database Version", "1.0"),
 
-        ("Installed Date & Time",
-         installed),
+        ("Installed Date & Time", installed),
 
-        ("Last Backup Date & Time",
-         backup or "Never"),
+        ("Last Backup Date & Time", backup or "Never"),
 
-        ("Database Location",
-         "database/pos.db"),
+        ("Developed By", "Mpho George Makaliana"),
 
-        ("Developed By",
-         "Mpho George Makaliana"),
+        ("Phone Number", "+266 53239121"),
 
-        ("Phone Number",
-         "+266 53239121"),
-
-        ("Email Address",
-         "makalianamphogeorge@gmail.com")
+        ("Email Address", "makalianamphogeorge@gmail.com")
 
     ]
 
 
 
-    frame = ttk.Frame(
-        window
-    )
-
-    frame.pack(
-        padx=30
-    )
-
-
-
     for index, (label, value) in enumerate(info):
 
-        ttk.Label(
-            frame,
+        tk.Label(
+            info_frame,
             text=label + ":",
-            font=("Arial", 10, "bold")
+            font=label_font,
+            anchor="w"
         ).grid(
             row=index,
             column=0,
             sticky="w",
-            pady=6
+            pady=7
         )
 
 
-
-        ttk.Label(
-            frame,
-            text=value
+        tk.Label(
+            info_frame,
+            text=value,
+            font=value_font,
+            anchor="w"
         ).grid(
             row=index,
             column=1,
             sticky="w",
-            padx=15
+            padx=20,
+            pady=7
         )
 
 
@@ -167,13 +177,17 @@ def open_system_information(parent):
     # CLOSE BUTTON
     # =====================================
 
-    ttk.Button(
-        window,
+    tk.Button(
+        main_frame,
         text="Close",
-        width=15,
+        width=18,
+        height=2,
+        bg="#7f8c8d",
+        fg="white",
+        font=("Arial", 11, "bold"),
         command=close_window
     ).pack(
-        pady=25
+        pady=30
     )
 
 
@@ -182,8 +196,10 @@ def open_system_information(parent):
     # WINDOW CONTROL
     # =====================================
 
-    # Handle X button
     window.protocol(
         "WM_DELETE_WINDOW",
         close_window
     )
+
+
+    return window
