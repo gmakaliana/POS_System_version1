@@ -244,7 +244,13 @@ def create_tables():
         installed_datetime TEXT,
 
 
-        last_backup_datetime TEXT DEFAULT NULL
+        last_backup_datetime TEXT DEFAULT NULL,
+
+        automatic_backup_enabled INTEGER DEFAULT 1,
+
+        backup_location TEXT,
+
+        backup_keep_count INTEGER DEFAULT 10
 
     )
     """)
@@ -290,11 +296,17 @@ def create_tables():
 
             installed_datetime,
 
-            last_backup_datetime
+            last_backup_datetime,
+
+            automatic_backup_enabled,
+
+            backup_location,
+
+            backup_keep_count
 
         )
 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
         """,
 
@@ -321,6 +333,12 @@ def create_tables():
             5,
 
             datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+
+            1,
+
+            "",
+
+            10,
 
             None
 

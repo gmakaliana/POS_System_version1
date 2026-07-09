@@ -286,17 +286,139 @@ def update_last_backup(datetime_value):
     cursor = conn.cursor()
 
 
-    cursor.execute("""
-    UPDATE settings
+    cursor.execute(
+        """
+        UPDATE settings
 
-    SET last_backup_datetime = ?
+        SET last_backup_datetime = ?
 
-    WHERE id = 1
+        WHERE id = 1
 
-    """,
-    (
-        datetime_value,
-    ))
+        """,
+        (
+            datetime_value,
+        )
+    )
+
+
+    conn.commit()
+
+    conn.close()
+
+
+
+# =====================================
+# BACKUP SETTINGS
+# =====================================
+
+def get_backup_settings():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+
+    cursor.execute(
+        """
+        SELECT
+
+        automatic_backup_enabled,
+
+        last_backup_datetime,
+
+        backup_location,
+
+        backup_keep_count
+
+        FROM settings
+
+        WHERE id = 1
+        """
+    )
+
+
+    result = cursor.fetchone()
+
+
+    conn.close()
+
+
+    return result
+
+
+
+# =====================================
+# UPDATE BACKUP SETTINGS
+# =====================================
+
+def update_backup_settings(
+        enabled,
+        backup_location,
+        keep_count
+):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+
+    cursor.execute(
+        """
+        UPDATE settings
+
+        SET
+
+        automatic_backup_enabled = ?,
+
+        backup_location = ?,
+
+        backup_keep_count = ?
+
+        WHERE id = 1
+
+        """,
+
+        (
+            enabled,
+            backup_location,
+            keep_count
+        )
+    )
+
+
+    conn.commit()
+
+    conn.close()
+
+
+
+# =====================================
+# UPDATE LAST AUTOMATIC BACKUP DATETIME
+# =====================================
+
+def update_last_backup_datetime(
+        datetime_value
+):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+
+    cursor.execute(
+        """
+        UPDATE settings
+
+        SET last_backup_datetime = ?
+
+        WHERE id = 1
+
+        """,
+
+        (
+            datetime_value,
+        )
+    )
 
 
     conn.commit()

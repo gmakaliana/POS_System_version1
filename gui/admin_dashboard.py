@@ -181,4 +181,5 @@ def open_admin_dashboard(parent):
         fg="white"
     ).pack(pady=30)
 
+    return root
     

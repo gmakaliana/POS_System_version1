@@ -1,5 +1,13 @@
 # main.py
 
+from modules.system.app_paths import (
+    initialize_application_directories
+)
+
+
+initialize_application_directories()
+
+
 from database.create_tables import create_tables
 
 

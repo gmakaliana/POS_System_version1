@@ -1,4 +1,3 @@
-import os
 from datetime import datetime
 
 from modules.settings.settings import (
@@ -7,7 +6,13 @@ from modules.settings.settings import (
     increase_receipt_number
 )
 
+from modules.system.app_paths import (
+    get_receipts_directory
+)
+
 from auth.session import get_session_user
+
+
 
 def generate_receipt(
         sale_id,
@@ -17,8 +22,14 @@ def generate_receipt(
         paid
 ):
 
-    os.makedirs(
-        "receipts",
+    # =====================================
+    # RECEIPT STORAGE LOCATION
+    # =====================================
+
+    receipt_directory = get_receipts_directory()
+
+    receipt_directory.mkdir(
+        parents=True,
         exist_ok=True
     )
 
@@ -32,9 +43,10 @@ def generate_receipt(
 
 
     filename = (
-        f"receipts/receipt_{receipt_number}.txt"
+        receipt_directory
+        /
+        f"receipt_{receipt_number}.txt"
     )
-
 
 
     # =====================================
@@ -73,25 +85,46 @@ def generate_receipt(
 
         receipt_footer = "THANK YOU"
 
+
+
     # =====================================
     # LOGGED-IN USER
     # =====================================
 
     user = get_session_user()
 
+
     if user:
+
         served_by = user["username"]
+
     else:
+
         served_by = "Unknown"
 
 
+
+    # =====================================
+    # DATE AND TIME
+    # =====================================
+
     now = datetime.now()
 
-    date_str = now.strftime("%Y-%m-%d")
 
-    time_str = now.strftime("%H:%M")
+    date_str = now.strftime(
+        "%Y-%m-%d"
+    )
 
 
+    time_str = now.strftime(
+        "%H:%M"
+    )
+
+
+
+    # =====================================
+    # CALCULATIONS
+    # =====================================
 
     final_total = max(
         0,
@@ -102,6 +135,10 @@ def generate_receipt(
     change = paid - final_total
 
 
+
+    # =====================================
+    # CREATE RECEIPT FILE
+    # =====================================
 
     with open(
         filename,
@@ -151,15 +188,20 @@ def generate_receipt(
             f"{receipt_header.center(33)}\n"
         )
 
+
         file.write(
             "=================================\n"
         )
+
 
         file.write(
             f"Served By : {served_by}\n"
         )
 
-        file.write("\n")
+
+        file.write(
+            "\n"
+        )
 
 
 
@@ -204,6 +246,7 @@ def generate_receipt(
 
 
         for item in items:
+
 
             name = (
                 item["product_name"][:12]
@@ -272,25 +315,31 @@ def generate_receipt(
             "=================================\n"
         )
 
+
         file.write(
             f"{receipt_footer.center(33)}\n\n"
         )
 
+
         file.write(
-            "Developed By:"
+            "Developed By:\n"
         )
+
 
         file.write(
             "Mpho George Makaliana\n"
         )
 
+
         file.write(
             "Phone : +266 53239121\n"
         )
 
+
         file.write(
             "Email : makalianamphogeorge@gmail.com\n"
         )
+
 
         file.write(
             "=================================\n"
@@ -299,11 +348,11 @@ def generate_receipt(
 
 
     # =====================================
-    # UPDATE NEXT RECEIPT NUMBER
+    # UPDATE RECEIPT NUMBER
     # =====================================
 
     increase_receipt_number()
 
 
 
-    return filename
+    return str(filename)

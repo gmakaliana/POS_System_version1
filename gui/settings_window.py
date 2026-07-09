@@ -9,6 +9,10 @@ from gui.system_info_window import open_system_information
 
 from gui.inventory_settings_window import open_inventory_settings 
 
+from gui.backup_recovery_window import (
+    open_backup_recovery_window
+)
+
 def center_window(window, width, height):
 
     screen_width = window.winfo_screenwidth()
@@ -146,9 +150,16 @@ def open_settings_window(parent):
     # =====================================
 
     backup_button = ttk.Button(
+
         button_frame,
+
         text="Backup & Recovery",
-        width=30
+
+        width=30,
+
+        command=lambda:
+        open_backup_recovery_window(settings_window)
+
     )
 
     backup_button.pack(

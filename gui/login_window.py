@@ -8,12 +8,17 @@ from auth.permissions import is_admin
 #settings
 from modules.settings.settings import get_settings
 
+from modules.system.application_exit import (
+    close_application
+)
 
 settings = get_settings()
 
 business_name = settings["business_name"]
 
 #settings
+
+
 
 def center_window(window, width, height):
     screen_width = window.winfo_screenwidth()
@@ -142,7 +147,10 @@ def create_login_window():
     username_entry.focus()
 
     def close_login():
-        root.destroy()
+
+        close_application(
+            root
+        )
 
     root.protocol(
         "WM_DELETE_WINDOW",

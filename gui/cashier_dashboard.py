@@ -102,17 +102,6 @@ def open_cashier_dashboard(parent):
     ).pack(pady=10)
 
     tk.Button(
-        button_frame,
-        text="SEARCH PRODUCT",
-        bg="#3498db",
-        fg="white",
-        width=22,
-        height=2,
-        font=button_font,
-        cursor="hand2"
-    ).pack(pady=10)
-
-    tk.Button(
         main_frame,
         text="LOGOUT",
         bg="#e74c3c",
