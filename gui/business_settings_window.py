@@ -68,7 +68,6 @@ def open_business_settings(parent):
         business_address = settings["business_address"]
         business_phone = settings["business_phone"]
         business_email = settings["business_email"]
-        company_logo = settings["company_logo"]
         receipt_header = settings["receipt_header"]
         receipt_footer = settings["receipt_footer"]
 
@@ -79,15 +78,12 @@ def open_business_settings(parent):
         business_address = settings[2]
         business_phone = settings[3]
         business_email = settings[4]
-        company_logo = settings[5]
         receipt_header = settings[6]
         receipt_footer = settings[7]
 
 
 
-    logo_path = tk.StringVar(
-        value=company_logo
-    )
+   
 
 
 
@@ -183,63 +179,6 @@ def open_business_settings(parent):
     )
 
 
-
-    # =====================================
-    # LOGO
-    # =====================================
-
-    ttk.Label(
-        frame,
-        text="Company Logo"
-    ).grid(
-        row=4,
-        column=0,
-        sticky="w",
-        pady=8
-    )
-
-
-
-    ttk.Entry(
-        frame,
-        textvariable=logo_path,
-        width=40
-    ).grid(
-        row=4,
-        column=1
-    )
-
-
-
-    def choose_logo():
-
-        file = filedialog.askopenfilename(
-
-            filetypes=[
-                ("Images", "*.png *.jpg *.jpeg")
-            ]
-
-        )
-
-
-        if file:
-
-            logo_path.set(file)
-
-
-
-    ttk.Button(
-        frame,
-        text="Choose Logo",
-        command=choose_logo
-    ).grid(
-        row=5,
-        column=1,
-        sticky="w"
-    )
-
-
-
     # =====================================
     # RECEIPT HEADER
     # =====================================
@@ -322,8 +261,6 @@ def open_business_settings(parent):
             fields["Business Phone"].get(),
 
             fields["Business Email"].get(),
-
-            logo_path.get(),
 
             header_box.get(
                 "1.0",

@@ -74,7 +74,6 @@ def update_business_information(
         business_address,
         business_phone,
         business_email,
-        company_logo,
         receipt_header,
         receipt_footer
 ):
@@ -97,8 +96,6 @@ def update_business_information(
 
         business_email = ?,
 
-        company_logo = ?,
-
         receipt_header = ?,
 
         receipt_footer = ?
@@ -111,7 +108,6 @@ def update_business_information(
         business_address,
         business_phone,
         business_email,
-        company_logo,
         receipt_header,
         receipt_footer
     ))

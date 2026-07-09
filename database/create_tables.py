@@ -227,9 +227,6 @@ def create_tables():
         business_email TEXT DEFAULT '',
 
 
-        company_logo TEXT DEFAULT '',
-
-
         receipt_header TEXT DEFAULT '',
 
 
@@ -284,8 +281,6 @@ def create_tables():
 
             business_email,
 
-            company_logo,
-
             receipt_header,
 
             receipt_footer,
@@ -306,7 +301,7 @@ def create_tables():
 
         )
 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
         """,
 
@@ -321,8 +316,6 @@ def create_tables():
             "+266 53239121",
 
             "business@gmail.com",
-
-            "",
 
             "POS Receipt",
 
