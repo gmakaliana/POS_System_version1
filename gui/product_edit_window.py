@@ -75,7 +75,7 @@ def open_edit_product_window(product_data, refresh_callback):
         )
 
         refresh_callback()
-        messagebox.showinfo("Success", "Product updated")
+        messagebox.showinfo("Success", "Product updated",parent=root)
         root.destroy()
 
     tk.Button(

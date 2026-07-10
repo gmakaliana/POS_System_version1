@@ -64,18 +64,18 @@ def open_add_product_window(refresh_callback):
             # VALIDATION (TEXT FIELDS)
             # -----------------------------
             if not name:
-                messagebox.showerror("Error", "Product name is required")
+                messagebox.showerror("Error", "Product name is required",parent=root)
                 return
 
             if not supplier_name:
-                messagebox.showerror("Error", "Select supplier")
+                messagebox.showerror("Error", "Select supplier",parent=root)
                 return
 
             # -----------------------------
             # VALIDATION (NUMERIC FIELDS)
             # -----------------------------
             if not cost or not sell or not qty:
-                messagebox.showerror("Error", "Cost, Selling Price and Quantity are required")
+                messagebox.showerror("Error", "Cost, Selling Price and Quantity are required",parent=root)
                 return
 
             # -----------------------------
@@ -86,7 +86,7 @@ def open_add_product_window(refresh_callback):
                 sell_val = float(sell)
                 qty_val = int(qty)
             except ValueError:
-                messagebox.showerror("Error", "Cost, Selling Price and Quantity must be numbers")
+                messagebox.showerror("Error", "Cost, Selling Price and Quantity must be numbers",parent=root)
                 return
 
             # -----------------------------
@@ -102,11 +102,11 @@ def open_add_product_window(refresh_callback):
             )
 
             refresh_callback()
-            messagebox.showinfo("Success", "Product added successfully")
+            messagebox.showinfo("Success", "Product added successfully",parent=root)
             root.destroy()
 
         except Exception as e:
-            messagebox.showerror("Error", str(e))
+            messagebox.showerror("Error", str(e),parent=root)
 
     tk.Button(
         root,

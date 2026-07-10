@@ -35,6 +35,8 @@ def open_low_stock_window(parent):
         root.destroy()
         parent.deiconify()
 
+    root.protocol("WM_DELETE_WINDOW", close_window)
+
     # -----------------------------------
     # TABLE FRAME
     # -----------------------------------
@@ -98,7 +100,7 @@ def open_low_stock_window(parent):
         products = get_low_stock_product_details()
 
         if not products:
-            messagebox.showinfo("Low Stock", "No low stock products found.")
+            messagebox.showinfo("Low Stock", "No low stock products found.",parent=root)
             return
 
         for p in products:
@@ -156,4 +158,4 @@ def open_low_stock_window(parent):
     # -----------------------------------
     load_low_stock_products()
 
-    root.mainloop()
+    

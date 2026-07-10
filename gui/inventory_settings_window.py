@@ -143,14 +143,14 @@ def open_inventory_settings(parent):
 
             messagebox.showinfo(
                 "Saved",
-                "Inventory settings saved."
+                "Inventory settings saved.",parent=window
             )
 
         except ValueError:
 
             messagebox.showerror(
                 "Error",
-                "Enter a valid number."
+                "Enter a valid number.",parent=window
             )
 
     # =====================================

@@ -144,10 +144,10 @@ def open_product_management_window(admin_root):
         product_id = get_selected_id()
 
         if not product_id:
-            messagebox.showwarning("Warning", "Select a product")
+            messagebox.showwarning("Warning", "Select a product",parent=root)
             return
 
-        if messagebox.askyesno("Confirm", "Delete product?"):
+        if messagebox.askyesno("Confirm", "Delete product?",parent=root):
             delete_product(product_id)
             load_products()
 
@@ -159,7 +159,7 @@ def open_product_management_window(admin_root):
         selected = tree.focus()
 
         if not selected:
-            messagebox.showwarning("Warning", "Select a product")
+            messagebox.showwarning("Warning", "Select a product",parent=root)
             return
 
         product_id = get_selected_id()
