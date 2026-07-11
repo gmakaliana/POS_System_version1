@@ -14,6 +14,9 @@ def open_add_user_window(refresh_callback=None):
     username_entry = tk.Entry(win)
     username_entry.pack()
 
+    # Focus username automatically
+    username_entry.focus()
+
     tk.Label(win, text="Password").pack()
     password_entry = tk.Entry(win, show="*")
     password_entry.pack()
@@ -30,12 +33,12 @@ def open_add_user_window(refresh_callback=None):
         role = role_var.get()
 
         if not username or not password:
-            messagebox.showerror("Error", "All fields required")
+            messagebox.showerror("Error", "All fields required",parent=win)
             return
 
         add_user(username, password, role)
 
-        messagebox.showinfo("Success", "User added successfully")
+        messagebox.showinfo("Success", "User added successfully",parent=win)
 
         win.destroy()
 

@@ -36,7 +36,7 @@ def open_cashier_dashboard(parent):
     user = get_session_user()
 
     if not user:
-        messagebox.showerror("Error", "Session expired. Please login again.")
+        messagebox.showerror("Error", "Session expired. Please login again.",parent=root)
         root.destroy()
         return
 

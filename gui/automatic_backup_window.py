@@ -344,7 +344,7 @@ def open_automatic_backup_window(parent):
 
             messagebox.showerror(
                 "Invalid Value",
-                "Backups to keep must be a positive number."
+                "Backups to keep must be a positive number.",parent=window
             )
 
             return
@@ -367,7 +367,7 @@ def open_automatic_backup_window(parent):
 
         messagebox.showinfo(
             "Saved",
-            "Automatic backup settings updated."
+            "Automatic backup settings updated.",parent=window
         )
 
 
@@ -399,6 +399,11 @@ def open_automatic_backup_window(parent):
         padx=10
     )
 
+    # Press Enter to save settings
+    window.bind(
+        "<Return>",
+        lambda event: save_settings()
+    )
 
     tk.Button(
         button_frame,

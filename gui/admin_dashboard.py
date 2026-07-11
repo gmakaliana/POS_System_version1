@@ -36,14 +36,14 @@ def open_admin_dashboard(parent):
     user = get_session_user()
 
     if not user:
-        messagebox.showerror("Error", "Session expired. Please login again.")
+        messagebox.showerror("Error", "Session expired. Please login again.",parent=root)
         root.destroy()
         return
 
     user_id = user["user_id"]
 
     # safe low stock alert
-    root.after(800, show_low_stock_alert)
+    root.after(800, lambda: show_low_stock_alert(root))
 
     # ---------------------------
     # LOGOUT

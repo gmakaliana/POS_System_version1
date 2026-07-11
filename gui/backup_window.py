@@ -124,7 +124,7 @@ def open_backup_window(parent):
 
                 messagebox.showinfo(
                     "Backup Complete",
-                    f"Backup saved:\n\n{backup}"
+                    f"Backup saved:\n\n{backup}",parent=window
                 )
 
 
@@ -132,7 +132,7 @@ def open_backup_window(parent):
 
                 messagebox.showerror(
                     "Backup Failed",
-                    "Database file not found."
+                    "Database file not found.",parent=window
                 )
 
 
@@ -140,7 +140,7 @@ def open_backup_window(parent):
 
             messagebox.showerror(
                 "Backup Error",
-                str(error)
+                str(error),parent=window
             )
 
 
@@ -174,6 +174,11 @@ def open_backup_window(parent):
         pady=10
     )
 
+    # Press Enter to save settings
+    window.bind(
+        "<Return>",
+        lambda event: select_destination()
+    )
 
     # =====================================
     # CLOSE BUTTON

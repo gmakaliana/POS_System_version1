@@ -157,14 +157,14 @@ def open_sales_settings(parent):
 
             messagebox.showinfo(
                 "Saved",
-                "Sales settings saved."
+                "Sales settings saved.",parent=window
             )
 
         except ValueError:
 
             messagebox.showerror(
                 "Error",
-                "Receipt number must be numeric."
+                "Receipt number must be numeric.",parent=window
             )
 
     # =====================================
@@ -192,6 +192,12 @@ def open_sales_settings(parent):
     ).pack(
         side="left",
         padx=5
+    )
+
+    # Press Enter to save settings
+    window.bind(
+        "<Return>",
+        lambda event: save()
     )
 
     tk.Button(

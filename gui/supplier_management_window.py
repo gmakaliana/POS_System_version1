@@ -173,13 +173,13 @@ def open_supplier_management_window(admin_root):
         if not supplier_id:
             messagebox.showwarning(
                 "Warning",
-                "Select a supplier."
+                "Select a supplier.",parent=root
             )
             return
 
         confirm = messagebox.askyesno(
             "Confirm",
-            "Delete selected supplier?"
+            "Delete selected supplier?",parent=root
         )
 
         if confirm:
@@ -196,7 +196,7 @@ def open_supplier_management_window(admin_root):
 
                 messagebox.showerror(
                     "Error",
-                    str(e)
+                    str(e),parent=root
                 )
 
     # -----------------------------------
@@ -210,7 +210,7 @@ def open_supplier_management_window(admin_root):
 
             messagebox.showwarning(
                 "Warning",
-                "Select a supplier."
+                "Select a supplier.",parent=root
             )
 
             return
@@ -230,7 +230,7 @@ def open_supplier_management_window(admin_root):
 
         open_edit_supplier_window(
             supplier_data,
-            load_suppliers
+            load_suppliers,root
         )
 
     # -----------------------------------

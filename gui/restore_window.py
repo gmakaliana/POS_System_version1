@@ -274,7 +274,7 @@ def open_restore_window(parent):
 
             messagebox.showwarning(
                 "No Backup Selected",
-                "Please select a backup file."
+                "Please select a backup file.",parent=window
             )
 
             return
@@ -287,7 +287,7 @@ def open_restore_window(parent):
 
             messagebox.showerror(
                 "Invalid Backup",
-                "The selected file is not a valid POS database backup."
+                "The selected file is not a valid POS database backup.",parent=window 
             )
 
             return
@@ -299,7 +299,7 @@ def open_restore_window(parent):
             (
                 "Are you sure you want to restore this backup?\n\n"
                 "Current data will be replaced."
-            )
+            ),parent=window
         )
 
 
@@ -322,7 +322,7 @@ def open_restore_window(parent):
                 (
                     "Database restored successfully.\n\n"
                     "Restart application now?"
-                )
+                ),parent=window 
             )
 
 
@@ -341,7 +341,7 @@ def open_restore_window(parent):
 
             messagebox.showerror(
                 "Restore Failed",
-                "Database restore failed."
+                "Database restore failed.",parent=window
             )
 
 
@@ -375,7 +375,11 @@ def open_restore_window(parent):
         padx=10
     )
 
-
+    # Press Enter to save settings
+    window.bind(
+        "<Return>",
+        lambda event: restore_now()
+    )
 
     tk.Button(
         button_frame,

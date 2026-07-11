@@ -17,6 +17,9 @@ def open_edit_user_window(user_data, refresh_callback):
     username_entry.pack()
     username_entry.insert(0, username)
 
+    # Focus username automatically
+    username_entry.focus()
+
     role_var = tk.StringVar(value=role)
 
     tk.Label(win, text="Role").pack()
@@ -26,7 +29,7 @@ def open_edit_user_window(user_data, refresh_callback):
 
     def save():
         update_user(user_id, username_entry.get(), role_var.get())
-        messagebox.showinfo("Success", "Updated successfully")
+        messagebox.showinfo("Success", "Updated successfully",parent=win)
         win.destroy()
         refresh_callback()
 

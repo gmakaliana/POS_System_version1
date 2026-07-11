@@ -98,14 +98,14 @@ def create_login_window():
         if user == "inactive":
             messagebox.showerror(
                 "Error",
-                "Account inactive"
+                "Account inactive",parent=root
             )
             return
 
         if not user:
             messagebox.showerror(
                 "Error",
-                "Invalid credentials"
+                "Invalid credentials",parent=root
             )
             return
 
@@ -116,8 +116,9 @@ def create_login_window():
         password_entry.delete(0, tk.END)
 
         if user["must_change_password"] == 1:
-            root.destroy()
-            open_change_password(user)
+            # Hide login window while changing password
+            #root.withdraw()
+            open_change_password(user,root)
             return
 
         root.withdraw()

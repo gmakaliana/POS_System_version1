@@ -104,13 +104,10 @@ def get_low_stock_product_details():
     return products
 
 
-
-
-
 # -----------------------------------
 # SHOW LOW STOCK ALERT
 # -----------------------------------
-def show_low_stock_alert():
+def show_low_stock_alert(parent):
     """
     Displays a warning message listing
     all low-stock products.
@@ -146,7 +143,8 @@ def show_low_stock_alert():
 
     messagebox.showwarning(
         "Low Stock Alert",
-        message
+        message,
+        parent=parent
     )
 
 

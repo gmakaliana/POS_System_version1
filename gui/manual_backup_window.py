@@ -185,7 +185,7 @@ def open_manual_backup_window(parent):
 
             messagebox.showwarning(
                 "No Location",
-                "Please select a backup destination."
+                "Please select a backup destination.",parent=window
             )
 
             return
@@ -202,7 +202,7 @@ def open_manual_backup_window(parent):
 
                 messagebox.showinfo(
                     "Backup Complete",
-                    f"Backup created successfully:\n\n{backup_file}"
+                    f"Backup created successfully:\n\n{backup_file}",parent=window
                 )
 
 
@@ -210,7 +210,7 @@ def open_manual_backup_window(parent):
 
                 messagebox.showerror(
                     "Backup Failed",
-                    "Database file was not found."
+                    "Database file was not found.",parent=window
                 )
 
 
@@ -218,7 +218,7 @@ def open_manual_backup_window(parent):
 
             messagebox.showerror(
                 "Backup Error",
-                str(error)
+                str(error),parent=window
             )
 
 
@@ -250,6 +250,11 @@ def open_manual_backup_window(parent):
         padx=10
     )
 
+    # Press Enter to save settings
+    window.bind(
+        "<Return>",
+        lambda event: backup_now()
+    )
 
     tk.Button(
         button_frame,

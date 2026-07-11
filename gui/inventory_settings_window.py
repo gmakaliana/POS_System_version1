@@ -113,6 +113,7 @@ def open_inventory_settings(parent):
         font=entry_font
     )
 
+     
     entry.grid(
         row=0,
         column=1,
@@ -120,10 +121,15 @@ def open_inventory_settings(parent):
         pady=10
     )
 
+
+
     entry.insert(
         0,
         get_low_stock_threshold()
     )
+
+    # Focus entry automatically
+    entry.focus_set()
 
     # =====================================
     # SAVE FUNCTION
@@ -153,6 +159,8 @@ def open_inventory_settings(parent):
                 "Enter a valid number.",parent=window
             )
 
+    
+
     # =====================================
     # BUTTONS
     # =====================================
@@ -178,6 +186,12 @@ def open_inventory_settings(parent):
     ).pack(
         side="left",
         padx=5
+    )
+
+    # Press Enter to save settings
+    window.bind(
+        "<Return>",
+        lambda event: save()
     )
 
     tk.Button(

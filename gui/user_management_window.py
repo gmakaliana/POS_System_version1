@@ -109,10 +109,10 @@ def open_user_management_window(admin_root):
         user_id = get_selected_user_id()
 
         if not user_id:
-            messagebox.showwarning("Warning", "Select a user")
+            messagebox.showwarning("Warning", "Select a user",parent=root)
             return
 
-        confirm = messagebox.askyesno("Confirm", "Delete this user?")
+        confirm = messagebox.askyesno("Confirm", "Delete this user?",parent=root)
 
         if confirm:
             try:
@@ -120,7 +120,7 @@ def open_user_management_window(admin_root):
                 load_users()
 
             except Exception as e:
-                messagebox.showerror("Error", str(e))
+                messagebox.showerror("Error", str(e),parent=root)
 
     # -----------------------------------
     # EDIT USER
@@ -130,7 +130,7 @@ def open_user_management_window(admin_root):
         selected = tree.focus()
 
         if not selected:
-            messagebox.showwarning("Warning", "Select a user")
+            messagebox.showwarning("Warning", "Select a user",parent=root)
             return
 
         user_id = get_selected_user_id()

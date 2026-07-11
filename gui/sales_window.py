@@ -135,7 +135,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
         product = get_product_by_barcode(code)
 
         if not product:
-            messagebox.showerror("Error", "Product not found")
+            messagebox.showerror("Error", "Product not found",parent=root)
             barcode_var.set("")
             barcode_entry.focus_set()
             return
@@ -143,7 +143,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
         success, msg = add_product(product[0], 1)
 
         if not success:
-            messagebox.showerror("Error", msg)
+            messagebox.showerror("Error", msg,parent=root)
 
         barcode_var.set("")
         refresh_cart()
@@ -162,7 +162,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
         results = search_products(text)
 
         if not results:
-            messagebox.showinfo("Info", "No product found")
+            messagebox.showinfo("Info", "No product found",parent=root)
             return
 
         product = results[0]
@@ -170,7 +170,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
         success, msg = add_product(product[0], 1)
 
         if not success:
-            messagebox.showerror("Error", msg)
+            messagebox.showerror("Error", msg,parent=root)
 
         search_var.set("")
         refresh_cart()
@@ -184,7 +184,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
         selected = tree.selection()
 
         if not selected:
-            messagebox.showerror("Error", "No product selected")
+            messagebox.showerror("Error", "No product selected",parent=root)
             return
 
         values = tree.item(selected[0])["values"]
@@ -221,7 +221,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
         cart = get_cart_items()
 
         if not cart:
-            messagebox.showerror("Error", "Cart is empty")
+            messagebox.showerror("Error", "Cart is empty",parent=root)
             return
 
         total = get_total()
@@ -231,20 +231,20 @@ def open_sales_window(user_id, role="cashier",parent=None):
         final = max(0, total - discount)
 
         if paid <= 0:
-            messagebox.showerror("Error", "Invalid payment amount")
+            messagebox.showerror("Error", "Invalid payment amount",parent=root)
             return
 
         if paid < final:
             messagebox.showerror(
                 "Error",
-                f"Insufficient payment. Required: M{final:.2f}"
+                f"Insufficient payment. Required: M{final:.2f}",parent=root
             )
             return
 
         success, sale_id = process_sale(user_id, cart, discount)
 
         if not success:
-            messagebox.showerror("Error", sale_id)
+            messagebox.showerror("Error", sale_id,parent=root)
             return
 
         receipt_file = generate_receipt(
@@ -257,7 +257,7 @@ def open_sales_window(user_id, role="cashier",parent=None):
 
         messagebox.showinfo(
             "Success",
-            f"Sale completed successfully!\nReceipt saved:\n{receipt_file}"
+            f"Sale completed successfully!\nReceipt saved:\n{receipt_file}",parent=root
         )
 
         clear_cart()

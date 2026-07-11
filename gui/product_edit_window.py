@@ -25,6 +25,9 @@ def open_edit_product_window(product_data, refresh_callback):
     name_entry.pack()
     name_entry.insert(0, product_data[1])
 
+    # Focus username automatically
+    name_entry.focus()
+
     tk.Label(root, text="Barcode").pack()
     barcode_entry = tk.Entry(root, width=35)
     barcode_entry.pack()

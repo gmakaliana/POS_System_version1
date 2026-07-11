@@ -21,6 +21,9 @@ def open_add_product_window(refresh_callback):
     name_entry = tk.Entry(root, width=35)
     name_entry.pack()
 
+    # Focus username automatically
+    name_entry.focus()
+
     tk.Label(root, text="Barcode").pack()
     barcode_entry = tk.Entry(root, width=35)
     barcode_entry.pack()

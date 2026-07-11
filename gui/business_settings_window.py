@@ -281,7 +281,7 @@ def open_business_settings(parent):
 
         messagebox.showinfo(
             "Saved",
-            "Business information saved."
+            "Business information saved.",parent=window
         )
 
     # =====================================
@@ -307,6 +307,12 @@ def open_business_settings(parent):
     ).pack(
         side="left",
         padx=10
+    )
+
+    # Press Enter to save settings
+    window.bind(
+        "<Return>",
+        lambda event: save()
     )
 
     tk.Button(

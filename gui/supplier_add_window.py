@@ -18,6 +18,9 @@ def open_add_supplier_window(refresh_callback):
     supplier_entry = tk.Entry(root, width=35)
     supplier_entry.pack()
 
+    # Focus username automatically
+    supplier_entry.focus()
+
     tk.Label(root, text="Phone Number").pack(pady=(10, 0))
     phone_entry = tk.Entry(root, width=35)
     phone_entry.pack()
@@ -38,7 +41,7 @@ def open_add_supplier_window(refresh_callback):
         if not supplier_name:
             messagebox.showerror(
                 "Error",
-                "Supplier name is required."
+                "Supplier name is required.",parent=root
             )
             return
 
@@ -54,7 +57,7 @@ def open_add_supplier_window(refresh_callback):
 
             messagebox.showinfo(
                 "Success",
-                "Supplier added successfully."
+                "Supplier added successfully.",parent=root
             )
 
             root.destroy()
@@ -62,7 +65,7 @@ def open_add_supplier_window(refresh_callback):
         except Exception as e:
             messagebox.showerror(
                 "Error",
-                str(e)
+                str(e),parent=root
             )
 
     tk.Button(
