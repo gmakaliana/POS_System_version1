@@ -80,3 +80,9 @@ def open_add_supplier_window(parent,refresh_callback):
         width=18,
         command=save_supplier
     ).pack(pady=20)
+
+    # Press Enter to save settings
+    root.bind(
+        "<Return>",
+        lambda event: save_supplier()
+    )

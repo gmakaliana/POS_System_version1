@@ -5,9 +5,13 @@ from modules.products.product_management import update_product
 from modules.suppliers.supplier_management import get_all_suppliers
 
 
-def open_edit_product_window(product_data, refresh_callback):
+def open_edit_product_window(product_data, refresh_callback,parent):
 
-    root = tk.Toplevel()
+    root = tk.Toplevel(parent)
+
+    root.transient(parent)
+    root.grab_set()
+
     root.title("EDIT PRODUCT")
     root.geometry("420x380")
 
@@ -67,19 +71,39 @@ def open_edit_product_window(product_data, refresh_callback):
     # -----------------------------------
     def update():
 
-        update_product(
-            product_id,
-            name_entry.get(),
-            barcode_entry.get(),
-            float(cost_entry.get()),
-            float(sell_entry.get()),
-            int(qty_entry.get()),
-            supplier_map[supplier_combo.get()]
-        )
+        try:
+            update_product(
+                product_id,
+                name_entry.get().strip(),
+                barcode_entry.get().strip(),
+                float(cost_entry.get()),
+                float(sell_entry.get()),
+                int(qty_entry.get()),
+                supplier_map[supplier_combo.get()]
+            )
 
-        refresh_callback()
-        messagebox.showinfo("Success", "Product updated",parent=root)
-        root.destroy()
+            messagebox.showinfo(
+                "Success",
+                "Product updated",
+                parent=root
+            )
+
+            root.destroy()
+            refresh_callback()
+
+        except ValueError:
+            messagebox.showerror(
+                "Error",
+                "Cost, selling price and quantity must be numbers",
+                parent=root
+            )
+
+        except Exception as e:
+            messagebox.showerror(
+                "Error",
+                str(e),
+                parent=root
+            )
 
     tk.Button(
         root,
@@ -89,3 +113,5 @@ def open_edit_product_window(product_data, refresh_callback):
         width=18,
         command=update
     ).pack(pady=15)
+
+    parent.wait_window(root)

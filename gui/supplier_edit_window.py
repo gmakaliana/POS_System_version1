@@ -335,6 +335,11 @@ def open_edit_supplier_window(
         padx=5
     )
 
+    # Press Enter to save settings
+    root.bind(
+        "<Return>",
+        lambda event: update()
+    )
 
 
     tk.Button(

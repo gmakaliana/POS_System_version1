@@ -5,9 +5,13 @@ from modules.products.product_management import add_product
 from modules.suppliers.supplier_management import get_all_suppliers
 
 
-def open_add_product_window(refresh_callback):
+def open_add_product_window(parent,refresh_callback):
 
-    root = tk.Toplevel()
+    root = tk.Toplevel(parent)
+
+    root.transient(parent)
+    root.grab_set()
+
     root.title("ADD PRODUCT")
     root.geometry("420x380")
 
@@ -119,3 +123,5 @@ def open_add_product_window(refresh_callback):
         width=18,
         command=save
     ).pack(pady=15)
+
+    parent.wait_window(root)

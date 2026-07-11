@@ -175,7 +175,7 @@ def open_product_management_window(admin_root):
             values[5]   # supplier
         )
 
-        open_edit_product_window(product_data, load_products)
+        open_edit_product_window(product_data, load_products,root)
 
     # -----------------------------------
     # LOW STOCK WINDOW
@@ -195,7 +195,7 @@ def open_product_management_window(admin_root):
         bg="#3498db",
         fg="white",
         width=14,
-        command=lambda: open_add_product_window(load_products)
+        command=lambda: open_add_product_window(root,load_products)
     ).pack(side="left", padx=5)
 
     tk.Button(
