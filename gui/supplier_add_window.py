@@ -4,9 +4,13 @@ from tkinter import messagebox
 from modules.suppliers.supplier_management import add_supplier
 
 
-def open_add_supplier_window(refresh_callback):
+def open_add_supplier_window(parent,refresh_callback):
 
-    root = tk.Toplevel()
+    root = tk.Toplevel(parent)
+
+    root.transient(parent)
+    root.grab_set()
+    
     root.title("ADD SUPPLIER")
     root.geometry("400x280")
     root.resizable(False, False)

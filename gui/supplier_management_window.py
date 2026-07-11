@@ -252,6 +252,7 @@ def open_supplier_management_window(admin_root):
         fg="white",
         command=lambda:
             open_add_supplier_window(
+                root,
                 load_suppliers
             )
     ).pack(

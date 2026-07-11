@@ -4,9 +4,13 @@ from tkinter import messagebox
 from modules.users.user_management import add_user
 
 
-def open_add_user_window(refresh_callback=None):
+def open_add_user_window(parent,refresh_callback=None):
 
-    win = tk.Toplevel()
+    win = tk.Toplevel(parent)
+
+    win.transient(parent)
+    win.grab_set()
+
     win.title("ADD USER")
     win.geometry("300x250")
 
@@ -27,6 +31,8 @@ def open_add_user_window(refresh_callback=None):
     tk.Radiobutton(win, text="Admin", variable=role_var, value="Admin").pack()
     tk.Radiobutton(win, text="Cashier", variable=role_var, value="Cashier").pack()
 
+    #parent.wait_window(win)
+
     def save():
         username = username_entry.get()
         password = password_entry.get()
@@ -45,4 +51,6 @@ def open_add_user_window(refresh_callback=None):
         if refresh_callback:
             refresh_callback()
 
-    tk.Button(win, text="Add User", command=save).pack(pady=10)
+    tk.Button(win, text="Add User", bg="#3498db",
+        fg="white",command=save).pack(pady=10)
+

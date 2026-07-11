@@ -4,11 +4,15 @@ from tkinter import messagebox
 from modules.users.user_management import update_user
 
 
-def open_edit_user_window(user_data, refresh_callback):
+def open_edit_user_window(user_data, refresh_callback,parent):
 
     user_id, username, role, _ = user_data
 
-    win = tk.Toplevel()
+    win = tk.Toplevel(parent)
+
+    win.transient(parent)
+    win.grab_set()
+
     win.title("EDIT USER")
     win.geometry("300x250")
 
@@ -27,10 +31,13 @@ def open_edit_user_window(user_data, refresh_callback):
     tk.Radiobutton(win, text="Admin", variable=role_var, value="Admin").pack()
     tk.Radiobutton(win, text="Cashier", variable=role_var, value="Cashier").pack()
 
+    #parent.wait_window(win)
+
     def save():
         update_user(user_id, username_entry.get(), role_var.get())
         messagebox.showinfo("Success", "Updated successfully",parent=win)
         win.destroy()
         refresh_callback()
 
-    tk.Button(win, text="Save", command=save).pack(pady=10)
+    tk.Button(win, text="Save", bg="#3498db",
+        fg="white",command=save).pack(pady=10)

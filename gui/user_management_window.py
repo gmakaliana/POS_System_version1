@@ -138,7 +138,7 @@ def open_user_management_window(admin_root):
 
         user_data = (user_id, values[0], values[1], values[2])
 
-        open_edit_user_window(user_data, load_users)
+        open_edit_user_window(user_data, load_users,root)
 
     # -----------------------------------
     # BUTTON PANEL
@@ -153,7 +153,7 @@ def open_user_management_window(admin_root):
         width=12,
         bg="#3498db",
         fg="white",
-        command=lambda: open_add_user_window(load_users)
+        command=lambda: open_add_user_window(root,load_users)
     ).pack(side="left", padx=5)
 
     # EDIT USER (ORANGE)
