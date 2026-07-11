@@ -41,3 +41,9 @@ def open_edit_user_window(user_data, refresh_callback,parent):
 
     tk.Button(win, text="Save", bg="#3498db",
         fg="white",command=save).pack(pady=10)
+    
+    # Press Enter to save settings
+    win.bind(
+        "<Return>",
+        lambda event: save()
+    )

@@ -114,4 +114,10 @@ def open_edit_product_window(product_data, refresh_callback,parent):
         command=update
     ).pack(pady=15)
 
+    # Press Enter to save settings
+    root.bind(
+        "<Return>",
+        lambda event: update()
+    )
+
     parent.wait_window(root)

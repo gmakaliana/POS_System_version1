@@ -53,4 +53,10 @@ def open_add_user_window(parent,refresh_callback=None):
 
     tk.Button(win, text="Add User", bg="#3498db",
         fg="white",command=save).pack(pady=10)
+    
+    # Press Enter to save settings
+    win.bind(
+        "<Return>",
+        lambda event: save()
+    )
 

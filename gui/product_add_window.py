@@ -124,4 +124,10 @@ def open_add_product_window(parent,refresh_callback):
         command=save
     ).pack(pady=15)
 
+    # Press Enter to save settings
+    root.bind(
+        "<Return>",
+        lambda event: save()
+    )
+
     parent.wait_window(root)
