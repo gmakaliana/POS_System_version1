@@ -38,9 +38,14 @@ def process_sale(user_id, cart_items, discount=0):
             for item in cart_items
         )
 
+        # Prevent invalid discount values
+        if discount < 0:
+            discount = 0
+
+        if discount > total_amount:
+            discount = total_amount
+
         final_amount = total_amount - discount
-        if final_amount < 0:
-            final_amount = 0
 
         # ==========================
         # INSERT SALE HEADER
@@ -63,13 +68,42 @@ def process_sale(user_id, cart_items, discount=0):
         sale_id = cursor.lastrowid
 
         # ==========================
+        # DISCOUNT DISTRIBUTION
+        # ==========================
+        discount_ratio = (
+            discount / total_amount
+            if total_amount > 0
+            else 0
+        )
+
+        allocated_discount = 0
+
+        # ==========================
         # PROCESS EACH CART ITEM
         # ==========================
-        for item in cart_items:
+        for index, item in enumerate(cart_items):
 
             product_id = item["product_id"]
             quantity = item["quantity"]
             unit_price = item["unit_price"]
+
+            line_total = quantity * unit_price
+
+            # --------------------------------
+            # Allocate discount
+            # --------------------------------
+            if index == len(cart_items) - 1:
+                # Give any remaining cents to the last item
+                line_discount = round(
+                    discount - allocated_discount,
+                    2
+                )
+            else:
+                line_discount = round(
+                    line_total * discount_ratio,
+                    2
+                )
+                allocated_discount += line_discount
 
             # --------------------------------
             # CHECK STOCK
@@ -83,7 +117,9 @@ def process_sale(user_id, cart_items, discount=0):
             result = cursor.fetchone()
 
             if not result:
-                raise Exception(f"Product {product_id} not found.")
+                raise Exception(
+                    f"Product {product_id} not found."
+                )
 
             current_stock = result[0]
 
@@ -100,14 +136,16 @@ def process_sale(user_id, cart_items, discount=0):
                     sale_id,
                     product_id,
                     quantity,
-                    price
+                    price,
+                    discount
                 )
-                VALUES (?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?)
             """, (
                 sale_id,
                 product_id,
                 quantity,
-                unit_price
+                unit_price,
+                line_discount
             ))
 
             # --------------------------------

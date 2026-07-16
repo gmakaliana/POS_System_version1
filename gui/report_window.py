@@ -14,6 +14,7 @@ from modules.reports.reports import (
 # CENTER WINDOW
 # ==========================================================
 def center_window(window, width, height):
+
     screen_width = window.winfo_screenwidth()
     screen_height = window.winfo_screenheight()
 
@@ -32,62 +33,141 @@ def open_reports_dashboard(admin_root):
         admin_root.withdraw()
 
     root = tk.Toplevel()
+
     root.title("REPORTS DASHBOARD")
+
     center_window(root, 900, 450)
 
+
     def safe_restore():
+
         if admin_root and admin_root.winfo_exists():
             admin_root.deiconify()
 
+
     def close_window():
+
         root.destroy()
         safe_restore()
 
-    main = tk.Frame(root, padx=20, pady=20)
+
+    main = tk.Frame(
+        root,
+        padx=20,
+        pady=20
+    )
+
     main.pack(expand=True)
 
-    tk.Label(main, text="REPORTS DASHBOARD",
-             font=("Arial", 18, "bold")).pack(pady=10)
+
+    tk.Label(
+        main,
+        text="REPORTS DASHBOARD",
+        font=("Arial", 18, "bold")
+    ).pack(pady=10)
+
+
 
     btn = tk.Frame(main)
+
     btn.pack()
 
-    style = {"width": 28, "height": 2}
 
-    tk.Button(btn, text="Daily Sales Report & Profit/Loss",
-              bg="#3498db", fg="white",
-              **style,
-              command=lambda: open_daily_sales(root)
-              ).grid(row=0, column=0, padx=10, pady=10)
 
-    tk.Button(btn, text="Monthly Sales Report & Profit/Loss",
-              bg="#16a085", fg="white",
-              **style,
-              command=lambda: open_monthly_sales(root)
-              ).grid(row=0, column=1, padx=10, pady=10)
+    style = {
+        "width": 28,
+        "height": 2
+    }
 
-    tk.Button(btn, text="Daily Stock Book",
-              bg="#2ecc71", fg="white",
-              **style,
-              command=lambda: open_daily_stock(root)
-              ).grid(row=1, column=0, padx=10, pady=10)
 
-    tk.Button(btn, text="Monthly Stock Book",
-              bg="#8e44ad", fg="white",
-              **style,
-              command=lambda: open_monthly_stock(root)
-              ).grid(row=1, column=1, padx=10, pady=10)
 
-    tk.Button(main, text="Close",
-              bg="#7f8c8d", fg="white",
-              width=15,
-              command=close_window).pack(pady=15)
+    tk.Button(
+        btn,
+        text="Daily Sales Report & Profit/Loss",
+        bg="#3498db",
+        fg="white",
+        **style,
+        command=lambda: open_daily_sales(root)
 
-    # Handle window X button
+    ).grid(
+        row=0,
+        column=0,
+        padx=10,
+        pady=10
+    )
+
+
+
+    tk.Button(
+        btn,
+        text="Monthly Sales Report & Profit/Loss",
+        bg="#16a085",
+        fg="white",
+        **style,
+        command=lambda: open_monthly_sales(root)
+
+    ).grid(
+        row=0,
+        column=1,
+        padx=10,
+        pady=10
+    )
+
+
+
+    tk.Button(
+        btn,
+        text="Daily Stock Book",
+        bg="#2ecc71",
+        fg="white",
+        **style,
+        command=lambda: open_daily_stock(root)
+
+    ).grid(
+        row=1,
+        column=0,
+        padx=10,
+        pady=10
+    )
+
+
+
+    tk.Button(
+        btn,
+        text="Monthly Stock Book",
+        bg="#8e44ad",
+        fg="white",
+        **style,
+        command=lambda: open_monthly_stock(root)
+
+    ).grid(
+        row=1,
+        column=1,
+        padx=10,
+        pady=10
+    )
+
+
+
+    tk.Button(
+        main,
+        text="Close",
+        bg="#7f8c8d",
+        fg="white",
+        width=15,
+        command=close_window
+
+    ).pack(
+        pady=15
+    )
+
+
+
     root.protocol(
         "WM_DELETE_WINDOW",
         close_window
     )
+
 
 
 # ==========================================================
@@ -97,75 +177,260 @@ def open_daily_sales(parent):
 
     parent.withdraw()
 
+
     win = tk.Toplevel()
+
     win.title("DAILY SALES REPORT")
-    center_window(win, 1100, 650)
+
+    center_window(
+        win,
+        1250,
+        700
+    )
+
+
 
     def close():
+
         win.destroy()
+
         if parent.winfo_exists():
             parent.deiconify()
 
-    report_date = str(date.today())
-    generated = datetime.now().strftime("%d %B %Y | %H:%M")
 
-    tk.Label(win, text="DAILY SALES REPORT",
-             font=("Arial", 16, "bold")).pack()
-    tk.Label(win, text=f"Report Generated: {generated}").pack()
+
+    report_date = str(date.today())
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+
+    tk.Label(
+        win,
+        text="DAILY SALES REPORT",
+        font=("Arial", 16, "bold")
+    ).pack()
+
+
+
+    tk.Label(
+        win,
+        text=f"Report Generated: {generated}"
+    ).pack()
+
+
 
     frame = tk.Frame(win)
-    frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-    columns = ("Product", "Barcode", "UnitCost(M)", "UnitPrice(M)",
-               "Quantity(Units)", "TotalCost(M)", "TotalSales(M)", "UnitProfit/Loss(M)")
+    frame.pack(
+        fill="both",
+        expand=True,
+        padx=10,
+        pady=10
+    )
 
-    tree = ttk.Treeview(frame, columns=columns, show="headings")
 
-    for c in columns:
-        tree.heading(c, text=c)
-        tree.column(c, width=120)
 
-    tree.pack(side="left", fill="both", expand=True)
+    columns = (
 
-    scroll = ttk.Scrollbar(frame, command=tree.yview)
-    tree.configure(yscrollcommand=scroll.set)
-    scroll.pack(side="right", fill="y")
+        "Product",
+        "Barcode",
+        "Unit Cost(M)",
+        "Unit Price(M)",
+        "Quantity",
+        "Total Cost(M)",
+        "Gross Sales(M)",
+        "Discount(M)",
+        "Net Sales(M)",
+        "Profit/Loss(M)"
+
+    )
+
+
+
+    tree = ttk.Treeview(
+        frame,
+        columns=columns,
+        show="headings"
+    )
+
+
+
+    for column in columns:
+
+        tree.heading(
+            column,
+            text=column
+        )
+
+        tree.column(
+            column,
+            width=120
+        )
+
+
+
+    tree.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+
+
+    scroll = ttk.Scrollbar(
+        frame,
+        command=tree.yview
+    )
+
+    tree.configure(
+        yscrollcommand=scroll.set
+    )
+
+    scroll.pack(
+        side="right",
+        fill="y"
+    )
+
+
 
     rows, summary = get_daily_sales(report_date)
 
-    for r in rows:
-        tree.insert("", "end", values=tuple(r))
 
-    # SUMMARY TABLE
+
+    for row in rows:
+
+        tree.insert(
+            "",
+            "end",
+            values=tuple(row)
+        )
+
+
+
+    # ==========================
+    # SUMMARY
+    # ==========================
+
     sum_frame = tk.Frame(win)
-    sum_frame.pack(fill="x", padx=10, pady=10)
 
-    tk.Label(sum_frame, text="DAILY SALES SUMMARY",
-             font=("Arial", 12, "bold")).pack(anchor="w")
+    sum_frame.pack(
+        fill="x",
+        padx=10,
+        pady=10
+    )
 
-    sum_tree = ttk.Treeview(sum_frame, columns=("Description", "Amount"),
-                            show="headings", height=5)
 
-    sum_tree.heading("Description", text="Description")
-    sum_tree.heading("Amount", text="Amount")
+    tk.Label(
+        sum_frame,
+        text="DAILY SALES SUMMARY",
+        font=("Arial", 12, "bold")
+    ).pack(
+        anchor="w"
+    )
 
-    sum_tree.pack(fill="x")
 
-    sum_tree.insert("", "end", values=("Total Products Sold", summary["products"]))
-    sum_tree.insert("", "end", values=("Total Quantity Sold", f'{summary["quantity"]} Units'))
-    sum_tree.insert("", "end", values=("Total Cost of Goods Sold", f'M{summary["cost"]:.2f}'))
-    sum_tree.insert("", "end", values=("Total Sales", f'M{summary["sales"]:.2f}'))
-    sum_tree.insert("", "end", values=("Profit/Loss", f'+M{summary["profit"]:.2f}'))
 
-    tk.Button(win, text="Close",width=14,
+    sum_tree = ttk.Treeview(
+        sum_frame,
+        columns=("Description", "Amount"),
+        show="headings",
+        height=7
+    )
+
+
+
+    sum_tree.heading(
+        "Description",
+        text="Description"
+    )
+
+
+    sum_tree.heading(
+        "Amount",
+        text="Amount"
+    )
+
+
+
+    sum_tree.pack(
+        fill="x"
+    )
+
+
+
+    summary_rows = [
+
+        (
+            "Total Products Sold",
+            summary["products"]
+        ),
+
+        (
+            "Total Quantity Sold",
+            f'{summary["quantity"]} Units'
+        ),
+
+        (
+            "Total Cost of Goods Sold",
+            f'M{summary["cost"]:.2f}'
+        ),
+
+        (
+            "Gross Sales",
+            f'M{summary["gross_sales"]:.2f}'
+        ),
+
+        (
+            "Total Discount",
+            f'M{summary["discount"]:.2f}'
+        ),
+
+        (
+            "Net Sales",
+            f'M{summary["net_sales"]:.2f}'
+        ),
+
+        (
+            "Profit/Loss",
+            f'M{summary["profit"]:.2f}'
+        )
+
+    ]
+
+
+
+    for item in summary_rows:
+
+        sum_tree.insert(
+            "",
+            "end",
+            values=item
+        )
+
+
+
+    tk.Button(
+        win,
+        text="Close",
+        width=14,
         bg="#7f8c8d",
-        fg="white", command=close).pack(pady=10)
+        fg="white",
+        command=close
 
-    # Handle window X button
+    ).pack(
+        pady=10
+    )
+
+
+
     win.protocol(
         "WM_DELETE_WINDOW",
         close
     )
+
 
 
 # ==========================================================
@@ -175,207 +440,651 @@ def open_monthly_sales(parent):
 
     parent.withdraw()
 
+
     win = tk.Toplevel()
+
     win.title("MONTHLY SALES REPORT")
-    center_window(win, 1100, 650)
+
+    center_window(
+        win,
+        1250,
+        700
+    )
+
 
     def close():
+
         win.destroy()
+
         if parent.winfo_exists():
             parent.deiconify()
 
-    month = datetime.now().strftime("%Y-%m")
-    generated = datetime.now().strftime("%d %B %Y | %H:%M")
 
-    tk.Label(win, text="MONTHLY SALES REPORT",
-             font=("Arial", 16, "bold")).pack()
-    tk.Label(win, text=f"Report Generated: {generated}").pack()
-    tk.Label(win, text=f"Period: {month}").pack()
+
+    month = datetime.now().strftime("%Y-%m")
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+
+    tk.Label(
+        win,
+        text="MONTHLY SALES REPORT",
+        font=("Arial", 16, "bold")
+    ).pack()
+
+
+
+    tk.Label(
+        win,
+        text=f"Report Generated: {generated}"
+    ).pack()
+
+
+
+    tk.Label(
+        win,
+        text=f"Period: {month}"
+    ).pack()
+
+
 
     frame = tk.Frame(win)
-    frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-    columns = ("Product", "Barcode", "UnitCost(M)", "UnitPrice(M)",
-               "Quantity(Units)", "TotalCost(M)", "TotalSales(M)", "Profit/Loss(M)")
+    frame.pack(
+        fill="both",
+        expand=True,
+        padx=10,
+        pady=10
+    )
 
-    tree = ttk.Treeview(frame, columns=columns, show="headings")
 
-    for c in columns:
-        tree.heading(c, text=c)
-        tree.column(c, width=120)
+    columns = (
 
-    tree.pack(side="left", fill="both", expand=True)
+        "Product",
+        "Barcode",
+        "Unit Cost(M)",
+        "Unit Price(M)",
+        "Quantity",
+        "Total Cost(M)",
+        "Gross Sales(M)",
+        "Discount(M)",
+        "Net Sales(M)",
+        "Profit/Loss(M)"
 
-    scroll = ttk.Scrollbar(frame, command=tree.yview)
-    tree.configure(yscrollcommand=scroll.set)
-    scroll.pack(side="right", fill="y")
+    )
+
+
+    tree = ttk.Treeview(
+        frame,
+        columns=columns,
+        show="headings"
+    )
+
+
+
+    for column in columns:
+
+        tree.heading(
+            column,
+            text=column
+        )
+
+        tree.column(
+            column,
+            width=120
+        )
+
+
+    tree.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+
+
+    scroll = ttk.Scrollbar(
+        frame,
+        command=tree.yview
+    )
+
+
+    tree.configure(
+        yscrollcommand=scroll.set
+    )
+
+
+    scroll.pack(
+        side="right",
+        fill="y"
+    )
+
 
     rows, summary = get_monthly_sales(month)
 
-    for r in rows:
-        tree.insert("", "end", values=tuple(r))
+
+
+    for row in rows:
+
+        tree.insert(
+            "",
+            "end",
+            values=tuple(row)
+        )
+
+
+    # SUMMARY
 
     sum_frame = tk.Frame(win)
-    sum_frame.pack(fill="x", padx=10, pady=10)
 
-    tk.Label(sum_frame, text="MONTHLY SALES SUMMARY",
-             font=("Arial", 12, "bold")).pack(anchor="w")
+    sum_frame.pack(
+        fill="x",
+        padx=10,
+        pady=10
+    )
 
-    sum_tree = ttk.Treeview(sum_frame, columns=("Description", "Amount"),
-                            show="headings", height=5)
 
-    sum_tree.heading("Description", text="Description")
-    sum_tree.heading("Amount", text="Amount")
+    tk.Label(
+        sum_frame,
+        text="MONTHLY SALES SUMMARY",
+        font=("Arial", 12, "bold")
+    ).pack(
+        anchor="w"
+    )
 
-    sum_tree.pack(fill="x")
 
-    sum_tree.insert("", "end", values=("Total Products Sold", summary["products"]))
-    sum_tree.insert("", "end", values=("Total Quantity Sold", f'{summary["quantity"]} Units'))
-    sum_tree.insert("", "end", values=("Total Cost of Goods Sold", f'M{summary["cost"]:.2f}'))
-    sum_tree.insert("", "end", values=("Total Sales", f'M{summary["sales"]:.2f}'))
-    sum_tree.insert("", "end", values=("Gross Profit/Loss", f'+M{summary["profit"]:.2f}'))
+    sum_tree = ttk.Treeview(
+        sum_frame,
+        columns=("Description", "Amount"),
+        show="headings",
+        height=7
+    )
 
-    tk.Button(win, text="Close",width=14,
+
+    sum_tree.heading(
+        "Description",
+        text="Description"
+    )
+
+
+    sum_tree.heading(
+        "Amount",
+        text="Amount"
+    )
+
+
+    sum_tree.pack(
+        fill="x"
+    )
+
+
+    summary_rows = [
+
+        (
+            "Total Products Sold",
+            summary["products"]
+        ),
+
+        (
+            "Total Quantity Sold",
+            f'{summary["quantity"]} Units'
+        ),
+
+        (
+            "Total Cost of Goods Sold",
+            f'M{summary["cost"]:.2f}'
+        ),
+
+        (
+            "Gross Sales",
+            f'M{summary["gross_sales"]:.2f}'
+        ),
+
+        (
+            "Total Discount",
+            f'M{summary["discount"]:.2f}'
+        ),
+
+        (
+            "Net Sales",
+            f'M{summary["net_sales"]:.2f}'
+        ),
+
+        (
+            "Profit/Loss",
+            f'M{summary["profit"]:.2f}'
+        )
+
+    ]
+
+
+
+    for item in summary_rows:
+
+        sum_tree.insert(
+            "",
+            "end",
+            values=item
+        )
+
+
+    tk.Button(
+        win,
+        text="Close",
+        width=14,
         bg="#7f8c8d",
-        fg="white", command=close).pack(pady=10)
+        fg="white",
+        command=close
 
-    # Handle window X button
+    ).pack(
+        pady=10
+    )
+
+
+
     win.protocol(
         "WM_DELETE_WINDOW",
         close
     )
 
 
-# ==========================================================
-# DAILY STOCK BOOK (WITH TOTAL ROW)
+    # ==========================================================
+# DAILY STOCK BOOK
 # ==========================================================
 def open_daily_stock(parent):
 
     parent.withdraw()
 
+
     win = tk.Toplevel()
+
     win.title("DAILY STOCK BOOK")
-    center_window(win, 900, 500)
+
+    center_window(
+        win,
+        950,
+        550
+    )
+
 
     def close():
+
         win.destroy()
+
         if parent.winfo_exists():
             parent.deiconify()
 
-    generated = datetime.now().strftime("%d %B %Y | %H:%M")
 
-    tk.Label(win, text="DAILY STOCK BOOK",
-             font=("Arial", 16, "bold")).pack()
-    tk.Label(win, text=f"Report Generated: {generated}").pack()
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+    tk.Label(
+        win,
+        text="DAILY STOCK BOOK",
+        font=("Arial", 16, "bold")
+    ).pack()
+
+
+
+    tk.Label(
+        win,
+        text=f"Report Generated: {generated}"
+    ).pack()
+
+
 
     frame = tk.Frame(win)
-    frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-    columns = ("Product", "Opening Stock", "Quantity Sold", "Closing Stock")
+    frame.pack(
+        fill="both",
+        expand=True,
+        padx=10,
+        pady=10
+    )
 
-    tree = ttk.Treeview(frame, columns=columns, show="headings")
 
-    for c in columns:
-        tree.heading(c, text=c)
-        tree.column(c, width=150)
 
-    tree.pack(side="left", fill="both", expand=True)
+    columns = (
 
-    scroll = ttk.Scrollbar(frame, command=tree.yview)
-    tree.configure(yscrollcommand=scroll.set)
-    scroll.pack(side="right", fill="y")
+        "Product",
+        "Opening Stock",
+        "Quantity Sold",
+        "Closing Stock"
+
+    )
+
+
+
+    tree = ttk.Treeview(
+        frame,
+        columns=columns,
+        show="headings"
+    )
+
+
+
+    for column in columns:
+
+        tree.heading(
+            column,
+            text=column
+        )
+
+        tree.column(
+            column,
+            width=180
+        )
+
+
+
+    tree.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+
+
+    scroll = ttk.Scrollbar(
+        frame,
+        command=tree.yview
+    )
+
+
+    tree.configure(
+        yscrollcommand=scroll.set
+    )
+
+
+    scroll.pack(
+        side="right",
+        fill="y"
+    )
+
+
 
     today = str(date.today())
+
     rows = get_daily_stock_report(today)
 
-    total_open, total_sold, total_close = 0, 0, 0
 
-    for r in rows:
-        product, sold, closing, opening = r
-        tree.insert("", "end", values=(product, opening, sold, closing))
+
+    total_open = 0
+    total_sold = 0
+    total_close = 0
+
+
+
+    for row in rows:
+
+        product, sold, closing, opening = row
+
+
+        tree.insert(
+            "",
+            "end",
+            values=(
+                product,
+                opening,
+                sold,
+                closing
+            )
+        )
+
 
         total_open += opening
+
         total_sold += sold
+
         total_close += closing
 
+
+
     # TOTAL ROW
-    tree.insert("", "end", values=("TOTAL", total_open, total_sold, total_close))
 
-    tk.Button(win, text="Close",width=14,
+    tree.insert(
+        "",
+        "end",
+        values=(
+            "TOTAL",
+            total_open,
+            total_sold,
+            total_close
+        )
+    )
+
+
+
+    tk.Button(
+        win,
+        text="Close",
+        width=14,
         bg="#7f8c8d",
-        fg="white", command=close).pack(pady=10)
+        fg="white",
+        command=close
 
-    # Handle window X button
+    ).pack(
+        pady=10
+    )
+
+
+
     win.protocol(
         "WM_DELETE_WINDOW",
         close
     )
 
 
+
 # ==========================================================
-# MONTHLY STOCK BOOK (WITH TOTAL ROW)
+# MONTHLY STOCK BOOK
 # ==========================================================
 def open_monthly_stock(parent):
 
     parent.withdraw()
 
+
+
     win = tk.Toplevel()
+
     win.title("MONTHLY STOCK BOOK")
-    center_window(win, 900, 500)
+
+
+    center_window(
+        win,
+        950,
+        550
+    )
+
+
 
     def close():
+
         win.destroy()
+
         if parent.winfo_exists():
             parent.deiconify()
 
-    generated = datetime.now().strftime("%d %B %Y | %H:%M")
-    month = datetime.now().strftime("%Y-%m")
 
-    tk.Label(win, text="MONTHLY STOCK BOOK",
-             font=("Arial", 16, "bold")).pack()
-    tk.Label(win, text=f"Report Generated: {generated}").pack()
-    tk.Label(win, text=f"Period: {month}").pack()
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+    month = datetime.now().strftime(
+        "%Y-%m"
+    )
+
+
+
+    tk.Label(
+        win,
+        text="MONTHLY STOCK BOOK",
+        font=("Arial", 16, "bold")
+    ).pack()
+
+
+
+    tk.Label(
+        win,
+        text=f"Report Generated: {generated}"
+    ).pack()
+
+
+
+    tk.Label(
+        win,
+        text=f"Period: {month}"
+    ).pack()
+
+
 
     frame = tk.Frame(win)
-    frame.pack(fill="both", expand=True, padx=10, pady=10)
 
-    columns = ("Product", "Opening Stock", "Quantity Sold", "Closing Stock")
+    frame.pack(
+        fill="both",
+        expand=True,
+        padx=10,
+        pady=10
+    )
 
-    tree = ttk.Treeview(frame, columns=columns, show="headings")
 
-    for c in columns:
-        tree.heading(c, text=c)
-        tree.column(c, width=150)
 
-    tree.pack(side="left", fill="both", expand=True)
+    columns = (
 
-    scroll = ttk.Scrollbar(frame, command=tree.yview)
-    tree.configure(yscrollcommand=scroll.set)
-    scroll.pack(side="right", fill="y")
+        "Product",
+        "Opening Stock",
+        "Quantity Sold",
+        "Closing Stock"
+
+    )
+
+
+
+    tree = ttk.Treeview(
+        frame,
+        columns=columns,
+        show="headings"
+    )
+
+
+
+    for column in columns:
+
+        tree.heading(
+            column,
+            text=column
+        )
+
+
+        tree.column(
+            column,
+            width=180
+        )
+
+
+
+    tree.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+
+
+    scroll = ttk.Scrollbar(
+        frame,
+        command=tree.yview
+    )
+
+
+
+    tree.configure(
+        yscrollcommand=scroll.set
+    )
+
+
+    scroll.pack(
+        side="right",
+        fill="y"
+    )
+
+
 
     rows = get_monthly_stock_report(month)
 
-    total_open, total_sold, total_close = 0, 0, 0
 
-    for r in rows:
-        product, sold, closing, opening = r
-        tree.insert("", "end", values=(product, opening, sold, closing))
+
+    total_open = 0
+
+    total_sold = 0
+
+    total_close = 0
+
+
+
+    for row in rows:
+
+        product, sold, closing, opening = row
+
+
+
+        tree.insert(
+            "",
+            "end",
+            values=(
+                product,
+                opening,
+                sold,
+                closing
+            )
+        )
+
 
         total_open += opening
+
         total_sold += sold
+
         total_close += closing
 
-    tree.insert("", "end", values=("TOTAL", total_open, total_sold, total_close))
 
-    tk.Button(win, text="Close",width=14,
+
+    # TOTAL ROW
+
+    tree.insert(
+        "",
+        "end",
+        values=(
+            "TOTAL",
+            total_open,
+            total_sold,
+            total_close
+        )
+    )
+
+
+
+    tk.Button(
+        win,
+        text="Close",
+        width=14,
         bg="#7f8c8d",
-        fg="white", command=close).pack(pady=10)
+        fg="white",
+        command=close
 
-    # =====================================
-    # WINDOW CONTROL
-    # =====================================
+    ).pack(
+        pady=10
+    )
 
-    # Handle window X button
+
+
     win.protocol(
         "WM_DELETE_WINDOW",
         close

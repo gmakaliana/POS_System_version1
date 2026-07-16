@@ -188,6 +188,7 @@ def create_tables():
 
         price REAL NOT NULL,
 
+        discount REAL DEFAULT 0,
 
         FOREIGN KEY (sale_id)
 
@@ -203,6 +204,29 @@ def create_tables():
 
     conn.commit()
 
+    # =====================================
+    # SALES TRANSACTIONS MIGRATION
+    # =====================================
+
+    cursor.execute("""
+    PRAGMA table_info(sales_transactions)
+    """)
+
+
+    columns = [
+        column[1]
+        for column in cursor.fetchall()
+    ]
+
+
+    if "discount" not in columns:
+
+        cursor.execute("""
+        ALTER TABLE sales_transactions
+        ADD COLUMN discount REAL DEFAULT 0
+        """)
+
+        conn.commit()
 
 
     # =====================================
