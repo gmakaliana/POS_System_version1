@@ -238,32 +238,23 @@ def create_tables():
 
         id INTEGER PRIMARY KEY,
 
-
         business_name TEXT DEFAULT '',
-
 
         business_address TEXT DEFAULT '',
 
-
         business_phone TEXT DEFAULT '',
-
 
         business_email TEXT DEFAULT '',
 
-
         receipt_header TEXT DEFAULT '',
 
-
         receipt_footer TEXT DEFAULT '',
-
 
         receipt_number_start INTEGER DEFAULT 1000,
 
         low_stock_threshold INTEGER DEFAULT 5,
 
-
         installed_datetime TEXT,
-
 
         last_backup_datetime TEXT DEFAULT NULL,
 
@@ -271,7 +262,23 @@ def create_tables():
 
         backup_location TEXT,
 
-        backup_keep_count INTEGER DEFAULT 10
+        backup_keep_count INTEGER DEFAULT 10,
+
+
+        automatic_daily_report_enabled INTEGER DEFAULT 0,
+
+        daily_report_time TEXT DEFAULT '18:00',
+
+
+        automatic_monthly_report_enabled INTEGER DEFAULT 0,
+
+        monthly_report_time TEXT DEFAULT '18:00',
+
+
+        last_daily_report_date TEXT DEFAULT NULL,
+
+
+        last_monthly_report_month TEXT DEFAULT NULL
 
     )
     """)
@@ -321,11 +328,26 @@ def create_tables():
 
             backup_location,
 
-            backup_keep_count
+            backup_keep_count,
+
+            automatic_daily_report_enabled,
+
+            daily_report_time,
+
+
+            automatic_monthly_report_enabled,
+
+            monthly_report_time,
+
+
+            last_daily_report_date,
+
+
+            last_monthly_report_month
 
         )
 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
         """,
 
@@ -356,6 +378,21 @@ def create_tables():
             "",
 
             10,
+
+            0,
+
+            '18:00',
+
+
+            0,
+
+            '18:00',
+
+
+            "",
+
+
+            "",
 
             None
 

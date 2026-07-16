@@ -30,6 +30,19 @@ if __name__ == "__main__":
 
 
     # =====================================
+    # START REPORT SCHEDULER
+    # =====================================
+
+    from modules.reports.report_scheduler import (
+        start_report_scheduler
+    )
+
+
+    start_report_scheduler()
+
+
+
+    # =====================================
     # IMPORT GUI AFTER DATABASE EXISTS
     # =====================================
 

@@ -420,3 +420,139 @@ def update_last_backup_datetime(
     conn.commit()
 
     conn.close()
+
+# =====================================
+# REPORT SCHEDULER SETTINGS
+# =====================================
+
+
+def get_report_scheduler_settings():
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+    SELECT
+
+        automatic_daily_report_enabled,
+
+        daily_report_time,
+
+        automatic_monthly_report_enabled,
+
+        monthly_report_time,
+
+        last_daily_report_date,
+
+        last_monthly_report_month
+
+    FROM settings
+
+    WHERE id = 1
+
+    """)
+
+
+    result = cursor.fetchone()
+
+
+    conn.close()
+
+
+    return result
+
+
+
+def update_report_scheduler_settings(
+        daily_enabled,
+        daily_time,
+        monthly_enabled,
+        monthly_time
+):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+    UPDATE settings
+
+    SET
+
+    automatic_daily_report_enabled = ?,
+
+    daily_report_time = ?,
+
+    automatic_monthly_report_enabled = ?,
+
+    monthly_report_time = ?
+
+    WHERE id = 1
+
+    """,
+    (
+        daily_enabled,
+        daily_time,
+        monthly_enabled,
+        monthly_time
+    ))
+
+
+    conn.commit()
+
+    conn.close()
+
+
+
+def update_last_daily_report_date(report_date):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+    UPDATE settings
+
+    SET last_daily_report_date = ?
+
+    WHERE id = 1
+
+    """,
+    (
+        report_date,
+    ))
+
+
+    conn.commit()
+
+    conn.close()
+
+
+
+def update_last_monthly_report_month(month):
+
+    conn = get_connection()
+
+    cursor = conn.cursor()
+
+
+    cursor.execute("""
+    UPDATE settings
+
+    SET last_monthly_report_month = ?
+
+    WHERE id = 1
+
+    """,
+    (
+        month,
+    ))
+
+
+    conn.commit()
+
+    conn.close()

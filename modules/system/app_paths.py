@@ -155,6 +155,13 @@ def get_receipts_directory():
         "receipts"
     )
 
+def get_reports_directory():
+
+    return (
+        get_application_directory()
+        /
+        "reports"
+    )
 
 def get_logs_directory():
 
@@ -200,6 +207,9 @@ def initialize_application_directories():
         get_receipts_directory()
     )
 
+    reports_directory = (
+        get_reports_directory()
+    )
 
     logs_directory = (
         get_logs_directory()
@@ -221,6 +231,9 @@ def initialize_application_directories():
         exist_ok=True
     )
 
+    reports_directory.mkdir(
+        exist_ok=True
+    )
 
     logs_directory.mkdir(
         exist_ok=True

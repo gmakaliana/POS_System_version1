@@ -9,6 +9,11 @@ from gui.backup_recovery_window import (
     open_backup_recovery_window
 )
 
+from gui.report_settings_window import (
+    open_report_settings_window
+)
+
+
 
 def center_window(window, width, height):
 
@@ -18,25 +23,29 @@ def center_window(window, width, height):
     x = (screen_width // 2) - (width // 2)
     y = (screen_height // 2) - (height // 2)
 
-    window.geometry(f"{width}x{height}+{x}+{y}")
+    window.geometry(
+        f"{width}x{height}+{x}+{y}"
+    )
+
 
 
 def open_settings_window(parent):
 
-    # =====================================
-    # HIDE PARENT WINDOW
-    # =====================================
-
     parent.withdraw()
 
-    # =====================================
-    # CREATE SETTINGS WINDOW
-    # =====================================
+
 
     settings_window = tk.Toplevel(parent)
 
-    settings_window.title("SETTINGS")
-    settings_window.resizable(False, False)
+    settings_window.title(
+        "SETTINGS"
+    )
+
+    settings_window.resizable(
+        False,
+        False
+    )
+
 
     center_window(
         settings_window,
@@ -44,11 +53,26 @@ def open_settings_window(parent):
         550
     )
 
-    title_font = ("Arial", 20, "bold")
-    button_font = ("Arial", 11, "bold")
+
+    title_font = (
+        "Arial",
+        20,
+        "bold"
+    )
+
+
+    button_font = (
+        "Arial",
+        11,
+        "bold"
+    )
+
 
     button_width = 18
+
     button_height = 2
+
+
 
     # =====================================
     # CLOSE FUNCTION
@@ -60,14 +84,14 @@ def open_settings_window(parent):
 
         parent.deiconify()
 
-    # =====================================
-    # WINDOW CONTROL
-    # =====================================
+
 
     settings_window.protocol(
         "WM_DELETE_WINDOW",
         close_settings
     )
+
+
 
     # =====================================
     # MAIN FRAME
@@ -79,27 +103,33 @@ def open_settings_window(parent):
         pady=20
     )
 
-    main_frame.pack(expand=True)
+    main_frame.pack(
+        expand=True
+    )
 
-    # =====================================
-    # TITLE
-    # =====================================
+
 
     tk.Label(
         main_frame,
         text="SETTINGS",
         font=title_font
     ).pack(
-        pady=(0, 25)
+        pady=(0,25)
     )
+
+
 
     # =====================================
     # BUTTON FRAME
     # =====================================
 
-    btn_frame = tk.Frame(main_frame)
+    btn_frame = tk.Frame(
+        main_frame
+    )
 
     btn_frame.pack()
+
+
 
     # =====================================
     # BUSINESS INFORMATION
@@ -113,13 +143,17 @@ def open_settings_window(parent):
         bg="#3498db",
         fg="white",
         font=button_font,
-        command=lambda: open_business_settings(settings_window)
+        command=lambda:
+            open_business_settings(settings_window)
+
     ).grid(
         row=0,
         column=0,
         padx=10,
         pady=10
     )
+
+
 
     # =====================================
     # SALES SETTINGS
@@ -133,13 +167,17 @@ def open_settings_window(parent):
         bg="#3498db",
         fg="white",
         font=button_font,
-        command=lambda: open_sales_settings(settings_window)
+        command=lambda:
+            open_sales_settings(settings_window)
+
     ).grid(
         row=0,
         column=1,
         padx=10,
         pady=10
     )
+
+
 
     # =====================================
     # INVENTORY SETTINGS
@@ -153,13 +191,17 @@ def open_settings_window(parent):
         bg="#16a085",
         fg="white",
         font=button_font,
-        command=lambda: open_inventory_settings(settings_window)
+        command=lambda:
+            open_inventory_settings(settings_window)
+
     ).grid(
         row=0,
         column=2,
         padx=10,
         pady=10
     )
+
+
 
     # =====================================
     # BACKUP & RECOVERY
@@ -173,13 +215,17 @@ def open_settings_window(parent):
         bg="#9b59b6",
         fg="white",
         font=button_font,
-        command=lambda: open_backup_recovery_window(settings_window)
+        command=lambda:
+            open_backup_recovery_window(settings_window)
+
     ).grid(
         row=1,
         column=0,
         padx=10,
         pady=10
     )
+
+
 
     # =====================================
     # SYSTEM INFORMATION
@@ -193,13 +239,41 @@ def open_settings_window(parent):
         bg="#34495e",
         fg="white",
         font=button_font,
-        command=lambda: open_system_information(settings_window)
+        command=lambda:
+            open_system_information(settings_window)
+
     ).grid(
         row=1,
         column=1,
         padx=10,
         pady=10
     )
+
+
+
+    # =====================================
+    # REPORT AUTOMATION SETTINGS
+    # =====================================
+
+    tk.Button(
+        btn_frame,
+        text="Reports",
+        width=button_width,
+        height=button_height,
+        bg="#e67e22",
+        fg="white",
+        font=button_font,
+        command=lambda:
+            open_report_settings_window(settings_window)
+
+    ).grid(
+        row=1,
+        column=2,
+        padx=10,
+        pady=10
+    )
+
+
 
     # =====================================
     # CLOSE BUTTON
@@ -214,6 +288,7 @@ def open_settings_window(parent):
         fg="white",
         font=button_font,
         command=close_settings
+
     ).pack(
         pady=30
     )

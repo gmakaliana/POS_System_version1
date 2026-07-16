@@ -1,14 +1,20 @@
 import tkinter as tk
-from tkinter import ttk
+from tkinter import ttk, messagebox
 from datetime import datetime, date
 
 from modules.reports.reports import (
     get_daily_sales,
     get_monthly_sales,
     get_daily_stock_report,
-    get_monthly_stock_report
+    get_monthly_stock_report 
 )
 
+from modules.reports.report_export import (
+    save_daily_sales_report,
+    save_monthly_sales_report,
+    save_daily_stock_report,
+    save_monthly_stock_report
+)
 
 # ==========================================================
 # CENTER WINDOW
@@ -412,8 +418,47 @@ def open_daily_sales(parent):
 
 
 
+    button_frame = tk.Frame(win)
+
+    button_frame.pack(
+        pady=10
+    )
+
+
+    def save_report():
+
+        file_path = save_daily_sales_report(
+            report_date,
+            generated,
+            rows,
+            summary
+        )
+
+
+        messagebox.showinfo(
+            "Report Saved",
+            f"Daily Sales Report saved:\n\n{file_path}",parent=win
+        )
+
+
+
     tk.Button(
-        win,
+        button_frame,
+        text="Save",
+        width=14,
+        bg="#27ae60",
+        fg="white",
+        command=save_report
+
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+
+    tk.Button(
+        button_frame,
         text="Close",
         width=14,
         bg="#7f8c8d",
@@ -421,7 +466,8 @@ def open_daily_sales(parent):
         command=close
 
     ).pack(
-        pady=10
+        side="left",
+        padx=5
     )
 
 
@@ -671,8 +717,48 @@ def open_monthly_sales(parent):
         )
 
 
+    button_frame = tk.Frame(win)
+
+    button_frame.pack(
+        pady=10
+    )
+
+
+
+    def save_report():
+
+        file_path = save_monthly_sales_report(
+            month,
+            generated,
+            rows,
+            summary
+        )
+
+
+        messagebox.showinfo(
+            "Report Saved",
+            f"Monthly Sales Report saved:\n\n{file_path}",parent=win
+        )
+
+
+
     tk.Button(
-        win,
+        button_frame,
+        text="Save",
+        width=14,
+        bg="#27ae60",
+        fg="white",
+        command=save_report
+
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+
+    tk.Button(
+        button_frame,
         text="Close",
         width=14,
         bg="#7f8c8d",
@@ -680,7 +766,8 @@ def open_monthly_sales(parent):
         command=close
 
     ).pack(
-        pady=10
+        side="left",
+        padx=5
     )
 
 
@@ -861,8 +948,47 @@ def open_daily_stock(parent):
 
 
 
+    button_frame = tk.Frame(win)
+
+    button_frame.pack(
+        pady=10
+    )
+
+
+
+    def save_report():
+
+        file_path = save_daily_stock_report(
+            today,
+            generated,
+            rows
+        )
+
+
+        messagebox.showinfo(
+            "Report Saved",
+            f"Daily Stock Book saved:\n\n{file_path}",parent=win
+        )
+
+
+
     tk.Button(
-        win,
+        button_frame,
+        text="Save",
+        width=14,
+        bg="#27ae60",
+        fg="white",
+        command=save_report
+
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+
+    tk.Button(
+        button_frame,
         text="Close",
         width=14,
         bg="#7f8c8d",
@@ -870,7 +996,8 @@ def open_daily_stock(parent):
         command=close
 
     ).pack(
-        pady=10
+        side="left",
+        padx=5
     )
 
 
@@ -1071,8 +1198,47 @@ def open_monthly_stock(parent):
 
 
 
+    button_frame = tk.Frame(win)
+
+    button_frame.pack(
+        pady=10
+    )
+
+
+
+    def save_report():
+
+        file_path = save_monthly_stock_report(
+            month,
+            generated,
+            rows
+        )
+
+
+        messagebox.showinfo(
+            "Report Saved",
+            f"Monthly Stock Book saved:\n\n{file_path}",parent=win
+        )
+
+
+
     tk.Button(
-        win,
+        button_frame,
+        text="Save",
+        width=14,
+        bg="#27ae60",
+        fg="white",
+        command=save_report
+
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+
+    tk.Button(
+        button_frame,
         text="Close",
         width=14,
         bg="#7f8c8d",
@@ -1080,10 +1246,9 @@ def open_monthly_stock(parent):
         command=close
 
     ).pack(
-        pady=10
+        side="left",
+        padx=5
     )
-
-
 
     win.protocol(
         "WM_DELETE_WINDOW",
