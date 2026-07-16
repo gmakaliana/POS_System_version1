@@ -236,6 +236,6 @@ def get_monthly_stock_report(month):
 
     rows = cursor.fetchall()
 
-    conn.close()
+    conn.close() 
 
     return rows

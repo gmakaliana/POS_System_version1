@@ -392,9 +392,7 @@ def create_tables():
             "",
 
 
-            "",
-
-            None
+            ""
 
         ))
 
