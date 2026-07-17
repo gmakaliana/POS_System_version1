@@ -1,10 +1,18 @@
+# gui/user_add_window.py
+
 import tkinter as tk
 from tkinter import messagebox
 
 from modules.users.user_management import add_user
+from auth.permissions import can_create_user
 
 
-def open_add_user_window(parent,refresh_callback=None):
+
+def open_add_user_window(
+        parent,
+        current_user,
+        refresh_callback=None
+):
 
     win = tk.Toplevel(parent)
 
@@ -12,51 +20,210 @@ def open_add_user_window(parent,refresh_callback=None):
     win.grab_set()
 
     win.title("ADD USER")
-    win.geometry("300x250")
+    win.geometry("320x320")
+    win.resizable(False, False)
 
-    tk.Label(win, text="Username").pack()
-    username_entry = tk.Entry(win)
-    username_entry.pack()
 
-    # Focus username automatically
-    username_entry.focus()
 
-    tk.Label(win, text="Password").pack()
-    password_entry = tk.Entry(win, show="*")
-    password_entry.pack()
+    # =====================================
+    # CHECK AVAILABLE ROLES
+    # =====================================
 
-    role_var = tk.StringVar(value="Cashier")
+    available_roles = []
 
-    tk.Label(win, text="Role").pack()
-    tk.Radiobutton(win, text="Admin", variable=role_var, value="Admin").pack()
-    tk.Radiobutton(win, text="Cashier", variable=role_var, value="Cashier").pack()
 
-    #parent.wait_window(win)
+    possible_roles = [
+        "System Admin",
+        "Default Admin",
+        "Admin",
+        "Cashier"
+    ]
 
-    def save():
-        username = username_entry.get()
-        password = password_entry.get()
-        role = role_var.get()
 
-        if not username or not password:
-            messagebox.showerror("Error", "All fields required",parent=win)
-            return
+    for role in possible_roles:
 
-        add_user(username, password, role)
+        if can_create_user(
+            current_user,
+            role
+        ):
 
-        messagebox.showinfo("Success", "User added successfully",parent=win)
+            available_roles.append(role)
+
+
+
+    if not available_roles:
+
+        messagebox.showerror(
+            "Permission Denied",
+            "You cannot create users.",
+            parent=win
+        )
 
         win.destroy()
+        return
 
-        if refresh_callback:
-            refresh_callback()
 
-    tk.Button(win, text="Add User", bg="#3498db",
-        fg="white",command=save).pack(pady=10)
-    
-    # Press Enter to save settings
+
+    # =====================================
+    # USERNAME
+    # =====================================
+
+    tk.Label(
+        win,
+        text="Username"
+    ).pack(pady=5)
+
+
+    username_entry = tk.Entry(win)
+
+    username_entry.pack()
+
+    username_entry.focus()
+
+
+
+    # =====================================
+    # TEMP PASSWORD
+    # =====================================
+
+    tk.Label(
+        win,
+        text="Temporary Password"
+    ).pack(pady=5)
+
+
+    password_entry = tk.Entry(
+        win,
+        show="*"
+    )
+
+    password_entry.pack()
+
+
+
+    # =====================================
+    # ROLE
+    # =====================================
+
+    tk.Label(
+        win,
+        text="Role"
+    ).pack(pady=5)
+
+
+
+    role_var = tk.StringVar(
+        value=available_roles[0]
+    )
+
+
+
+    for role in available_roles:
+
+        tk.Radiobutton(
+            win,
+            text=role,
+            variable=role_var,
+            value=role
+        ).pack()
+
+
+
+    # =====================================
+    # SAVE
+    # =====================================
+
+    def save():
+
+        username = username_entry.get().strip()
+
+        password = password_entry.get().strip()
+
+        role = role_var.get()
+
+
+
+        if not username or not password:
+
+            messagebox.showerror(
+                "Error",
+                "All fields required.",
+                parent=win
+            )
+
+            return
+
+
+
+        # PASSWORD POLICY
+        if len(password) < 8:
+
+            messagebox.showerror(
+                "Weak Password",
+                "Password must be at least 8 characters long.",
+                parent=win
+            )
+
+            return
+
+
+
+        try:
+
+            add_user(
+                current_user,
+                username,
+                password,
+                role
+            )
+
+
+            messagebox.showinfo(
+                "Success",
+                "User added successfully.",
+                parent=win
+            )
+
+
+            win.destroy()
+
+
+            if refresh_callback:
+
+                refresh_callback()
+
+
+
+        except Exception as e:
+
+            messagebox.showerror(
+                "Error",
+                str(e),
+                parent=win
+            )
+
+
+
+    # =====================================
+    # BUTTON
+    # =====================================
+
+    tk.Button(
+        win,
+        text="Add User",
+        bg="#3498db",
+        fg="white",
+        width=15,
+        command=save
+    ).pack(
+        pady=15
+    )
+
+
+
+    # ENTER = SAVE
+
     win.bind(
         "<Return>",
         lambda event: save()
     )
-

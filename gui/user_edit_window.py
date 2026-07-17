@@ -1,48 +1,264 @@
+# gui/user_edit_window.py
+
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, ttk
 
 from modules.users.user_management import update_user
+from auth.permissions import can_change_role
 
 
-def open_edit_user_window(user_data, refresh_callback,parent):
 
-    user_id, username, role, _ = user_data
+def open_edit_user_window(
+        user_data,
+        current_user,
+        refresh_callback,
+        parent
+):
+
+
+    target_user = user_data
+
+
+
+    # =====================================
+    # PROTECT SYSTEM ADMIN
+    # =====================================
+
+    if target_user["role"] == "System Admin":
+
+        messagebox.showerror(
+            "Restricted",
+            "System Admin account cannot be edited.",
+            parent=parent
+        )
+
+        return
+
+
 
     win = tk.Toplevel(parent)
 
+    win.title(
+        "EDIT USER"
+    )
+
+    win.geometry(
+        "320x250"
+    )
+
+    win.resizable(
+        False,
+        False
+    )
+
+
     win.transient(parent)
+
     win.grab_set()
 
-    win.title("EDIT USER")
-    win.geometry("300x250")
 
-    tk.Label(win, text="Username").pack()
-    username_entry = tk.Entry(win)
+
+    # =====================================
+    # USERNAME
+    # =====================================
+
+    tk.Label(
+        win,
+        text="Username"
+    ).pack(
+        pady=5
+    )
+
+
+    username_entry = tk.Entry(
+        win
+    )
+
     username_entry.pack()
-    username_entry.insert(0, username)
 
-    # Focus username automatically
+
+    username_entry.insert(
+        0,
+        target_user["username"]
+    )
+
+
     username_entry.focus()
 
-    role_var = tk.StringVar(value=role)
 
-    tk.Label(win, text="Role").pack()
 
-    tk.Radiobutton(win, text="Admin", variable=role_var, value="Admin").pack()
-    tk.Radiobutton(win, text="Cashier", variable=role_var, value="Cashier").pack()
+    # =====================================
+    # ROLE
+    # =====================================
 
-    #parent.wait_window(win)
+    tk.Label(
+        win,
+        text="Role"
+    ).pack(
+        pady=5
+    )
+
+
+    role_var = tk.StringVar(
+        value=target_user["role"]
+    )
+
+
+
+    allowed_roles = [
+        target_user["role"]
+    ]
+
+
+
+    possible_roles = [
+        "Default Admin",
+        "Admin",
+        "Cashier"
+    ]
+
+
+
+    for role in possible_roles:
+
+
+        if role == target_user["role"]:
+
+            continue
+
+
+
+        if can_change_role(
+            current_user,
+            target_user,
+            role
+        ):
+
+            allowed_roles.append(
+                role
+            )
+
+
+
+    role_box = ttk.Combobox(
+        win,
+        textvariable=role_var,
+        values=allowed_roles,
+        state="readonly"
+    )
+
+
+    role_box.pack()
+
+
+
+    # =====================================
+    # SAVE
+    # =====================================
 
     def save():
-        update_user(user_id, username_entry.get(), role_var.get())
-        messagebox.showinfo("Success", "Updated successfully",parent=win)
-        win.destroy()
-        refresh_callback()
 
-    tk.Button(win, text="Save", bg="#3498db",
-        fg="white",command=save).pack(pady=10)
-    
-    # Press Enter to save settings
+
+        username = username_entry.get().strip()
+
+        role = role_var.get()
+
+
+
+        if not username:
+
+            messagebox.showerror(
+                "Error",
+                "Username is required.",
+                parent=win
+            )
+
+            return
+
+
+
+        try:
+
+
+            update_user(
+
+                current_user,
+
+                target_user["user_id"],
+
+                username,
+
+                role
+
+            )
+
+
+
+            messagebox.showinfo(
+                "Success",
+                "User updated successfully.",
+                parent=win
+            )
+
+
+
+            win.destroy()
+
+
+
+            refresh_callback()
+
+
+
+        except Exception as e:
+
+
+            messagebox.showerror(
+                "Error",
+                str(e),
+                parent=win
+            )
+
+
+
+    # =====================================
+    # BUTTONS
+    # =====================================
+
+    button_frame = tk.Frame(win)
+
+    button_frame.pack(
+        pady=15
+    )
+
+
+
+    tk.Button(
+        button_frame,
+        text="Save",
+        width=12,
+        bg="#3498db",
+        fg="white",
+        command=save
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+
+    tk.Button(
+        button_frame,
+        text="Cancel",
+        width=12,
+        command=win.destroy
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+
     win.bind(
         "<Return>",
         lambda event: save()

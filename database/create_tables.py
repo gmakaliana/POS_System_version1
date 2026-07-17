@@ -37,47 +37,99 @@ def create_tables():
 
 
     # =====================================
-    # DEFAULT ADMIN
+    # USER ROLE MIGRATION
     # =====================================
 
-    cursor.execute(
-        "SELECT * FROM users WHERE username = ?",
-        ("admin",)
-    )
+    # Convert old Admin account into Default Admin
+    # For existing installations
+
+    cursor.execute("""
+        SELECT user_id, role
+        FROM users
+        WHERE username = ?
+    """,
+    (
+        "admin",
+    ))
 
 
-    if not cursor.fetchone():
+    old_admin = cursor.fetchone()
+
+
+
+    if old_admin:
+
+        if old_admin[1] == "Admin":
+
+            cursor.execute("""
+                UPDATE users
+                SET role = ?
+                WHERE username = ?
+            """,
+            (
+                "Default Admin",
+                "admin"
+            ))
+
+            conn.commit()
+
+
+
+    # =====================================
+    # CREATE SYSTEM ADMIN
+    # =====================================
+
+    cursor.execute("""
+        SELECT user_id
+        FROM users
+        WHERE role = ?
+    """,
+    (
+        "System Admin",
+    ))
+
+
+    system_admin = cursor.fetchone()
+
+
+
+    if not system_admin:
+
 
         cursor.execute("""
-        INSERT INTO users (
+            INSERT INTO users
+            (
+                username,
+                password_hash,
+                role,
+                must_change_password,
+                is_active,
+                created_at
+            )
 
-            username,
-
-            password_hash,
-
-            role,
-
-            must_change_password,
-
-            created_at
-
-        )
-
-        VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?)
 
         """,
         (
-            "admin",
 
-            hash_password("admin123"),
+            "systemadmin",
 
-            "Admin",
+            hash_password(
+                "systemadmin123"
+            ),
+
+            "System Admin",
 
             1,
 
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            1,
+
+            datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
 
         ))
+
 
         conn.commit()
 
@@ -190,6 +242,7 @@ def create_tables():
 
         discount REAL DEFAULT 0,
 
+
         FOREIGN KEY (sale_id)
 
         REFERENCES sales(sale_id),
@@ -204,12 +257,14 @@ def create_tables():
 
     conn.commit()
 
+
+
     # =====================================
     # SALES TRANSACTIONS MIGRATION
     # =====================================
 
     cursor.execute("""
-    PRAGMA table_info(sales_transactions)
+        PRAGMA table_info(sales_transactions)
     """)
 
 
@@ -222,11 +277,12 @@ def create_tables():
     if "discount" not in columns:
 
         cursor.execute("""
-        ALTER TABLE sales_transactions
-        ADD COLUMN discount REAL DEFAULT 0
+            ALTER TABLE sales_transactions
+            ADD COLUMN discount REAL DEFAULT 0
         """)
 
         conn.commit()
+
 
 
     # =====================================
@@ -277,7 +333,6 @@ def create_tables():
 
         last_daily_report_date TEXT DEFAULT NULL,
 
-
         last_monthly_report_month TEXT DEFAULT NULL
 
     )
@@ -291,13 +346,14 @@ def create_tables():
     # DEFAULT SETTINGS RECORD
     # =====================================
 
-    cursor.execute(
-        "SELECT id FROM settings WHERE id = 1"
-    )
+    cursor.execute("""
+        SELECT id
+        FROM settings
+        WHERE id = 1
+    """)
 
 
     if not cursor.fetchone():
-
 
         cursor.execute("""
         INSERT INTO settings (
@@ -322,8 +378,6 @@ def create_tables():
 
             installed_datetime,
 
-            last_backup_datetime,
-
             automatic_backup_enabled,
 
             backup_location,
@@ -334,20 +388,17 @@ def create_tables():
 
             daily_report_time,
 
-
             automatic_monthly_report_enabled,
 
             monthly_report_time,
 
-
             last_daily_report_date,
-
 
             last_monthly_report_month
 
         )
 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 
         """,
 
@@ -381,21 +432,17 @@ def create_tables():
 
             0,
 
-            '18:00',
-
+            "18:00",
 
             0,
 
-            '18:00',
-
+            "18:00",
 
             "",
-
 
             ""
 
         ))
-
 
         conn.commit()
 

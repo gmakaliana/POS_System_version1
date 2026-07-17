@@ -1,11 +1,17 @@
+# gui/change_password.py
+
 import tkinter as tk
 from tkinter import messagebox
 
 from database.db import get_connection
 from auth.password_utils import hash_password
-from auth.permissions import is_admin
+from auth.permissions import (
+    can_access_admin_dashboard
+)
+
 from gui.admin_dashboard import open_admin_dashboard
 from gui.cashier_dashboard import open_cashier_dashboard
+
 
 
 def open_change_password(user, parent):
@@ -16,20 +22,37 @@ def open_change_password(user, parent):
     root = tk.Toplevel(parent)
 
     root.title("CHANGE PASSWORD")
-    root.geometry("300x250")
-    root.resizable(False, False)
 
-    # Keep window on top
+    root.geometry(
+        "320x270"
+    )
+
+    root.resizable(
+        False,
+        False
+    )
+
+
+
+    # Keep modal
     root.transient(parent)
+
     root.grab_set()
 
-    # Prevent closing window before password change
+
+
+    # =====================================
+    # PREVENT CLOSE
+    # =====================================
+
     def prevent_close():
+
         messagebox.showwarning(
             "Password Change Required",
             "You must change your password before continuing.",
             parent=root
         )
+
 
 
     root.protocol(
@@ -38,105 +61,165 @@ def open_change_password(user, parent):
     )
 
 
+
+    # =====================================
+    # NEW PASSWORD
+    # =====================================
+
     tk.Label(
         root,
         text="New Password"
-    ).pack(pady=5)
+    ).pack(
+        pady=5
+    )
+
 
     new_password_entry = tk.Entry(
         root,
         show="*"
     )
+
     new_password_entry.pack()
 
+
+
+    # =====================================
+    # CONFIRM PASSWORD
+    # =====================================
 
     tk.Label(
         root,
         text="Confirm Password"
-    ).pack(pady=5)
+    ).pack(
+        pady=5
+    )
+
 
     confirm_password_entry = tk.Entry(
         root,
         show="*"
     )
+
     confirm_password_entry.pack()
 
 
 
-    # ----------------------------
-    # SAVE NEW PASSWORD
-    # ----------------------------
+    # =====================================
+    # SAVE PASSWORD
+    # =====================================
+
     def save_password():
 
-        new_password = new_password_entry.get()
-        confirm_password = confirm_password_entry.get()
+        new_password = new_password_entry.get().strip()
+
+        confirm_password = confirm_password_entry.get().strip()
+
 
 
         if not new_password or not confirm_password:
+
             messagebox.showerror(
                 "Error",
-                "All fields required",
+                "All fields required.",
                 parent=root
             )
+
             return
+
+
+
+        # PASSWORD POLICY
+
+        if len(new_password) < 8:
+
+            messagebox.showerror(
+                "Weak Password",
+                "Password must be at least 8 characters long.",
+                parent=root
+            )
+
+            return
+
 
 
         if new_password != confirm_password:
+
             messagebox.showerror(
                 "Error",
-                "Passwords do not match",
+                "Passwords do not match.",
                 parent=root
             )
+
             return
 
 
+
         try:
+
             conn = get_connection()
+
             cursor = conn.cursor()
+
 
 
             cursor.execute("""
                 UPDATE users
-                SET password_hash = ?,
-                    must_change_password = 0
-                WHERE user_id = ?
-            """, (
+
+                SET password_hash=?,
+                    must_change_password=0
+
+                WHERE user_id=?
+
+            """,
+            (
                 hash_password(new_password),
                 user["user_id"]
             ))
 
 
+
             conn.commit()
+
             conn.close()
+
 
 
             messagebox.showinfo(
                 "Success",
-                "Password updated successfully",
+                "Password updated successfully.",
                 parent=root
             )
 
 
-            # Close change password window
+
+            # Close password window
+
             root.destroy()
 
-            # Close login window
-            #if parent:
-            #hide login window
+
+
+            # Hide login window
+
             parent.withdraw()
 
-            # ----------------------------
-            # OPEN DASHBOARD
-            # ----------------------------
 
-            if is_admin(user):
+
+            # =====================================
+            # OPEN DASHBOARD
+            # =====================================
+
+            if can_access_admin_dashboard(user):
+
                 open_admin_dashboard(parent)
 
             else:
+
                 open_cashier_dashboard(parent)
 
 
+
         except Exception as e:
+
 
             messagebox.showerror(
                 "Database Error",
@@ -146,22 +229,36 @@ def open_change_password(user, parent):
 
 
 
+    # =====================================
+    # BUTTON
+    # =====================================
+
     tk.Button(
         root,
         text="SAVE PASSWORD",
+        width=18,
+        bg="#3498db",
+        fg="white",
         command=save_password
-    ).pack(pady=15)
+    ).pack(
+        pady=15
+    )
 
-    # Press Enter to save password
+
+
+    # ENTER = SAVE
+
     root.bind(
         "<Return>",
         lambda event: save_password()
     )
 
-    # Focus first field
+
+
+    # Focus
+
     new_password_entry.focus()
 
-    root.bind(
-        "<Return>",
-        lambda event: save_password()
-    )
+
+
+    return root
