@@ -49,7 +49,6 @@ def is_last_day_of_month():
         today.month
     )[1]
 
-
     return today.day == last_day
 
 
@@ -61,12 +60,11 @@ def is_last_day_of_month():
 
 def generate_daily_reports():
 
+    print("Generating daily reports...")
+
+
     today = str(date.today())
 
-
-    # -------------------------------
-    # Daily Sales
-    # -------------------------------
 
     rows, summary = get_daily_sales(
         today
@@ -87,10 +85,6 @@ def generate_daily_reports():
 
 
 
-    # -------------------------------
-    # Daily Stock
-    # -------------------------------
-
     stock_rows = get_daily_stock_report(
         today
     )
@@ -103,10 +97,12 @@ def generate_daily_reports():
     )
 
 
-
     update_last_daily_report_date(
         today
     )
+
+
+    print("Daily reports completed.")
 
 
 
@@ -117,14 +113,13 @@ def generate_daily_reports():
 
 def generate_monthly_reports():
 
+    print("Generating monthly reports...")
+
+
     month = datetime.now().strftime(
         "%Y-%m"
     )
 
-
-    # -------------------------------
-    # Monthly Sales
-    # -------------------------------
 
     rows, summary = get_monthly_sales(
         month
@@ -143,9 +138,7 @@ def generate_monthly_reports():
         summary
     )
 
-    # -------------------------------
-    # Monthly Stock
-    # -------------------------------
+
 
     stock_rows = get_monthly_stock_report(
         month
@@ -159,10 +152,12 @@ def generate_monthly_reports():
     )
 
 
-
     update_last_monthly_report_month(
         month
     )
+
+
+    print("Monthly reports completed.")
 
 
 
@@ -173,45 +168,58 @@ def generate_monthly_reports():
 
 def report_scheduler_loop():
 
-
     global scheduler_running
-
 
     while scheduler_running:
 
         try:
-
-
             settings = get_report_scheduler_settings()
-
-
 
             if settings:
 
+                # sqlite Row conversion
 
-                (
-                    daily_enabled,
-                    daily_time,
-                    monthly_enabled,
-                    monthly_time,
-                    last_daily,
-                    last_monthly
-
-                ) = settings
+                daily_enabled = settings[
+                    "automatic_daily_report_enabled"
+                ]
 
 
+                daily_time = settings[
+                    "daily_report_time"
+                ]
+
+
+                monthly_enabled = settings[
+                    "automatic_monthly_report_enabled"
+                ]
+
+
+                monthly_time = settings[
+                    "monthly_report_time"
+                ]
+
+
+                last_daily = settings[
+                    "last_daily_report_date"
+                ]
+
+
+                last_monthly = settings[
+                    "last_monthly_report_month"
+                ]
 
                 current_time = datetime.now().strftime(
                     "%H:%M"
                 )
-
-
 
                 today = str(
                     date.today()
                 )
 
 
+                current_month = datetime.now().strftime(
+                    "%Y-%m"
+                )
 
                 # =====================================
                 # DAILY REPORT CHECK
@@ -231,20 +239,11 @@ def report_scheduler_loop():
 
                 ):
 
-
                     generate_daily_reports()
-
-
 
                 # =====================================
                 # MONTHLY REPORT CHECK
                 # =====================================
-
-
-                current_month = datetime.now().strftime(
-                    "%Y-%m"
-                )
-
 
                 if (
 
@@ -264,26 +263,19 @@ def report_scheduler_loop():
 
                 ):
 
-
                     generate_monthly_reports()
 
-
-
         except Exception as error:
+
 
             print(
                 "Report Scheduler Error:",
                 error
             )
 
-
-
-        # check every minute
+        # Check every 60 seconds
 
         time.sleep(60)
-
-
-
 
 # ==========================================================
 # START SCHEDULER
@@ -314,6 +306,7 @@ def start_report_scheduler():
 
 
 
+
 # ==========================================================
 # STOP SCHEDULER
 # ==========================================================
@@ -324,6 +317,3 @@ def stop_report_scheduler():
 
 
     scheduler_running = False
-
-
-    

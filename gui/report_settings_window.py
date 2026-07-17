@@ -85,15 +85,21 @@ def open_report_settings_window(parent):
 
     if settings:
 
-        (
-            daily_enabled,
-            daily_time,
-            monthly_enabled,
-            monthly_time,
-            last_daily,
-            last_monthly
+        daily_enabled = settings[
+            "automatic_daily_report_enabled"
+        ]
 
-        ) = settings
+        daily_time = settings[
+            "daily_report_time"
+        ]
+
+        monthly_enabled = settings[
+            "automatic_monthly_report_enabled"
+        ]
+
+        monthly_time = settings[
+            "monthly_report_time"
+        ]
 
 
     else:
@@ -103,6 +109,7 @@ def open_report_settings_window(parent):
 
         monthly_enabled = 0
         monthly_time = "18:00"
+
 
 
 
@@ -252,6 +259,57 @@ def open_report_settings_window(parent):
 
 
     # ======================================================
+    # TIME VALIDATION
+    # ======================================================
+
+    def validate_time(value):
+
+        try:
+
+            parts = value.split(":")
+
+
+            if len(parts) != 2:
+
+                return False
+
+
+            hour = int(parts[0])
+
+            minute = int(parts[1])
+
+
+            if hour < 0 or hour > 23:
+
+                return False
+
+
+            if minute < 0 or minute > 59:
+
+                return False
+
+
+            return True
+
+
+        except:
+
+            return False
+
+
+
+    def normalize_time(value):
+
+        hour, minute = value.split(":")
+
+        return (
+            f"{int(hour):02d}:"
+            f"{int(minute):02d}"
+        )
+
+
+
+    # ======================================================
     # SAVE FUNCTION
     # ======================================================
 
@@ -263,42 +321,38 @@ def open_report_settings_window(parent):
 
 
 
-        # Validate time format
-
-        try:
-
-            hour, minute = map(
-                int,
-                daily_time.split(":")
-            )
-
-
-            if hour > 23 or minute > 59:
-
-                raise ValueError
-
-
-
-            hour, minute = map(
-                int,
-                monthly_time.split(":")
-            )
-
-
-            if hour > 23 or minute > 59:
-
-                raise ValueError
-
-
-
-        except:
+        if not validate_time(daily_time):
 
             messagebox.showerror(
-                "Invalid Time",
-                "Use 24 hour format.\nExample: 18:30"
+                "Invalid Daily Time",
+                "Use 24 hour format.\nExample: 15:30",
+                parent=win
             )
 
             return
+
+
+
+        if not validate_time(monthly_time):
+
+            messagebox.showerror(
+                "Invalid Monthly Time",
+                "Use 24 hour format.\nExample: 08:00",
+                parent=win
+            )
+
+            return
+
+
+
+        daily_time = normalize_time(
+            daily_time
+        )
+
+
+        monthly_time = normalize_time(
+            monthly_time
+        )
 
 
 
@@ -318,7 +372,8 @@ def open_report_settings_window(parent):
 
         messagebox.showinfo(
             "Saved",
-            "Report automation settings saved.",parent=main
+            "Report automation settings saved.",
+            parent=win
         )
 
 
@@ -334,6 +389,7 @@ def open_report_settings_window(parent):
     button_frame.pack(
         pady=20
     )
+
 
 
     tk.Button(
