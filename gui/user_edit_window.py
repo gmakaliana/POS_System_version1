@@ -249,8 +249,10 @@ def open_edit_user_window(
 
     tk.Button(
         button_frame,
-        text="Cancel",
+        text="Close",
         width=12,
+        bg="#7f8c8d",
+        fg="white",
         command=win.destroy
     ).pack(
         side="left",

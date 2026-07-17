@@ -200,8 +200,10 @@ def open_reset_password_window(
 
     tk.Button(
         win,
-        text="Cancel",
+        text="Close",
         width=18,
+        bg="#7f8c8d",
+        fg="white",
         command=win.destroy
     ).pack()
 
