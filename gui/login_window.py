@@ -3,7 +3,7 @@ from tkinter import messagebox
 
 from auth.login import authenticate_user
 from auth.session import create_session
-from auth.permissions import is_admin
+from auth.permissions import can_access_admin_dashboard
 
 #settings
 from modules.settings.settings import get_settings
@@ -123,7 +123,7 @@ def create_login_window():
 
         root.withdraw()
 
-        if is_admin(user):
+        if can_access_admin_dashboard(user):
             open_admin_dashboard(root)
         else:
             open_cashier_dashboard(root)
