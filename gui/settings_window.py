@@ -13,6 +13,9 @@ from gui.report_settings_window import (
     open_report_settings_window
 )
 
+from tkinter import messagebox
+from auth.session import get_session_user
+from auth.permissions import can_manage_settings
 
 
 def center_window(window, width, height):
@@ -30,6 +33,41 @@ def center_window(window, width, height):
 
 
 def open_settings_window(parent):
+
+    # =====================================
+    # CHECK SETTINGS PERMISSION
+    # =====================================
+
+    user = get_session_user()
+
+
+    if not user:
+
+        messagebox.showerror(
+            "Error",
+            "Session expired.",
+            parent=parent
+        )
+
+        return
+
+
+
+    if not can_manage_settings(user):
+
+        messagebox.showerror(
+            "Access Denied",
+            "You do not have permission to access settings.",
+            parent=parent
+        )
+
+        return
+
+
+
+    # =====================================
+    # OPEN SETTINGS WINDOW
+    # =====================================
 
     parent.withdraw()
 

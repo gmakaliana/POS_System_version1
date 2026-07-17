@@ -15,6 +15,8 @@ from gui.settings_window import open_settings_window
 
 from modules.inventory.stock_alerts import show_low_stock_alert
 
+from auth.permissions import can_manage_settings
+
 
 
 def center_window(window, width, height):
@@ -333,23 +335,23 @@ def open_admin_dashboard(parent):
 
     # SETTINGS
 
-    tk.Button(
-        btn_frame,
-        text="Settings",
-        width=button_width,
-        height=button_height,
-        bg="#34495e",
-        fg="white",
-        font=button_font,
-        command=lambda:
-            open_settings_window(root)
-    ).grid(
-        row=1,
-        column=2,
-        padx=10,
-        pady=10
-    )
+    if can_manage_settings(user):
 
+        tk.Button(
+            btn_frame,
+            text="Settings",
+            width=button_width,
+            height=button_height,
+            bg="#34495e",
+            fg="white",
+            font=button_font,
+            command=lambda: open_settings_window(root)
+        ).grid(
+            row=1,
+            column=2,
+            padx=10,
+            pady=10
+        )
 
 
     # LOGOUT
