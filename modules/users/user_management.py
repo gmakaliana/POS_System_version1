@@ -14,6 +14,7 @@ from auth.permissions import (
 
 from datetime import datetime
 
+from auth.password_policy import validate_password
 
 
 # =====================================================
@@ -86,6 +87,12 @@ def add_user(
             "Username and password required."
         )
 
+    valid, message = validate_password(password)
+
+
+    if not valid:
+
+        raise Exception(message)
 
 
     if role == "System Admin":
@@ -378,6 +385,12 @@ def reset_password(
             "Password cannot be empty."
         )
 
+    valid, message = validate_password(new_password)
+
+
+    if not valid:
+
+        raise Exception(message)
 
 
     target_user = get_user_by_id(

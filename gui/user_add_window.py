@@ -6,6 +6,7 @@ from tkinter import messagebox
 from modules.users.user_management import add_user
 from auth.permissions import can_create_user
 
+from auth.password_policy import validate_password
 
 
 def open_add_user_window(
@@ -156,11 +157,16 @@ def open_add_user_window(
 
 
         # PASSWORD POLICY
-        if len(password) < 8:
+        valid, message = validate_password(
+            password
+        )
+
+
+        if not valid:
 
             messagebox.showerror(
                 "Weak Password",
-                "Password must be at least 8 characters long.",
+                message,
                 parent=win
             )
 

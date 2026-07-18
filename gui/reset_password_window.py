@@ -5,7 +5,7 @@ from tkinter import messagebox
 
 from modules.users.user_management import reset_password
 
-
+from auth.password_policy import validate_password
 
 def open_reset_password_window(
         parent,
@@ -118,11 +118,16 @@ def open_reset_password_window(
 
         # PASSWORD POLICY
 
-        if len(new_password) < 8:
+        valid, message = validate_password(
+            new_password
+        )
+
+
+        if not valid:
 
             messagebox.showerror(
                 "Weak Password",
-                "Password must be at least 8 characters long.",
+                message,
                 parent=win
             )
 

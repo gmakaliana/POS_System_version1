@@ -115,7 +115,7 @@ def create_tables():
             "systemadmin",
 
             hash_password(
-                "systemadmin123"
+                "SystemAdmin@123"
             ),
 
             "System Admin",

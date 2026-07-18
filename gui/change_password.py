@@ -12,7 +12,7 @@ from auth.permissions import (
 from gui.admin_dashboard import open_admin_dashboard
 from gui.cashier_dashboard import open_cashier_dashboard
 
-
+from auth.password_policy import validate_password
 
 def open_change_password(user, parent):
     """
@@ -130,11 +130,16 @@ def open_change_password(user, parent):
 
         # PASSWORD POLICY
 
-        if len(new_password) < 8:
+        valid, message = validate_password(
+            new_password
+        )
+
+
+        if not valid:
 
             messagebox.showerror(
                 "Weak Password",
-                "Password must be at least 8 characters long.",
+                message,
                 parent=root
             )
 
