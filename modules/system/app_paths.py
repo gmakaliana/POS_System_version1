@@ -171,6 +171,13 @@ def get_logs_directory():
         "logs"
     )
 
+def get_audit_directory():
+
+    return (
+        get_application_directory()
+        /
+        "audit_logs"
+    )
 
 def get_settings_path():
 
@@ -215,6 +222,9 @@ def initialize_application_directories():
         get_logs_directory()
     )
 
+    audit_directory = (
+        get_audit_directory()
+    )
 
     application_directory.mkdir(
         parents=True,
@@ -238,3 +248,9 @@ def initialize_application_directories():
     logs_directory.mkdir(
         exist_ok=True
     )
+
+    audit_directory.mkdir(
+        exist_ok=True
+    )
+
+    

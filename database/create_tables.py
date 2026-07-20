@@ -446,6 +446,39 @@ def create_tables():
 
         conn.commit()
 
+    # =====================================
+    # AUDIT LOGS TABLE
+    # =====================================
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS audit_logs (
+
+        audit_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        user_id INTEGER,
+
+        username TEXT,
+
+        role TEXT,
+
+        module TEXT NOT NULL,
+
+        action TEXT NOT NULL,
+
+        description TEXT,
+
+        log_datetime TEXT DEFAULT CURRENT_TIMESTAMP,
+
+
+        FOREIGN KEY (user_id)
+
+        REFERENCES users(user_id)
+
+    )
+    """)
+
+    conn.commit()
+
 
 
     conn.close()

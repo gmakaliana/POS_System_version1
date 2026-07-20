@@ -5,12 +5,16 @@ from auth.login import authenticate_user
 from auth.session import create_session
 from auth.permissions import can_access_admin_dashboard
 
+from modules.audit.audit_logs import log_activity
+
 #settings
 from modules.settings.settings import get_settings
 
 from modules.system.application_exit import (
     close_application
 )
+
+
 
 settings = get_settings()
 
@@ -110,6 +114,12 @@ def create_login_window():
             return
 
         create_session(user)
+
+        log_activity(
+            module="AUTH",
+            action="LOGIN",
+            description="User logged in"
+        )
 
         # Clear login credentials for security
         username_entry.delete(0, tk.END)

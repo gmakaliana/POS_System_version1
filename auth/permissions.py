@@ -392,7 +392,17 @@ def can_manage_settings(user):
         is_default_admin(user)
     )
 
+# =====================================================
+# AUDIT LOGS
+# =====================================================
 
+def can_view_audit_logs(user):
+
+    return (
+        is_system_admin(user)
+        or
+        is_default_admin(user)
+    )
 
 
 

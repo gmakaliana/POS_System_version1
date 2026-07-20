@@ -15,8 +15,11 @@ from gui.settings_window import open_settings_window
 
 from modules.inventory.stock_alerts import show_low_stock_alert
 
-from auth.permissions import can_manage_settings
-
+from auth.permissions import (
+    can_manage_settings,
+    can_view_audit_logs
+)
+from gui.audit_logs_window import open_audit_logs_window
 
 
 def center_window(window, width, height):
@@ -353,6 +356,26 @@ def open_admin_dashboard(parent):
             pady=10
         )
 
+        # AUDIT LOGS
+
+    if can_view_audit_logs(user):
+
+        tk.Button(
+            btn_frame,
+            text="Audit Logs",
+            width=button_width,
+            height=button_height,
+            bg="#8e44ad",
+            fg="white",
+            font=button_font,
+            command=lambda: open_audit_logs_window(root)
+
+        ).grid(
+            row=2,
+            column=0,
+            padx=10,
+            pady=10
+        )
 
     # LOGOUT
 
