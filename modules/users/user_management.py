@@ -15,6 +15,7 @@ from auth.permissions import (
 from datetime import datetime
 
 from auth.password_policy import validate_password
+from modules.audit.audit_logs import log_activity
 
 
 # =====================================================
@@ -148,6 +149,11 @@ def add_user(
 
         conn.commit()
 
+        log_activity(
+            module="USERS",
+            action="CREATE",
+            description="User created"
+        )
 
     finally:
 
@@ -253,7 +259,8 @@ def update_user(
 
 
     final_role = target_user["role"]
-
+ 
+    original_role = target_user["role"]
 
 
     if can_change_role(
@@ -290,6 +297,21 @@ def update_user(
 
         conn.commit()
 
+        if original_role != final_role:
+
+            log_activity(
+                module="USERS",
+                action="ROLE_CHANGE",
+                description="User role changed"
+        )
+
+        else:
+
+            log_activity(
+                module="USERS",
+                action="UPDATE",
+                description="User edited"
+            )
 
     finally:
 
@@ -359,6 +381,11 @@ def delete_user(
 
         conn.commit()
 
+        log_activity(
+            module="USERS",
+            action="DELETE",
+            description="User deleted"
+        )
 
     finally:
 
@@ -452,6 +479,11 @@ def reset_password(
 
         conn.commit()
 
+        log_activity(
+            module="USERS",
+            action="PASSWORD_RESET",
+            description="Password reset"
+        )
 
     finally:
 
