@@ -1,5 +1,5 @@
 from database.db import get_connection
-
+from modules.audit.audit_logs import log_activity
 
 # -----------------------------------
 # LOW STOCK LIMIT
@@ -116,6 +116,13 @@ def add_product(
     ))
 
     conn.commit()
+
+    log_activity(
+        module="PRODUCTS",
+        action="CREATE",
+        description="Product added"
+    )
+
     conn.close()
 
 
@@ -156,6 +163,13 @@ def update_product(
     ))
 
     conn.commit()
+
+    log_activity(
+        module="PRODUCTS",
+        action="UPDATE",
+        description="Product edited"
+    )
+
     conn.close()
 
 
@@ -173,6 +187,13 @@ def delete_product(product_id):
     )
 
     conn.commit()
+
+    log_activity(
+        module="PRODUCTS",
+        action="DELETE",
+        description="Product deleted"
+    )
+
     conn.close()
 
 

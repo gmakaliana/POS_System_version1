@@ -26,7 +26,7 @@ from modules.settings.settings import (
     update_last_backup_datetime
 )
 
-
+from modules.audit.audit_logs import log_activity
 
 # ==========================================================
 # CREATE BACKUP FILE NAME
@@ -216,6 +216,12 @@ def create_automatic_backup():
 
         backup_file
 
+    )
+
+    log_activity(
+        module="BACKUP",
+        action="CREATE",
+        description="Automatic database backup created"
     )
 
 

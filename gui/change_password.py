@@ -14,6 +14,8 @@ from gui.cashier_dashboard import open_cashier_dashboard
 
 from auth.password_policy import validate_password
 
+from modules.audit.audit_logs import log_activity
+
 def open_change_password(user, parent):
     """
     Forces user to change password on first login.
@@ -187,7 +189,16 @@ def open_change_password(user, parent):
 
             conn.close()
 
+            # =====================================
+            # AUDIT LOG
+            # =====================================
 
+            log_activity(
+                
+                action="PASSWORD_CHANGE",
+                module="AUTH",
+                description="Password changed"
+            )
 
             messagebox.showinfo(
                 "Success",

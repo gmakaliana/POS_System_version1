@@ -1,5 +1,5 @@
 from database.db import get_connection
-
+from modules.audit.audit_logs import log_activity
 
 
 # =====================================
@@ -115,6 +115,12 @@ def update_business_information(
 
     conn.commit()
 
+    log_activity(
+        module="SETTINGS",
+        action="UPDATE",
+        description="Business information updated"
+    )
+
     conn.close()
 
 
@@ -146,6 +152,12 @@ def update_sales_settings(receipt_number_start):
 
 
     conn.commit()
+
+    log_activity(
+        module="SETTINGS",
+        action="UPDATE",
+        description="Receipt number start changed"
+    )
 
     conn.close()
 
@@ -384,6 +396,12 @@ def update_backup_settings(
 
     conn.commit()
 
+    log_activity(
+        module="SETTINGS",
+        action="UPDATE",
+        description="Backup settings changed"
+    )
+
     conn.close()
 
 
@@ -502,6 +520,12 @@ def update_report_scheduler_settings(
 
 
     conn.commit()
+
+    log_activity(
+        module="SETTINGS",
+        action="UPDATE",
+        description="Report settings changed"
+    )
 
     conn.close()
 

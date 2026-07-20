@@ -10,6 +10,7 @@ from auth.session import get_session_user
 # ==========================================================
 
 def log_activity(
+        
         module,
         action,
         description

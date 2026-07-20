@@ -19,7 +19,7 @@ from modules.system.app_paths import (
     get_backup_directory
 )
 
-
+from modules.audit.audit_logs import log_activity
 
 # ==========================================================
 # CREATE SAFETY BACKUP NAME
@@ -237,7 +237,11 @@ def restore_database(
 
         )
 
-
+        log_activity(
+            module="BACKUP",
+            action="RESTORE",
+            description="Database restored"
+        )
 
         return True
 

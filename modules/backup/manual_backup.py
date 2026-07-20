@@ -19,6 +19,7 @@ from modules.system.app_paths import (
     get_database_path
 )
 
+from modules.audit.audit_logs import log_activity
 
 
 # ==========================================================
@@ -226,6 +227,10 @@ def create_manual_backup(
 
     )
 
-
+    log_activity(
+        module="BACKUP",
+        action="CREATE",
+        description="Backup created"
+    )
 
     return backup_file

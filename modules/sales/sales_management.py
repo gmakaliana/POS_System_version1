@@ -1,5 +1,5 @@
 from database.db import get_connection
-
+from modules.audit.audit_logs import log_activity
 
 def process_sale(user_id, cart_items, discount=0):
 
@@ -164,6 +164,12 @@ def process_sale(user_id, cart_items, discount=0):
         # COMMIT TRANSACTION
         # ==========================
         conn.commit()
+
+        log_activity(
+            module="SALES",
+            action="COMPLETE",
+            description="Sale completed"
+        )
 
         return True, sale_id
 

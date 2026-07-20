@@ -1,5 +1,5 @@
 from database.db import get_connection
-
+from modules.audit.audit_logs import log_activity
 
 # -----------------------------------
 # GET ALL SUPPLIERS
@@ -53,6 +53,13 @@ def add_supplier(
     ))
 
     conn.commit()
+
+    log_activity(
+        module="SUPPLIERS",
+        action="CREATE",
+        description="Supplier added"
+    )
+
     conn.close()
 
 
@@ -84,6 +91,13 @@ def update_supplier(
     ))
 
     conn.commit()
+
+    log_activity(
+        module="SUPPLIERS",
+        action="UPDATE",
+        description="Supplier edited"
+    )
+
     conn.close()
 
 
@@ -115,4 +129,11 @@ def delete_supplier(supplier_id):
     )
 
     conn.commit()
+
+    log_activity(
+        module="SUPPLIERS",
+        action="DELETE",
+        description="Supplier deleted"
+    )
+
     conn.close()
