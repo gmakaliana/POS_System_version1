@@ -1,6 +1,52 @@
 from database.db import get_connection
 from modules.audit.audit_logs import log_activity
 
+# =====================================
+# ALLOWED SETTINGS COLUMNS
+# =====================================
+
+ALLOWED_SETTINGS = {
+
+    "business_name",
+
+    "business_address",
+
+    "business_phone",
+
+    "business_email",
+
+    "receipt_header",
+
+    "receipt_footer",
+
+    "receipt_number_start",
+
+    "low_stock_threshold",
+
+    "last_backup_datetime",
+
+    "automatic_backup_enabled",
+
+    "backup_location",
+
+    "backup_keep_count",
+
+    "automatic_daily_report_enabled",
+
+    "daily_report_time",
+
+    "automatic_monthly_report_enabled",
+
+    "monthly_report_time",
+
+    "last_daily_report_date",
+
+    "last_monthly_report_month",
+
+    "installed_datetime"
+
+}
+
 
 # =====================================
 # LOAD ALL SETTINGS
@@ -28,13 +74,19 @@ def get_settings():
 
     return settings
 
-
-
 # =====================================
 # GET SINGLE SETTING VALUE
 # =====================================
 
 def get_setting_value(column_name):
+
+
+    if column_name not in ALLOWED_SETTINGS:
+
+        raise ValueError(
+            "Invalid settings field."
+        )
+
 
     conn = get_connection()
 
@@ -62,7 +114,6 @@ def get_setting_value(column_name):
 
 
     return None
-
 
 
 # =====================================
