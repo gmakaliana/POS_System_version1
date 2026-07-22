@@ -17,6 +17,11 @@ from datetime import datetime
 from auth.password_policy import validate_password
 from modules.audit.audit_logs import log_activity
 
+from utils.validation import (
+    validate_username,
+    validate_password_length
+)
+
 
 # =====================================================
 # GET ALL VISIBLE USERS
@@ -87,6 +92,17 @@ def add_user(
         raise Exception(
             "Username and password required."
         )
+    
+    valid, message = validate_username(username)
+
+    if not valid:
+        raise Exception(message)
+
+
+    valid, message = validate_password_length(password)
+
+    if not valid:
+        raise Exception(message)
 
     valid, message = validate_password(password)
 
@@ -216,6 +232,10 @@ def get_user_by_id(user_id):
 # UPDATE USER
 # =====================================================
 
+# =====================================================
+# UPDATE USER
+# =====================================================
+
 def update_user(
         editor,
         user_id,
@@ -258,9 +278,24 @@ def update_user(
 
 
 
+    # =====================================================
+    # INPUT VALIDATION
+    # =====================================================
+
+    valid, message = validate_username(
+        username
+    )
+
+    if not valid:
+
+        raise Exception(
+            message
+        )
+
     final_role = target_user["role"]
- 
+
     original_role = target_user["role"]
+
 
 
     if can_change_role(
@@ -274,6 +309,7 @@ def update_user(
 
 
     conn = get_connection()
+
     cursor = conn.cursor()
 
 
@@ -295,7 +331,10 @@ def update_user(
         ))
 
 
+
         conn.commit()
+
+
 
         if original_role != final_role:
 
@@ -303,7 +342,7 @@ def update_user(
                 module="USERS",
                 action="ROLE_CHANGE",
                 description="User role changed"
-        )
+            )
 
         else:
 
@@ -313,11 +352,10 @@ def update_user(
                 description="User edited"
             )
 
+
     finally:
 
         conn.close()
-
-
 
 
 
