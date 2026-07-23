@@ -3,6 +3,12 @@ from tkinter import messagebox
 
 from modules.suppliers.supplier_management import add_supplier
 
+from utils.validation import (
+    validate_supplier_name,
+    validate_phone,
+    validate_address
+)
+
 
 def open_add_supplier_window(parent,refresh_callback):
 
@@ -42,12 +48,35 @@ def open_add_supplier_window(parent,refresh_callback):
         phone = phone_entry.get().strip()
         address = address_entry.get().strip()
 
-        if not supplier_name:
-            messagebox.showerror(
-                "Error",
-                "Supplier name is required.",parent=root
-            )
-            return
+
+        # =============================
+        # GUI VALIDATION
+        # =============================
+
+        checks = [
+
+            validate_supplier_name(supplier_name),
+
+            validate_phone(phone),
+
+            validate_address(address)
+
+        ]
+
+
+        for valid, message in checks:
+
+            if not valid:
+
+                messagebox.showerror(
+                    "Invalid Input",
+                    message,
+                    parent=root
+                )
+
+                return
+
+
 
         try:
 
@@ -57,19 +86,28 @@ def open_add_supplier_window(parent,refresh_callback):
                 address
             )
 
+
             refresh_callback()
+
 
             messagebox.showinfo(
                 "Success",
-                "Supplier added successfully.",parent=root
+                "Supplier added successfully.",
+                parent=root
             )
+
 
             root.destroy()
 
+
+
         except Exception as e:
+
+
             messagebox.showerror(
                 "Error",
-                str(e),parent=root
+                str(e),
+                parent=root
             )
 
     tk.Button(

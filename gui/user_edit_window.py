@@ -2,10 +2,9 @@
 
 import tkinter as tk
 from tkinter import messagebox, ttk
-
 from modules.users.user_management import update_user
 from auth.permissions import can_change_role
-
+from utils.validation import validate_username
 
 
 def open_edit_user_window(
@@ -165,17 +164,30 @@ def open_edit_user_window(
 
 
 
-        if not username:
+        valid, message = validate_username(
+            username
+        )
+
+
+        if not valid:
 
             messagebox.showerror(
-                "Error",
-                "Username is required.",
+                "Invalid Username",
+                message,
                 parent=win
             )
 
             return
+        
+        if not role:
 
+            messagebox.showerror(
+                "Error",
+                "Select a role.",
+                parent=win
+            )
 
+            return
 
         try:
 

@@ -5,6 +5,11 @@ from modules.suppliers.supplier_management import (
     update_supplier
 )
 
+from utils.validation import (
+    validate_supplier_name,
+    validate_phone,
+    validate_address
+)
 
 
 def center_window(window, width, height):
@@ -225,34 +230,44 @@ def open_edit_supplier_window(
 
     def update():
 
-
         supplier_name = supplier_entry.get().strip()
-
-
 
         phone = phone_entry.get().strip()
 
         address = address_entry.get().strip()
 
+        # =============================
+        # GUI VALIDATION
+        # =============================
+
+        checks = [
+
+            validate_supplier_name(supplier_name),
+
+            validate_phone(phone),
+
+            validate_address(address)
+
+        ]
 
 
-        if not supplier_name:
+        for valid, message in checks:
 
+            if not valid:
 
-            messagebox.showerror(
-                "Error",
-                "Supplier name is required.",
-                parent=root
-            )
+                messagebox.showerror(
+                    "Invalid Input",
+                    message,
+                    parent=root
+                )
 
-            return
+                return
 
 
 
         update_button.config(
             state="disabled"
         )
-
 
 
         try:
@@ -271,9 +286,7 @@ def open_edit_supplier_window(
             )
 
 
-
             refresh_callback()
-
 
 
             messagebox.showinfo(
@@ -281,7 +294,6 @@ def open_edit_supplier_window(
                 "Supplier updated successfully.",
                 parent=root
             )
-
 
 
             close_window()
@@ -301,7 +313,6 @@ def open_edit_supplier_window(
                 str(e),
                 parent=root
             )
-
 
 
     # -----------------------------------

@@ -2,12 +2,10 @@
 
 import tkinter as tk
 from tkinter import messagebox
-
 from modules.users.user_management import add_user
 from auth.permissions import can_create_user
-
 from auth.password_policy import validate_password
-
+from utils.validation import validate_username
 
 def open_add_user_window(
         parent,
@@ -144,17 +142,36 @@ def open_add_user_window(
 
 
 
-        if not username or not password:
+        # =============================
+        # USERNAME VALIDATION
+        # =============================
+
+        valid, message = validate_username(
+            username
+        )
+
+
+        if not valid:
 
             messagebox.showerror(
-                "Error",
-                "All fields required.",
+                "Invalid Username",
+                message,
                 parent=win
             )
 
             return
 
 
+
+        if not password:
+
+            messagebox.showerror(
+                "Error",
+                "Password is required.",
+                parent=win
+            )
+
+            return
 
         # PASSWORD POLICY
         valid, message = validate_password(
