@@ -5,6 +5,9 @@ from modules.backup.manual_backup import (
     create_manual_backup
 )
 
+from utils.validation import (
+    validate_backup_destination
+)
 
 def center_window(window, width, height):
 
@@ -181,11 +184,17 @@ def open_manual_backup_window(parent):
         destination = destination_var.get()
 
 
-        if not destination:
+        valid, message = validate_backup_destination(
+            destination
+        )
 
-            messagebox.showwarning(
-                "No Location",
-                "Please select a backup destination.",parent=window
+
+        if not valid:
+
+            messagebox.showerror(
+                "Invalid Destination",
+                message,
+                parent=window
             )
 
             return

@@ -3,11 +3,12 @@ from tkinter import filedialog, messagebox
 
 
 from modules.backup.restore_manager import (
-    validate_backup_file,
     restore_database
 )
 
-
+from utils.validation import (
+    validate_restore_file
+)
 
 def center_window(window, width, height):
 
@@ -281,18 +282,20 @@ def open_restore_window(parent):
 
 
 
-        if not validate_backup_file(
+        valid, message = validate_restore_file(
             backup_file
-        ):
+        )
+
+
+        if not valid:
 
             messagebox.showerror(
                 "Invalid Backup",
-                "The selected file is not a valid POS database backup.",parent=window 
+                message,
+                parent=window
             )
 
             return
-
-
 
         confirm = messagebox.askyesno(
             "Confirm Restore",

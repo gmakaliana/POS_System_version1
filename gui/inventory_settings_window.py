@@ -6,6 +6,7 @@ from modules.settings.settings import (
     update_low_stock_threshold
 )
 
+from utils.validation import validate_threshold
 
 def center_window(window, width, height):
 
@@ -139,9 +140,23 @@ def open_inventory_settings(parent):
 
         try:
 
-            value = int(
-                entry.get()
+            value = entry.get().strip()
+
+            valid, message = validate_threshold(
+                value
             )
+
+            if not valid:
+
+                messagebox.showerror(
+                    "Invalid Threshold",
+                    message,
+                    parent=window
+                )
+
+                return
+
+            value = int(value)
 
             update_low_stock_threshold(
                 value

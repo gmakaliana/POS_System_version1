@@ -6,6 +6,13 @@ from modules.settings.settings import (
     update_business_information
 )
 
+from utils.validation import (
+    validate_business_name,
+    validate_address,
+    validate_phone,
+    validate_email,
+    validate_receipt_text
+)
 
 def center_window(window, width, height):
 
@@ -257,31 +264,83 @@ def open_business_settings(parent):
 
     def save():
 
+
+        business_name = fields["Business Name"].get().strip()
+
+        business_address = fields["Business Address"].get().strip()
+
+        business_phone = fields["Business Phone"].get().strip()
+
+        business_email = fields["Business Email"].get().strip()
+
+
+        receipt_header_value = header_box.get(
+            "1.0",
+            "end"
+        ).strip()
+
+
+        receipt_footer_value = footer_box.get(
+            "1.0",
+            "end"
+        ).strip()
+
+
+
+        checks = [
+
+            validate_business_name(
+                business_name
+            ),
+
+            validate_address(
+                business_address
+            ),
+
+            validate_phone(
+                business_phone
+            ),
+
+            validate_email(
+                business_email
+            ),
+
+            validate_receipt_text(
+                receipt_header_value
+            ),
+
+            validate_receipt_text(
+                receipt_footer_value
+            )
+
+        ]
+
+
+
+        for valid, message in checks:
+
+            if not valid:
+
+                messagebox.showerror(
+                    "Invalid Input",
+                    message,
+                    parent=window
+                )
+
+                return
+
         update_business_information(
+            business_name,
 
-            fields["Business Name"].get(),
+            business_address,
 
-            fields["Business Address"].get(),
+            business_phone,
 
-            fields["Business Phone"].get(),
+            business_email,
 
-            fields["Business Email"].get(),
+            receipt_header_value,
 
-            header_box.get(
-                "1.0",
-                "end"
-            ).strip(),
-
-            footer_box.get(
-                "1.0",
-                "end"
-            ).strip()
-
-        )
-
-        messagebox.showinfo(
-            "Saved",
-            "Business information saved.",parent=window
+            receipt_footer_value
         )
 
     # =====================================

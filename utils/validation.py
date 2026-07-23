@@ -1,4 +1,247 @@
 import re
+import os
+import sqlite3
+
+
+
+# =====================================
+# BACKUP DESTINATION VALIDATION
+# =====================================
+
+def validate_backup_destination(
+        destination
+):
+    """
+    Validate backup destination folder.
+
+    Checks:
+    1. Destination is provided
+    2. Destination exists
+    3. Destination is a folder
+    4. Application has write permission
+
+    Returns:
+        (True, message)
+        or
+        (False, error message)
+    """
+
+
+    # =====================================
+    # CHECK EMPTY DESTINATION
+    # =====================================
+
+    if not destination:
+
+        return (
+            False,
+            "Please select a backup destination."
+        )
+
+
+
+    # =====================================
+    # CHECK PATH EXISTS
+    # =====================================
+
+    if not os.path.exists(
+        destination
+    ):
+
+        return (
+            False,
+            "Selected backup destination does not exist."
+        )
+
+
+
+    # =====================================
+    # CHECK IS DIRECTORY
+    # =====================================
+
+    if not os.path.isdir(
+        destination
+    ):
+
+        return (
+            False,
+            "Backup destination must be a folder."
+        )
+
+
+
+    # =====================================
+    # CHECK WRITE PERMISSION
+    # =====================================
+
+    if not os.access(
+        destination,
+        os.W_OK
+    ):
+
+        return (
+            False,
+            "Backup destination is not writable."
+        )
+
+
+
+    # =====================================
+    # VALID
+    # =====================================
+
+    return (
+        True,
+        "Valid backup destination."
+    )
+
+
+# =====================================
+# RESTORE FILE VALIDATION
+# =====================================
+
+def validate_restore_file(
+        backup_file
+):
+    """
+    Validate database backup file before restore.
+
+    Checks:
+    1. File path is provided
+    2. File exists
+    3. File extension is .db
+    4. File is not empty
+    5. File is a valid SQLite database
+
+    Returns:
+        (True, message)
+        or
+        (False, error message)
+    """
+
+
+    # =====================================
+    # CHECK EMPTY PATH
+    # =====================================
+
+    if not backup_file:
+
+        return (
+            False,
+            "Please select a backup file."
+        )
+
+
+
+    # =====================================
+    # CHECK FILE EXISTS
+    # =====================================
+
+    if not os.path.exists(
+        backup_file
+    ):
+
+        return (
+            False,
+            "Selected backup file does not exist."
+        )
+
+
+
+    # =====================================
+    # CHECK FILE TYPE
+    # =====================================
+
+    if not backup_file.lower().endswith(
+        ".db"
+    ):
+
+        return (
+            False,
+            "Backup file must be a SQLite (.db) file."
+        )
+
+
+
+    # =====================================
+    # CHECK FILE SIZE
+    # =====================================
+
+    if os.path.getsize(
+        backup_file
+    ) == 0:
+
+        return (
+            False,
+            "Backup file is empty."
+        )
+
+
+
+    # =====================================
+    # CHECK SQLITE DATABASE
+    # =====================================
+
+    try:
+
+        connection = sqlite3.connect(
+            backup_file
+        )
+
+
+        cursor = connection.cursor()
+
+
+        cursor.execute(
+            """
+            SELECT name
+            FROM sqlite_master
+            WHERE type='table'
+            """
+        )
+
+
+        tables = cursor.fetchall()
+
+
+        connection.close()
+
+
+
+        if not tables:
+
+            return (
+                False,
+                "The selected file is not a valid POS database backup."
+            )
+
+
+
+    except sqlite3.DatabaseError:
+
+        return (
+            False,
+            "The backup file is corrupted or not a valid SQLite database."
+        )
+
+
+    except Exception as error:
+
+        return (
+            False,
+            str(error)
+        )
+
+
+
+    # =====================================
+    # VALID
+    # =====================================
+
+    return (
+        True,
+        "Valid backup file."
+    )
 
 
 # =====================================

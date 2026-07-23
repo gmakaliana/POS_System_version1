@@ -6,6 +6,7 @@ from modules.settings.settings import (
     update_sales_settings
 )
 
+from utils.validation import validate_receipt_number
 
 def center_window(window, width, height):
 
@@ -147,9 +148,27 @@ def open_sales_settings(parent):
 
         try:
 
-            number = int(
-                entry.get()
+            value = entry.get().strip()
+
+
+            valid, message = validate_receipt_number(
+                value
             )
+
+
+            if not valid:
+
+                messagebox.showerror(
+                    "Invalid Receipt Number",
+                    message,
+                    parent=window
+                )
+
+                return
+
+
+
+            number = int(value)
 
             update_sales_settings(
                 number

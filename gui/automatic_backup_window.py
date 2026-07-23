@@ -10,6 +10,10 @@ from modules.system.app_paths import (
     get_backup_directory
 )
 
+from utils.validation import (
+    validate_backup_keep_count
+)
+
 
 def center_window(window, width, height):
 
@@ -330,14 +334,25 @@ def open_automatic_backup_window(parent):
 
         try:
 
-            keep_count = int(
+            valid, message = validate_backup_keep_count(
                 keep_count_var.get()
             )
 
 
-            if keep_count <= 0:
+            if not valid:
 
-                raise ValueError
+                messagebox.showerror(
+                    "Invalid Value",
+                    message,
+                    parent=window
+                )
+
+                return
+
+
+            keep_count = int(
+                keep_count_var.get()
+            )
 
 
         except ValueError:
