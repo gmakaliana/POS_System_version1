@@ -4,6 +4,12 @@ from tkinter import ttk, messagebox
 from modules.products.product_management import update_product
 from modules.suppliers.supplier_management import get_all_suppliers
 
+from utils.validation import (
+    validate_product_name,
+    validate_barcode,
+    validate_price,
+    validate_quantity
+)
 
 def open_edit_product_window(product_data, refresh_callback,parent):
 
@@ -63,8 +69,17 @@ def open_edit_product_window(product_data, refresh_callback,parent):
     supplier_combo.pack()
 
     # default supplier not strictly stored in tree, so leave blank or first
-    if suppliers:
-        supplier_combo.set(suppliers[0][1])
+    #if suppliers:
+    #    supplier_combo.set(suppliers[0][1])
+
+    current_supplier_id = product_data[6]
+
+    if current_supplier_id in reverse_map:
+
+        supplier_combo.set(
+            reverse_map[current_supplier_id]
+        )
+
 
     # -----------------------------------
     # UPDATE
@@ -72,33 +87,154 @@ def open_edit_product_window(product_data, refresh_callback,parent):
     def update():
 
         try:
+
+            name = name_entry.get().strip()
+            barcode = barcode_entry.get().strip()
+            cost = cost_entry.get().strip()
+            sell = sell_entry.get().strip()
+            qty = qty_entry.get().strip()
+            supplier_name = supplier_combo.get()
+
+
+
+            # =============================
+            # REQUIRED SUPPLIER
+            # =============================
+
+            if not supplier_name:
+
+                messagebox.showerror(
+                    "Error",
+                    "Select supplier.",
+                    parent=root
+                )
+
+                return
+
+
+
+            # =============================
+            # TEXT VALIDATION
+            # =============================
+
+            checks = [
+
+                validate_product_name(name),
+
+                validate_barcode(barcode)
+
+            ]
+
+
+            for valid, message in checks:
+
+                if not valid:
+
+                    messagebox.showerror(
+                        "Validation Error",
+                        message,
+                        parent=root
+                    )
+
+                    return
+
+
+
+            # =============================
+            # NUMBER CONVERSION
+            # =============================
+
+            try:
+
+                cost_value = float(cost)
+
+                sell_value = float(sell)
+
+                qty_value = int(qty)
+
+
+            except ValueError:
+
+
+                messagebox.showerror(
+                    "Invalid Input",
+                    "Cost price and selling price must be numbers. Quantity must be a whole number.",
+                    parent=root
+                )
+
+                return
+
+
+
+            # =============================
+            # NUMERIC VALIDATION
+            # =============================
+
+            checks = [
+
+                validate_price(cost_value),
+
+                validate_price(sell_value),
+
+                validate_quantity(qty_value)
+
+            ]
+
+
+            for valid, message in checks:
+
+                if not valid:
+
+                    messagebox.showerror(
+                        "Validation Error",
+                        message,
+                        parent=root
+                    )
+
+                    return
+
+
+
+            # =============================
+            # UPDATE DATABASE
+            # =============================
+
             update_product(
+
                 product_id,
-                name_entry.get().strip(),
-                barcode_entry.get().strip(),
-                float(cost_entry.get()),
-                float(sell_entry.get()),
-                int(qty_entry.get()),
-                supplier_map[supplier_combo.get()]
+
+                name,
+
+                barcode,
+
+                cost_value,
+
+                sell_value,
+
+                qty_value,
+
+                supplier_map[supplier_name]
+
             )
+
+
 
             messagebox.showinfo(
                 "Success",
-                "Product updated",
+                "Product updated successfully.",
                 parent=root
             )
+
 
             root.destroy()
+
             refresh_callback()
 
-        except ValueError:
-            messagebox.showerror(
-                "Error",
-                "Cost, selling price and quantity must be numbers",
-                parent=root
-            )
+
 
         except Exception as e:
+
+
             messagebox.showerror(
                 "Error",
                 str(e),

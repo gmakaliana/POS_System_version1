@@ -1,10 +1,50 @@
 from database.db import get_connection
 from modules.audit.audit_logs import log_activity
 
+from utils.validation import (
+    validate_product_name,
+    validate_barcode,
+    validate_price,
+    validate_quantity,
+    validate_search_text
+)
+
 # -----------------------------------
 # LOW STOCK LIMIT
 # -----------------------------------
 LOW_STOCK_LIMIT = 5
+
+# -----------------------------------
+# VALIDATE PRODUCT DATA
+# -----------------------------------
+
+def validate_product_data(
+        product_name,
+        barcode,
+        cost_price,
+        selling_price,
+        quantity
+):
+
+    checks = [
+
+        validate_product_name(product_name),
+
+        validate_barcode(barcode),
+
+        validate_price(cost_price),
+
+        validate_price(selling_price),
+
+        validate_quantity(quantity)
+
+    ]
+
+    for valid, message in checks:
+
+        if not valid:
+
+            raise Exception(message)
 
 
 # -----------------------------------
@@ -92,6 +132,14 @@ def add_product(
         supplier_id
 ):
 
+    validate_product_data(
+        product_name,
+        barcode,
+        cost_price,
+        selling_price,
+        quantity
+    )
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -138,6 +186,14 @@ def update_product(
         quantity,
         supplier_id
 ):
+
+    validate_product_data(
+        product_name,
+        barcode,
+        cost_price,
+        selling_price,
+        quantity
+    )
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -256,6 +312,11 @@ def get_product_by_barcode(barcode):
 # -----------------------------------
 def search_products(search_text):
 
+    valid, message = validate_search_text(search_text)
+
+    if not valid:
+        raise Exception(message)
+
     conn = get_connection()
     cursor = conn.cursor()
 
@@ -306,6 +367,11 @@ def get_product_stock(product_id):
 # UPDATE PRODUCT STOCK
 # -----------------------------------
 def update_product_stock(product_id, quantity):
+
+    valid, message = validate_quantity(quantity)
+
+    if not valid:
+        raise Exception(message)
 
     conn = get_connection()
     cursor = conn.cursor()

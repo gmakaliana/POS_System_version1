@@ -4,6 +4,13 @@ from tkinter import ttk, messagebox
 from modules.products.product_management import add_product
 from modules.suppliers.supplier_management import get_all_suppliers
 
+from utils.validation import (
+    validate_product_name,
+    validate_barcode,
+    validate_price,
+    validate_quantity
+)
+
 
 def open_add_product_window(parent,refresh_callback):
 
@@ -60,6 +67,7 @@ def open_add_product_window(parent,refresh_callback):
     def save():
 
         try:
+
             name = name_entry.get().strip()
             barcode = barcode_entry.get().strip()
             cost = cost_entry.get().strip()
@@ -67,38 +75,122 @@ def open_add_product_window(parent,refresh_callback):
             qty = qty_entry.get().strip()
             supplier_name = supplier_combo.get()
 
-            # -----------------------------
-            # VALIDATION (TEXT FIELDS)
-            # -----------------------------
-            if not name:
-                messagebox.showerror("Error", "Product name is required",parent=root)
-                return
+
+
+            # =============================
+            # REQUIRED FIELDS
+            # =============================
 
             if not supplier_name:
-                messagebox.showerror("Error", "Select supplier",parent=root)
+
+                messagebox.showerror(
+                    "Error",
+                    "Select supplier.",
+                    parent=root
+                )
+
                 return
 
-            # -----------------------------
-            # VALIDATION (NUMERIC FIELDS)
-            # -----------------------------
+
+
             if not cost or not sell or not qty:
-                messagebox.showerror("Error", "Cost, Selling Price and Quantity are required",parent=root)
+
+                messagebox.showerror(
+                    "Error",
+                    "Cost price, selling price and quantity are required.",
+                    parent=root
+                )
+
                 return
 
-            # -----------------------------
-            # SAFE CONVERSION
-            # -----------------------------
+
+
+            # =============================
+            # TEXT VALIDATION
+            # =============================
+
+            checks = [
+
+                validate_product_name(name),
+
+                validate_barcode(barcode)
+
+            ]
+
+
+            for valid, message in checks:
+
+                if not valid:
+
+                    messagebox.showerror(
+                        "Validation Error",
+                        message,
+                        parent=root
+                    )
+
+                    return
+
+
+
+            # =============================
+            # NUMBER CONVERSION
+            # =============================
+
             try:
+
                 cost_val = float(cost)
+
                 sell_val = float(sell)
+
                 qty_val = int(qty)
+
+
             except ValueError:
-                messagebox.showerror("Error", "Cost, Selling Price and Quantity must be numbers",parent=root)
+
+
+                messagebox.showerror(
+                    "Invalid Input",
+                    "Price must be numbers and quantity must be a whole number.",
+                    parent=root
+                )
+
                 return
 
-            # -----------------------------
-            # SAVE TO DB
-            # -----------------------------
+
+
+            # =============================
+            # NUMERIC VALIDATION
+            # =============================
+
+            checks = [
+
+                validate_price(cost_val),
+
+                validate_price(sell_val),
+
+                validate_quantity(qty_val)
+
+            ]
+
+
+            for valid, message in checks:
+
+                if not valid:
+
+                    messagebox.showerror(
+                        "Validation Error",
+                        message,
+                        parent=root
+                    )
+
+                    return
+
+
+
+            # =============================
+            # SAVE
+            # =============================
+
             add_product(
                 name,
                 barcode,
@@ -108,12 +200,29 @@ def open_add_product_window(parent,refresh_callback):
                 supplier_map[supplier_name]
             )
 
+
             refresh_callback()
-            messagebox.showinfo("Success", "Product added successfully",parent=root)
+
+
+            messagebox.showinfo(
+                "Success",
+                "Product added successfully.",
+                parent=root
+            )
+
+
             root.destroy()
 
+
+
         except Exception as e:
-            messagebox.showerror("Error", str(e),parent=root)
+
+
+            messagebox.showerror(
+                "Error",
+                str(e),
+                parent=root
+            )
 
     tk.Button(
         root,

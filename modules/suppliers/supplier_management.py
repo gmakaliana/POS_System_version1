@@ -1,6 +1,39 @@
 from database.db import get_connection
 from modules.audit.audit_logs import log_activity
 
+from utils.validation import (
+    validate_supplier_name,
+    validate_phone,
+    validate_address
+)
+
+# -----------------------------------
+# VALIDATE SUPPLIER DATA
+# -----------------------------------
+
+def validate_supplier_data(
+        supplier_name,
+        phone,
+        address
+):
+
+    checks = [
+
+        validate_supplier_name(supplier_name),
+
+        validate_phone(phone),
+
+        validate_address(address)
+
+    ]
+
+    for valid, message in checks:
+
+        if not valid:
+
+            raise Exception(message)
+
+
 # -----------------------------------
 # GET ALL SUPPLIERS
 # -----------------------------------
@@ -34,6 +67,12 @@ def add_supplier(
         phone,
         address
 ):
+
+    validate_supplier_data(
+        supplier_name,
+        phone,
+        address
+    )
 
     conn = get_connection()
     cursor = conn.cursor()
@@ -72,6 +111,12 @@ def update_supplier(
         phone,
         address
 ):
+    
+    validate_supplier_data(
+        supplier_name,
+        phone,
+        address
+    )
 
     conn = get_connection()
     cursor = conn.cursor()

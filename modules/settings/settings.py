@@ -1,6 +1,19 @@
 from database.db import get_connection
 from modules.audit.audit_logs import log_activity
 
+from utils.validation import (
+    validate_business_name,
+    validate_address,
+    validate_phone,
+    validate_email,
+    validate_receipt_text,
+    validate_receipt_number,
+    validate_threshold,
+    validate_backup_keep_count,
+    validate_report_time
+)
+
+
 # =====================================
 # ALLOWED SETTINGS COLUMNS
 # =====================================
@@ -47,6 +60,40 @@ ALLOWED_SETTINGS = {
 
 }
 
+# =====================================
+# VALIDATE BUSINESS INFORMATION
+# =====================================
+
+def validate_business_information(
+        business_name,
+        business_address,
+        business_phone,
+        business_email,
+        receipt_header,
+        receipt_footer
+):
+
+    checks = [
+
+        validate_business_name(business_name),
+
+        validate_address(business_address),
+
+        validate_phone(business_phone),
+
+        validate_email(business_email),
+
+        validate_receipt_text(receipt_header),
+
+        validate_receipt_text(receipt_footer)
+
+    ]
+
+    for valid, message in checks:
+
+        if not valid:
+
+            raise Exception(message)
 
 # =====================================
 # LOAD ALL SETTINGS
@@ -128,6 +175,15 @@ def update_business_information(
         receipt_header,
         receipt_footer
 ):
+    
+    validate_business_information(
+        business_name,
+        business_address,
+        business_phone,
+        business_email,
+        receipt_header,
+        receipt_footer
+    )
 
     conn = get_connection()
 
@@ -181,6 +237,14 @@ def update_business_information(
 # =====================================
 
 def update_sales_settings(receipt_number_start):
+
+    valid, message = validate_receipt_number(
+        receipt_number_start
+    )
+
+    if not valid:
+
+        raise Exception(message)
 
     conn = get_connection()
 
@@ -313,6 +377,12 @@ def get_low_stock_threshold():
 
 def update_low_stock_threshold(value):
 
+    valid, message = validate_threshold(value)
+
+    if not valid:
+
+        raise Exception(message)
+
     conn = get_connection()
 
     cursor = conn.cursor()
@@ -415,6 +485,20 @@ def update_backup_settings(
         backup_location,
         keep_count
 ):
+
+    valid, message = validate_backup_keep_count(
+        keep_count
+    )
+
+    if not valid:
+
+        raise Exception(message)
+    
+    if enabled not in (0, 1):
+
+        raise Exception(
+            "Invalid backup setting."
+        )
 
     conn = get_connection()
 
@@ -540,6 +624,35 @@ def update_report_scheduler_settings(
         monthly_enabled,
         monthly_time
 ):
+
+    if daily_enabled not in (0, 1):
+
+        raise Exception(
+            "Invalid daily report setting."
+        )
+
+    if monthly_enabled not in (0, 1):
+
+        raise Exception(
+            "Invalid monthly report setting."
+        )
+
+    valid, message = validate_report_time(
+        daily_time
+    )
+
+    if not valid:
+
+        raise Exception(message)
+
+
+    valid, message = validate_report_time(
+        monthly_time
+    )
+
+    if not valid:
+
+        raise Exception(message)
 
     conn = get_connection()
 

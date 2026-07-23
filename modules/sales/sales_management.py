@@ -1,6 +1,13 @@
 from database.db import get_connection
 from modules.audit.audit_logs import log_activity
 
+from utils.validation import (
+    validate_quantity,
+    validate_price,
+    validate_id,
+    validate_discount
+)
+
 def process_sale(user_id, cart_items, discount=0):
 
     """
@@ -19,6 +26,49 @@ def process_sale(user_id, cart_items, discount=0):
 
     if not cart_items:
         return False, "Cart is empty."
+    
+    valid, message = validate_id(
+        user_id,
+        "User ID"
+    )
+
+    if not valid:
+        return False, message
+
+
+    valid, message = validate_discount(
+        discount
+    )
+
+    if not valid:
+        return False, message
+
+
+    for item in cart_items:
+
+        valid, message = validate_id(
+            item["product_id"],
+            "Product ID"
+        )
+
+        if not valid:
+            return False, message
+
+
+        valid, message = validate_quantity(
+            item["quantity"]
+        )
+
+        if not valid:
+            return False, message
+
+
+        valid, message = validate_price(
+            item["unit_price"]
+        )
+
+        if not valid:
+            return False, message
 
     conn = get_connection()
 
