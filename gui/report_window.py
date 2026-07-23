@@ -308,6 +308,11 @@ def open_daily_sales(parent):
 
     for row in rows:
 
+        row = list(row)
+
+        # Profit/Loss column is the last column
+        row[-1] = f"M{float(row[-1]):.2f}"
+
         tree.insert(
             "",
             "end",
@@ -614,6 +619,11 @@ def open_monthly_sales(parent):
 
 
     for row in rows:
+
+        row = list(row)
+
+        # Profit/Loss column is the last column
+        row[-1] = f"M{float(row[-1]):.2f}"
 
         tree.insert(
             "",
