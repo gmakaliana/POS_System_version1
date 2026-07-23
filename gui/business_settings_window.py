@@ -343,6 +343,12 @@ def open_business_settings(parent):
             receipt_footer_value
         )
 
+        messagebox.showinfo(
+            "Success",
+            "Business information saved successfully.",
+            parent=window
+        )
+
     # =====================================
     # BUTTONS
     # =====================================
