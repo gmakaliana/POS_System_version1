@@ -163,14 +163,6 @@ def get_reports_directory():
         "reports"
     )
 
-def get_logs_directory():
-
-    return (
-        get_application_directory()
-        /
-        "logs"
-    )
-
 def get_audit_directory():
 
     return (
@@ -218,9 +210,7 @@ def initialize_application_directories():
         get_reports_directory()
     )
 
-    logs_directory = (
-        get_logs_directory()
-    )
+   
 
     audit_directory = (
         get_audit_directory()
@@ -245,9 +235,7 @@ def initialize_application_directories():
         exist_ok=True
     )
 
-    logs_directory.mkdir(
-        exist_ok=True
-    )
+
 
     audit_directory.mkdir(
         exist_ok=True
