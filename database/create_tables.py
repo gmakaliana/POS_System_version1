@@ -35,46 +35,6 @@ def create_tables():
     conn.commit()
 
 
-
-    # =====================================
-    # USER ROLE MIGRATION
-    # =====================================
-
-    # Convert old Admin account into Default Admin
-    # For existing installations
-
-    cursor.execute("""
-        SELECT user_id, role
-        FROM users
-        WHERE username = ?
-    """,
-    (
-        "admin",
-    ))
-
-
-    old_admin = cursor.fetchone()
-
-
-
-    if old_admin:
-
-        if old_admin[1] == "Admin":
-
-            cursor.execute("""
-                UPDATE users
-                SET role = ?
-                WHERE username = ?
-            """,
-            (
-                "Default Admin",
-                "admin"
-            ))
-
-            conn.commit()
-
-
-
     # =====================================
     # CREATE SYSTEM ADMIN
     # =====================================
