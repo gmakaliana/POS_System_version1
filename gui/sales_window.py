@@ -2,10 +2,10 @@
 GeoMaka POS Sales Window
 
 File:
-    modules/sales/sales_window.py
+modules/sales/sales_window.py
 
 Purpose:
-    Provide the POS sales interface.
+Provide the POS sales interface.
 
 Responsibilities:
 
@@ -21,26 +21,30 @@ Responsibilities:
 - Print receipt using XP-80C thermal printer.
 - Open BQ400AS cash drawer.
 - Manage receipt numbering.
+- Handle receipt generation failures safely.
+- Handle printer failures safely.
+- Handle cash drawer failures safely.
+- Never cancel a completed sale because of
+  receipt or hardware problems.
 
 Hardware:
-    Xprinter A160 / XP-80C
-    80mm Thermal Receipt Printer
-    BQ400AS Cash Drawer
+Xprinter A160 / XP-80C
+80mm Thermal Receipt Printer
+BQ400AS Cash Drawer
 
 Windows Printer:
-    XP-80C
+XP-80C
 
 Port:
-    USB002
+USB002
 
 Company:
-    GeoMaka Technologies
+GeoMaka Technologies
 """
-
 
 import tkinter as tk
 from tkinter import ttk, messagebox
-
+from pathlib import Path
 
 # ==========================================================
 # SALES CART
@@ -54,7 +58,6 @@ from modules.sales.cart import (
     clear_cart
 )
 
-
 # ==========================================================
 # PRODUCT MANAGEMENT
 # ==========================================================
@@ -64,7 +67,6 @@ from modules.products.product_management import (
     get_product_by_barcode
 )
 
-
 # ==========================================================
 # SALES MANAGEMENT
 # ==========================================================
@@ -73,7 +75,6 @@ from modules.sales.sales_management import (
     process_sale
 )
 
-
 # ==========================================================
 # RECEIPT GENERATOR
 # ==========================================================
@@ -81,7 +82,6 @@ from modules.sales.sales_management import (
 from modules.sales.receipt_generator import (
     generate_receipt
 )
-
 
 # ==========================================================
 # HARDWARE
@@ -96,7 +96,14 @@ from modules.hardware.receipt_printer import (
 # CENTER WINDOW
 # ==========================================================
 
-def center_window(window, width, height):
+def center_window(
+    window,
+    width,
+    height
+):
+    """
+    Centers a Tkinter window on the screen.
+    """
 
     x = (
         window.winfo_screenwidth() // 2
@@ -119,7 +126,18 @@ def center_window(window, width, height):
 # VALIDATION HELPERS
 # ==========================================================
 
-def validate_numeric_input(value):
+def validate_numeric_input(
+    value
+):
+    """
+    Validates numeric Entry input.
+
+    Allows:
+
+    - Empty value
+    - Whole numbers
+    - Decimal numbers
+    """
 
     if value == "":
         return True
@@ -138,7 +156,16 @@ def validate_numeric_input(value):
         return False
 
 
-def safe_float(value):
+def safe_float(
+    value
+):
+    """
+    Safely converts a value to a non-negative float.
+
+    Returns:
+
+        float
+    """
 
     try:
 
@@ -164,9 +191,13 @@ def open_sales_window(
     parent=None
 ):
 
-    root = tk.Toplevel(parent)
+    root = tk.Toplevel(
+        parent
+    )
 
-    root.title("Sales")
+    root.title(
+        "Sales"
+    )
 
     root.resizable(
         False,
@@ -179,7 +210,6 @@ def open_sales_window(
         650
     )
 
-
     # ======================================================
     # VALIDATION SETUP
     # ======================================================
@@ -190,7 +220,6 @@ def open_sales_window(
         ),
         "%P"
     )
-
 
     # ======================================================
     # VARIABLES
@@ -210,7 +239,6 @@ def open_sales_window(
 
     barcode_entry = None
 
-
     # ======================================================
     # TOTALS
     # ======================================================
@@ -227,7 +255,6 @@ def open_sales_window(
             paid_var.get()
         )
 
-
         # --------------------------------------------------
         # PREVENT DISCOUNT FROM EXCEEDING TOTAL
         # --------------------------------------------------
@@ -236,15 +263,12 @@ def open_sales_window(
 
             discount = total
 
-
         final = max(
             0,
             total - discount
         )
 
-
         change = paid - final
-
 
         # --------------------------------------------------
         # TOTAL
@@ -254,7 +278,6 @@ def open_sales_window(
             text=f"M{total:.2f}"
         )
 
-
         # --------------------------------------------------
         # FINAL TOTAL
         # --------------------------------------------------
@@ -262,7 +285,6 @@ def open_sales_window(
         final_label.config(
             text=f"M{final:.2f}"
         )
-
 
         # --------------------------------------------------
         # CHANGE
@@ -277,15 +299,15 @@ def open_sales_window(
             )
         )
 
-
     # ======================================================
     # FORCE TOTAL UPDATE
     # ======================================================
 
-    def force_update(*args):
+    def force_update(
+        *args
+    ):
 
         update_totals()
-
 
     discount_var.trace_add(
         "write",
@@ -297,7 +319,6 @@ def open_sales_window(
         force_update
     )
 
-
     # ======================================================
     # REFRESH CART
     # ======================================================
@@ -306,8 +327,9 @@ def open_sales_window(
 
         for row in tree.get_children():
 
-            tree.delete(row)
-
+            tree.delete(
+                row
+            )
 
         for item in get_cart_items():
 
@@ -322,9 +344,7 @@ def open_sales_window(
                 )
             )
 
-
         update_totals()
-
 
     # ======================================================
     # ADD PRODUCT BY BARCODE
@@ -334,23 +354,20 @@ def open_sales_window(
 
         code = barcode_var.get().strip()
 
-
         if not code:
 
             barcode_entry.focus_set()
 
             return
 
-
         product = get_product_by_barcode(
             code
         )
 
-
         if not product:
 
             messagebox.showerror(
-                "Error",
+                "Product Not Found",
                 "Product not found.",
                 parent=root
             )
@@ -361,12 +378,10 @@ def open_sales_window(
 
             return
 
-
         success, msg = add_product(
             product[0],
             1
         )
-
 
         if not success:
 
@@ -382,13 +397,11 @@ def open_sales_window(
 
             return
 
-
         barcode_var.set("")
 
         refresh_cart()
 
         barcode_entry.focus_set()
-
 
     # ======================================================
     # SEARCH AND ADD PRODUCT
@@ -398,36 +411,30 @@ def open_sales_window(
 
         text = search_var.get().strip()
 
-
         if not text:
 
             return
-
 
         results = search_products(
             text
         )
 
-
         if not results:
 
             messagebox.showinfo(
-                "Info",
+                "Product Search",
                 "No product found.",
                 parent=root
             )
 
             return
 
-
         product = results[0]
-
 
         success, msg = add_product(
             product[0],
             1
         )
-
 
         if not success:
 
@@ -439,13 +446,11 @@ def open_sales_window(
 
             return
 
-
         search_var.set("")
 
         refresh_cart()
 
         barcode_entry.focus_set()
-
 
     # ======================================================
     # REMOVE SELECTED PRODUCT
@@ -454,7 +459,6 @@ def open_sales_window(
     def remove_selected():
 
         selected = tree.selection()
-
 
         if not selected:
 
@@ -466,14 +470,11 @@ def open_sales_window(
 
             return
 
-
         values = tree.item(
             selected[0]
         )["values"]
 
-
         product_name = values[0]
-
 
         for item in get_cart_items():
 
@@ -489,11 +490,35 @@ def open_sales_window(
 
                 break
 
-
         refresh_cart()
 
         barcode_entry.focus_set()
 
+    # ======================================================
+    # CLEAR AFTER COMPLETED SALE
+    # ======================================================
+
+    def reset_sale_screen():
+
+        clear_cart()
+
+        discount_var.set(
+            "0"
+        )
+
+        paid_var.set(
+            "0"
+        )
+
+        barcode_var.set("")
+
+        search_var.set("")
+
+        refresh_cart()
+
+        update_totals()
+
+        barcode_entry.focus_set()
 
     # ======================================================
     # EXIT SALES
@@ -505,7 +530,6 @@ def open_sales_window(
 
         root.destroy()
 
-
         if (
             parent
             and
@@ -514,12 +538,10 @@ def open_sales_window(
 
             parent.deiconify()
 
-
     root.protocol(
         "WM_DELETE_WINDOW",
         exit_sales
     )
-
 
     # ======================================================
     # PAY / COMPLETE SALE
@@ -533,7 +555,6 @@ def open_sales_window(
 
         cart = get_cart_items()
 
-
         if not cart:
 
             messagebox.showerror(
@@ -543,7 +564,6 @@ def open_sales_window(
             )
 
             return
-
 
         # ==================================================
         # CALCULATE AMOUNTS
@@ -559,7 +579,6 @@ def open_sales_window(
             paid_var.get()
         )
 
-
         # ==================================================
         # LIMIT DISCOUNT
         # ==================================================
@@ -572,15 +591,12 @@ def open_sales_window(
                 f"{discount:.2f}"
             )
 
-
         final = max(
             0,
             total - discount
         )
 
-
         change = paid - final
-
 
         # ==================================================
         # VALIDATE PAYMENT
@@ -589,20 +605,19 @@ def open_sales_window(
         if paid <= 0:
 
             messagebox.showerror(
-                "Error",
+                "Payment Error",
                 "Invalid payment amount.",
                 parent=root
             )
 
-            paid_entry.focus_set()
+            paid_entry.focus()
 
             return
-
 
         if paid < final:
 
             messagebox.showerror(
-                "Error",
+                "Insufficient Payment",
                 (
                     f"Insufficient payment.\n\n"
                     f"Required: M{final:.2f}\n"
@@ -611,10 +626,9 @@ def open_sales_window(
                 parent=root
             )
 
-            paid_entry.focus_set()
+            paid_entry.focus()
 
             return
-
 
         # ==================================================
         # CONFIRM SALE
@@ -633,14 +647,22 @@ def open_sales_window(
             parent=root
         )
 
-
         if not confirm:
 
             return
 
-
         # ==================================================
         # PROCESS SALE
+        # ==================================================
+        #
+        # This is the critical transaction point.
+        #
+        # If process_sale() returns success=True,
+        # the sale is completed.
+        #
+        # Nothing below this point is allowed to
+        # cancel or reverse the sale.
+        #
         # ==================================================
 
         success, sale_id = process_sale(
@@ -648,7 +670,6 @@ def open_sales_window(
             cart,
             discount
         )
-
 
         # ==================================================
         # SALE FAILED
@@ -664,32 +685,31 @@ def open_sales_window(
 
             return
 
+        # ==================================================
+        # SALE IS NOW COMPLETED
+        # ==================================================
+        #
+        # From this point forward:
+        #
+        # - Receipt failure does NOT cancel sale.
+        # - Printer failure does NOT cancel sale.
+        # - Cash drawer failure does NOT cancel sale.
+        # - Printer error messages are NOT shown.
+        # - Cash drawer error messages are NOT shown.
+        #
+        # ==================================================
+
+        receipt_result = None
+
+        receipt_error = None
 
         # ==================================================
-        # GENERATE, SAVE AND PRINT RECEIPT
-        # ==================================================
-        #
-        # IMPORTANT:
-        #
-        # process_sale() has already committed the sale.
-        #
-        # generate_receipt() is now responsible for:
-        #
-        # 1. Getting the receipt directory.
-        # 2. Creating Documents/POS System/receipts/.
-        # 3. Getting the next receipt number.
-        # 4. Creating the receipt text file.
-        # 5. Saving the receipt.
-        # 6. Sending the receipt to the printer.
-        # 7. Increasing the receipt number.
-        #
-        # The sales window must NOT separately handle
-        # receipt numbering.
+        # GENERATE / SAVE / PRINT RECEIPT
         # ==================================================
 
         try:
 
-            receipt_path = generate_receipt(
+            receipt_result = generate_receipt(
                 sale_id=sale_id,
                 items=cart,
                 total=total,
@@ -697,178 +717,202 @@ def open_sales_window(
                 paid=paid
             )
 
-
         except Exception as e:
 
-            # ------------------------------------------------
-            # IMPORTANT:
-            #
-            # The sale has already been committed.
-            #
-            # Therefore the sale must NOT be cancelled
-            # because of a receipt problem.
-            # ------------------------------------------------
+            receipt_error = str(
+                e
+            )
+
+        # ==================================================
+        # RECEIPT GENERATION / SAVING FAILED
+        # ==================================================
+        #
+        # This warning is retained because the receipt
+        # file itself could not be generated or saved.
+        #
+        # This is different from a printer warning.
+        #
+        # ==================================================
+
+        if receipt_error is not None:
+
+            reset_sale_screen()
 
             messagebox.showwarning(
-                "Receipt Error",
+                "Sale Completed - Receipt Error",
                 (
-                    "Sale completed successfully.\n\n"
-                    "However, the receipt could not be "
-                    "generated or saved.\n\n"
-                    f"Receipt error:\n{e}\n\n"
+                    "SALE COMPLETED SUCCESSFULLY.\n\n"
+                    "However, the receipt could not "
+                    "be generated or saved.\n\n"
+                    f"Receipt error:\n"
+                    f"{receipt_error}\n\n"
                     "The sale has NOT been cancelled."
                 ),
                 parent=root
             )
 
-            clear_cart()
-
-            discount_var.set("0")
-
-            paid_var.set("0")
-
-            barcode_var.set("")
-
-            refresh_cart()
-
-            barcode_entry.focus_set()
-
             return
 
+        # ==================================================
+        # GET SAVED RECEIPT PATH
+        # ==================================================
+        #
+        # The current receipt_generator.py returns:
+        #
+        # {
+        #     "success": True,
+        #     "saved": True,
+        #     "path": "...",
+        #     "receipt_path": "...",
+        #     "receipt_number": ...
+        # }
+        #
+        # We only care about receipt saving here.
+        #
+        # Printer status is deliberately ignored.
+        #
+        # ==================================================
 
-        # ==================================================
-        # VERIFY RECEIPT PATH
-        # ==================================================
-        #
-        # generate_receipt() should return the actual path
-        # of the saved receipt.
-        #
-        # We verify it here before telling the cashier
-        # that the receipt was saved.
-        # ==================================================
+        receipt_path = None
 
         receipt_saved = False
 
-        try:
+        if isinstance(
+            receipt_result,
+            dict
+        ):
 
-            if receipt_path:
-
-                receipt_saved = (
-                    __import__("pathlib")
-                    .Path(receipt_path)
-                    .is_file()
+            receipt_path = (
+                receipt_result.get(
+                    "path"
                 )
+                or
+                receipt_result.get(
+                    "receipt_path"
+                )
+            )
 
-        except Exception:
+            receipt_saved = bool(
+                receipt_result.get(
+                    "saved",
+                    receipt_result.get(
+                        "success",
+                        False
+                    )
+                )
+            )
 
-            receipt_saved = False
+        elif isinstance(
+            receipt_result,
+            (str, Path)
+        ):
 
+            receipt_path = str(
+                receipt_result
+            )
 
         # ==================================================
-        # RECEIPT WAS NOT FOUND
+        # VERIFY RECEIPT FILE
+        # ==================================================
+
+        if receipt_path:
+
+            try:
+
+                receipt_saved = (
+                    Path(
+                        receipt_path
+                    ).is_file()
+                )
+
+            except Exception:
+
+                receipt_saved = False
+
+        # ==================================================
+        # RECEIPT WAS NOT SAVED
+        # ==================================================
+        #
+        # Sale remains completed.
+        #
         # ==================================================
 
         if not receipt_saved:
 
+            reset_sale_screen()
+
             messagebox.showwarning(
-                "Receipt Warning",
+                "Sale Completed - Receipt Error",
                 (
-                    "Sale completed successfully.\n\n"
-                    "However, the receipt file could not "
-                    "be verified in the Documents folder.\n\n"
-                    f"Receipt path returned:\n"
-                    f"{receipt_path}\n\n"
+                    "SALE COMPLETED SUCCESSFULLY.\n\n"
+                    "However, the receipt file could "
+                    "not be verified.\n\n"
                     "The sale has NOT been cancelled."
                 ),
                 parent=root
             )
 
-            clear_cart()
-
-            discount_var.set("0")
-
-            paid_var.set("0")
-
-            barcode_var.set("")
-
-            refresh_cart()
-
-            barcode_entry.focus_set()
-
             return
 
-
         # ==================================================
-        # OPEN CASH DRAWER
+        # CASH DRAWER
+        # ==================================================
+        #
+        # The cash drawer is operated AFTER:
+        #
+        # 1. The sale has been committed.
+        # 2. The receipt has been saved.
+        #
+        # IMPORTANT:
+        #
+        # The result is intentionally ignored.
+        #
+        # No drawer warning is displayed.
+        #
         # ==================================================
 
-        drawer_success, drawer_message = (
+        try:
+
             open_cash_drawer()
+
+        except Exception:
+
+            pass
+
+        # ==================================================
+        # CLEAR COMPLETED SALE
+        # ==================================================
+
+        reset_sale_screen()
+
+        # ==================================================
+        # SALE COMPLETION MESSAGE
+        # ==================================================
+        #
+        # No printer status.
+        # No printer warning.
+        # No printer error message.
+        # No cash drawer warning.
+        # No cash drawer error message.
+        #
+        # ==================================================
+
+        result_message = (
+            "Sale completed successfully.\n\n"
+            f"Sale ID: {sale_id}\n"
+            f"Total: M{final:.2f}\n"
+            f"Paid: M{paid:.2f}\n"
+            f"Change: M{change:.2f}\n\n"
+            "Receipt saved successfully.\n\n"
+            f"Saved Receipt:\n"
+            f"{receipt_path}"
         )
 
-
-        # ==================================================
-        # CLEAR CART
-        # ==================================================
-
-        clear_cart()
-
-        discount_var.set("0")
-
-        paid_var.set("0")
-
-        barcode_var.set("")
-
-
-        refresh_cart()
-
-        update_totals()
-
-        barcode_entry.focus_set()
-
-
-        # ==================================================
-        # SUCCESS MESSAGE
-        # ==================================================
-
-        if drawer_success:
-
-            messagebox.showinfo(
-                "Sale Completed",
-                (
-                    "Sale completed successfully.\n\n"
-                    f"Sale ID: {sale_id}\n"
-                    f"Total: M{final:.2f}\n"
-                    f"Paid: M{paid:.2f}\n"
-                    f"Change: M{change:.2f}\n\n"
-                    "Receipt saved and printed successfully.\n\n"
-                    f"Saved Receipt:\n"
-                    f"{receipt_path}\n\n"
-                    "Cash drawer opened."
-                ),
-                parent=root
-            )
-
-        else:
-
-            messagebox.showwarning(
-                "Sale Completed",
-                (
-                    "Sale completed successfully.\n\n"
-                    f"Sale ID: {sale_id}\n"
-                    f"Total: M{final:.2f}\n"
-                    f"Paid: M{paid:.2f}\n"
-                    f"Change: M{change:.2f}\n\n"
-                    "Receipt saved successfully.\n\n"
-                    f"Saved Receipt:\n"
-                    f"{receipt_path}\n\n"
-                    "WARNING:\n"
-                    "Cash drawer could not be opened.\n\n"
-                    f"{drawer_message}"
-                ),
-                parent=root
-            )
-
+        messagebox.showinfo(
+            "Sale Completed",
+            result_message,
+            parent=root
+        )
 
     # ======================================================
     # UI HEADER
@@ -886,17 +930,17 @@ def open_sales_window(
         pady=8
     )
 
-
     # ======================================================
     # INPUT AREA
     # ======================================================
 
-    input_frame = tk.Frame(root)
+    input_frame = tk.Frame(
+        root
+    )
 
     input_frame.pack(
         pady=10
     )
-
 
     # ======================================================
     # BARCODE
@@ -911,7 +955,6 @@ def open_sales_window(
         padx=5
     )
 
-
     barcode_entry = tk.Entry(
         input_frame,
         textvariable=barcode_var,
@@ -923,12 +966,10 @@ def open_sales_window(
         column=1
     )
 
-
     barcode_entry.bind(
         "<Return>",
         lambda e: add_by_barcode()
     )
-
 
     tk.Button(
         input_frame,
@@ -940,7 +981,6 @@ def open_sales_window(
         row=0,
         column=2
     )
-
 
     # ======================================================
     # PRODUCT SEARCH
@@ -955,7 +995,6 @@ def open_sales_window(
         padx=10
     )
 
-
     search_entry = tk.Entry(
         input_frame,
         textvariable=search_var,
@@ -967,12 +1006,10 @@ def open_sales_window(
         column=4
     )
 
-
     search_entry.bind(
         "<Return>",
         lambda e: search_and_add()
     )
-
 
     tk.Button(
         input_frame,
@@ -984,7 +1021,6 @@ def open_sales_window(
         row=0,
         column=5
     )
-
 
     # ======================================================
     # CART TABLE
@@ -1001,7 +1037,6 @@ def open_sales_window(
         show="headings",
         height=10
     )
-
 
     for column in (
         "Product",
@@ -1020,11 +1055,9 @@ def open_sales_window(
             width=180
         )
 
-
     tree.pack(
         pady=10
     )
-
 
     # ======================================================
     # REMOVE BUTTON
@@ -1040,7 +1073,6 @@ def open_sales_window(
         pady=5
     )
 
-
     ttk.Separator(
         root,
         orient="horizontal"
@@ -1050,17 +1082,17 @@ def open_sales_window(
         pady=10
     )
 
-
     # ======================================================
     # TOTAL SECTION
     # ======================================================
 
-    total_frame = tk.Frame(root)
+    total_frame = tk.Frame(
+        root
+    )
 
     total_frame.pack(
         pady=5
     )
-
 
     # ======================================================
     # TOTAL
@@ -1074,7 +1106,6 @@ def open_sales_window(
         column=0
     )
 
-
     total_label = tk.Label(
         total_frame,
         width=20,
@@ -1085,7 +1116,6 @@ def open_sales_window(
         row=0,
         column=1
     )
-
 
     # ======================================================
     # DISCOUNT
@@ -1099,7 +1129,6 @@ def open_sales_window(
         column=0
     )
 
-
     discount_entry = tk.Entry(
         total_frame,
         textvariable=discount_var
@@ -1110,12 +1139,10 @@ def open_sales_window(
         column=1
     )
 
-
     discount_entry.config(
         validate="key",
         validatecommand=vcmd
     )
-
 
     # ======================================================
     # FINAL TOTAL
@@ -1129,7 +1156,6 @@ def open_sales_window(
         column=0
     )
 
-
     final_label = tk.Label(
         total_frame,
         width=20,
@@ -1141,7 +1167,6 @@ def open_sales_window(
         column=1
     )
 
-
     ttk.Separator(
         root,
         orient="horizontal"
@@ -1151,17 +1176,17 @@ def open_sales_window(
         pady=10
     )
 
-
     # ======================================================
     # PAYMENT SECTION
     # ======================================================
 
-    pay_frame = tk.Frame(root)
+    pay_frame = tk.Frame(
+        root
+    )
 
     pay_frame.pack(
         pady=5
     )
-
 
     # ======================================================
     # AMOUNT PAID
@@ -1176,7 +1201,6 @@ def open_sales_window(
         padx=10
     )
 
-
     paid_entry = tk.Entry(
         pay_frame,
         textvariable=paid_var,
@@ -1189,12 +1213,10 @@ def open_sales_window(
         padx=10
     )
 
-
     paid_entry.config(
         validate="key",
         validatecommand=vcmd
     )
-
 
     # ======================================================
     # CHANGE
@@ -1209,7 +1231,6 @@ def open_sales_window(
         padx=10
     )
 
-
     change_label = tk.Label(
         pay_frame,
         width=20,
@@ -1222,7 +1243,6 @@ def open_sales_window(
         padx=10
     )
 
-
     ttk.Separator(
         root,
         orient="horizontal"
@@ -1232,17 +1252,17 @@ def open_sales_window(
         pady=10
     )
 
-
     # ======================================================
     # ACTION BUTTONS
     # ======================================================
 
-    button_frame = tk.Frame(root)
+    button_frame = tk.Frame(
+        root
+    )
 
     button_frame.pack(
         pady=15
     )
-
 
     # ======================================================
     # PAY
@@ -1266,7 +1286,6 @@ def open_sales_window(
         padx=10
     )
 
-
     # ======================================================
     # EXIT
     # ======================================================
@@ -1289,7 +1308,6 @@ def open_sales_window(
         padx=10
     )
 
-
     # ======================================================
     # INITIALIZE WINDOW
     # ======================================================
@@ -1298,11 +1316,9 @@ def open_sales_window(
 
     update_totals()
 
-
     root.after(
         100,
         lambda: barcode_entry.focus_set()
     )
-
 
     return root

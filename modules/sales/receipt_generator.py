@@ -5,7 +5,7 @@ File:
 modules/sales/receipt_generator.py
 
 Purpose:
-Generate, save, and print a receipt after a successful sale.
+Generate and save a receipt after a successful sale.
 
 Responsibilities:
 
@@ -14,9 +14,9 @@ Responsibilities:
 - Get the logged-in cashier/admin.
 - Generate receipt text.
 - Save receipt to the Windows Documents folder.
-- Print the receipt using the configured thermal printer.
+- Send the receipt to the configured thermal printer.
 - Increase the receipt number after successful receipt saving.
-- Return the saved receipt path.
+- Never allow printer failure to cancel a completed sale.
 
 Storage:
 Documents/
@@ -29,7 +29,6 @@ receipt_1002.txt
 Company:
 GeoMaka Technologies
 """
-
 
 from datetime import datetime
 
@@ -73,11 +72,14 @@ from auth.session import (
 
 
 # ==========================================================
-# SAFE ROW / DICTIONARY VALUE HELPER
+# ROW / DICTIONARY HELPER
 # ==========================================================
 
-def get_value(data, key, default=None):
-
+def get_value(
+    data,
+    key,
+    default=None
+):
     """
     Safely get a value from either:
 
@@ -95,11 +97,14 @@ def get_value(data, key, default=None):
         return default
 
 
-    # ------------------------------------------------------
-    # Dictionary
-    # ------------------------------------------------------
+    # ======================================================
+    # DICTIONARY
+    # ======================================================
 
-    if isinstance(data, dict):
+    if isinstance(
+        data,
+        dict
+    ):
 
         return data.get(
             key,
@@ -107,13 +112,21 @@ def get_value(data, key, default=None):
         )
 
 
-    # ------------------------------------------------------
-    # sqlite3.Row / mapping-style object
-    # ------------------------------------------------------
+    # ======================================================
+    # SQLITE3.ROW / MAPPING-LIKE OBJECT
+    # ======================================================
 
     try:
 
         return data[key]
+
+    except (
+        KeyError,
+        IndexError,
+        TypeError
+    ):
+
+        return default
 
     except Exception:
 
@@ -131,9 +144,8 @@ def generate_receipt(
     discount,
     paid
 ):
-
     """
-    Generate, save, and print a receipt.
+    Generate, save, and send a receipt to the printer.
 
     The receipt is saved first in:
 
@@ -143,25 +155,36 @@ def generate_receipt(
     the receipt number is increased.
 
     The receipt is then sent to the configured thermal
-    receipt printer.
+    printer.
 
-    Important:
+    IMPORTANT:
 
     The sale has already been successfully completed
     before this function is called.
 
-    Therefore, a receipt saving or printing failure
-    must NOT cancel the completed sale.
+    Printer problems MUST NEVER cancel the sale.
+
+    Printer status is deliberately NOT returned to the
+    sales window.
+
+    The receipt file is the authoritative receipt record.
 
     Returns:
 
-        str:
-            Full path to the saved receipt file.
+        dict:
+            {
+                "success": True,
+                "saved": True,
+                "path": "...",
+                "receipt_path": "...",
+                "receipt_number": ...
+            }
 
     Raises:
 
         Exception:
-            If the receipt cannot be generated or saved.
+            Only when the receipt itself cannot be
+            generated or saved.
     """
 
 
@@ -193,6 +216,10 @@ def generate_receipt(
     )
 
 
+    # ------------------------------------------------------
+    # Create directory if it does not exist
+    # ------------------------------------------------------
+
     receipt_directory.mkdir(
         parents=True,
         exist_ok=True
@@ -208,9 +235,9 @@ def generate_receipt(
     )
 
 
-    # ======================================================
-    # RECEIPT FILE
-    # ======================================================
+    # ------------------------------------------------------
+    # Receipt filename
+    # ------------------------------------------------------
 
     filename = (
         receipt_directory
@@ -228,68 +255,44 @@ def generate_receipt(
 
     if settings:
 
-        business_name = (
-            get_value(
-                settings,
-                "business_name",
-                "GeoMaka POS"
-            )
-            or
+        business_name = get_value(
+            settings,
+            "business_name",
             "GeoMaka POS"
         )
 
 
-        business_address = (
-            get_value(
-                settings,
-                "business_address",
-                ""
-            )
-            or
+        business_address = get_value(
+            settings,
+            "business_address",
             ""
         )
 
 
-        business_phone = (
-            get_value(
-                settings,
-                "business_phone",
-                ""
-            )
-            or
+        business_phone = get_value(
+            settings,
+            "business_phone",
             ""
         )
 
 
-        business_email = (
-            get_value(
-                settings,
-                "business_email",
-                ""
-            )
-            or
+        business_email = get_value(
+            settings,
+            "business_email",
             ""
         )
 
 
-        receipt_header = (
-            get_value(
-                settings,
-                "receipt_header",
-                "SALES RECEIPT"
-            )
-            or
+        receipt_header = get_value(
+            settings,
+            "receipt_header",
             "SALES RECEIPT"
         )
 
 
-        receipt_footer = (
-            get_value(
-                settings,
-                "receipt_footer",
-                "Thank you for shopping with us."
-            )
-            or
+        receipt_footer = get_value(
+            settings,
+            "receipt_footer",
             "Thank you for shopping with us."
         )
 
@@ -312,6 +315,52 @@ def generate_receipt(
 
 
     # ======================================================
+    # PROTECT AGAINST NULL SETTINGS
+    # ======================================================
+
+    business_name = (
+        business_name
+        or
+        "GeoMaka POS"
+    )
+
+
+    business_address = (
+        business_address
+        or
+        ""
+    )
+
+
+    business_phone = (
+        business_phone
+        or
+        ""
+    )
+
+
+    business_email = (
+        business_email
+        or
+        ""
+    )
+
+
+    receipt_header = (
+        receipt_header
+        or
+        "SALES RECEIPT"
+    )
+
+
+    receipt_footer = (
+        receipt_footer
+        or
+        "Thank you for shopping with us."
+    )
+
+
+    # ======================================================
     # LOGGED-IN USER
     # ======================================================
 
@@ -321,42 +370,38 @@ def generate_receipt(
     served_by = "Unknown"
 
 
-    if isinstance(user, dict):
+    if user:
 
         served_by = (
-            user.get("full_name")
+            get_value(
+                user,
+                "full_name"
+            )
             or
-            user.get("username")
+            get_value(
+                user,
+                "username"
+            )
             or
-            user.get("user_name")
+            get_value(
+                user,
+                "user_name"
+            )
             or
-            user.get("name")
+            get_value(
+                user,
+                "name"
+            )
             or
             "Unknown"
         )
 
 
-    else:
+        if served_by == "Unknown":
 
-        try:
-
-            served_by = (
-                user["full_name"]
-                or
-                user["username"]
-                or
-                user["user_name"]
-                or
-                user["name"]
-                or
-                "Unknown"
+            served_by = str(
+                user
             )
-
-        except Exception:
-
-            if user:
-
-                served_by = str(user)
 
 
     # ======================================================
@@ -536,6 +581,49 @@ def generate_receipt(
                 )
 
 
+                # ------------------------------------------
+                # Safely convert numeric values
+                # ------------------------------------------
+
+                try:
+
+                    quantity = float(
+                        quantity
+                    )
+
+                except Exception:
+
+                    quantity = 0
+
+
+                try:
+
+                    subtotal = float(
+                        subtotal
+                    )
+
+                except Exception:
+
+                    subtotal = 0
+
+
+                # ------------------------------------------
+                # Display quantity
+                # ------------------------------------------
+
+                if quantity.is_integer():
+
+                    quantity_display = str(
+                        int(quantity)
+                    )
+
+                else:
+
+                    quantity_display = str(
+                        quantity
+                    )
+
+
                 name = (
                     product_name[:30]
                     .ljust(30)
@@ -543,13 +631,12 @@ def generate_receipt(
 
 
                 qty = (
-                    str(quantity)
-                    .rjust(6)
+                    quantity_display.rjust(6)
                 )
 
 
                 amount = (
-                    f"M{float(subtotal):.2f}"
+                    f"M{subtotal:.2f}"
                     .rjust(12)
                 )
 
@@ -569,27 +656,27 @@ def generate_receipt(
             # ==============================================
 
             file.write(
-                f"TOTAL COST      : M{float(total):.2f}\n"
+                f"TOTAL COST      : M{total:.2f}\n"
             )
 
 
             file.write(
-                f"DISCOUNT        : M{float(discount):.2f}\n"
+                f"DISCOUNT        : M{discount:.2f}\n"
             )
 
 
             file.write(
-                f"FINAL TOTAL     : M{float(final_total):.2f}\n"
+                f"FINAL TOTAL     : M{final_total:.2f}\n"
             )
 
 
             file.write(
-                f"AMOUNT PAID     : M{float(paid):.2f}\n"
+                f"AMOUNT PAID     : M{paid:.2f}\n"
             )
 
 
             file.write(
-                f"CHANGE          : M{float(change):.2f}\n"
+                f"CHANGE          : M{change:.2f}\n"
             )
 
 
@@ -660,8 +747,9 @@ def generate_receipt(
     except Exception as e:
 
         # --------------------------------------------------
-        # Receipt has already been saved successfully.
-        # Do not treat the sale as failed.
+        # Receipt already exists.
+        #
+        # Do not fail the completed sale.
         # --------------------------------------------------
 
         print(
@@ -680,75 +768,100 @@ def generate_receipt(
     # ======================================================
     # PRINT RECEIPT
     # ======================================================
+    #
+    # IMPORTANT:
+    #
+    # The receipt file has already been saved successfully.
+    #
+    # Printing is OPTIONAL hardware functionality.
+    #
+    # print_receipt() returns:
+    #
+    #     (True, message)
+    #
+    # or
+    #
+    #     (False, error message)
+    #
+    # We deliberately ignore BOTH results here.
+    #
+    # This means:
+    #
+    # - Printer connected     -> sale remains successful.
+    # - Printer disconnected  -> sale remains successful.
+    # - Printer powered off   -> sale remains successful.
+    # - Printer error         -> sale remains successful.
+    # - Windows spooler error -> sale remains successful.
+    #
+    # The saved TXT receipt remains the permanent receipt
+    # record.
+    #
+    # ======================================================
 
     try:
 
-        print_success, print_message = (
-            print_receipt(
+        print_receipt(
 
-                business_name=business_name,
+            business_name,
+            business_address,
+            business_phone,
+            business_email,
 
-                business_address=business_address,
+            receipt_header,
+            receipt_footer,
 
-                business_phone=business_phone,
+            served_by,
 
-                business_email=business_email,
+            receipt_number,
 
-                receipt_header=receipt_header,
+            date_str,
+            time_str,
 
-                receipt_footer=receipt_footer,
+            items,
 
-                served_by=served_by,
+            total,
+            discount,
+            final_total,
 
-                receipt_number=receipt_number,
-
-                date_str=date_str,
-
-                time_str=time_str,
-
-                items=items,
-
-                total=total,
-
-                discount=discount,
-
-                final_total=final_total,
-
-                paid=paid,
-
-                change=change
-            )
+            paid,
+            change
         )
 
+    except Exception:
 
-    except Exception as e:
+        # --------------------------------------------------
+        # Hardware failure must NEVER affect the completed
+        # sale or the saved receipt.
+        # --------------------------------------------------
 
-        print_success = False
-
-        print_message = str(e)
+        pass
 
 
     # ======================================================
-    # PRINT RESULT
+    # RETURN RESULT
+    # ======================================================
+    #
+    # IMPORTANT:
+    #
+    # Do NOT return:
+    #
+    #     printed
+    #     print_success
+    #     print_message
+    #
+    # because the sales window should not display printer
+    # warnings from this function.
+    #
     # ======================================================
 
-    if not print_success:
-
-        print(
-            "WARNING: Receipt saved but printing failed."
-        )
-
-        print(
-            f"Receipt: {filename}"
-        )
-
-        print(
-            f"Printer error: {print_message}"
-        )
-
-
-    # ======================================================
-    # RETURN SAVED RECEIPT PATH
-    # ======================================================
-
-    return str(filename)
+    return {
+        "success": True,
+        "saved": True,
+        "path": str(
+            filename
+        ),
+        "receipt_path": str(
+            filename
+        ),
+        "receipt_number": receipt_number
+    }
