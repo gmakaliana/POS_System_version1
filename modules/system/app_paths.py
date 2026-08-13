@@ -1,15 +1,12 @@
 """
-Application Path Manager
+GeoMaka POS Application Path Manager
 
-Responsible for managing all user data locations.
+Purpose:
+    Manage all application data locations outside
+    the application/source-code directory.
 
-The application executable should remain unchanged.
-All changing data is stored outside the program folder.
-
-Compatible with:
-- Python development environment
-- PyInstaller executable
-- Windows desktop installation
+Company:
+    GeoMaka Technologies
 """
 
 from pathlib import Path
@@ -30,14 +27,14 @@ APP_NAME = "POS System"
 
 def get_documents_directory():
     """
-    Returns the actual Windows Documents folder.
+    Return the actual Windows Documents directory.
 
-    Uses Windows Known Folder API so it works with:
-    - OneDrive redirected Documents
-    - Custom Documents locations
-    - Different Windows configurations
+    Uses the Windows Known Folder API so that the application
+    also works when Documents is redirected to OneDrive or
+    another custom location.
 
-    Falls back to the default Documents folder.
+    Falls back to:
+        C:/Users/<User>/Documents
     """
 
     try:
@@ -50,11 +47,9 @@ def get_documents_directory():
                 ("Data4", ctypes.c_ubyte * 8)
             ]
 
-
         folder_guid = UUID(
             "FDD39AD0-238F-46AF-ADB4-6C85480369C7"
         )
-
 
         guid = GUID(
             folder_guid.fields[0],
@@ -65,9 +60,7 @@ def get_documents_directory():
             )
         )
 
-
         path_pointer = ctypes.c_wchar_p()
-
 
         result = ctypes.windll.shell32.SHGetKnownFolderPath(
             ctypes.byref(guid),
@@ -76,107 +69,127 @@ def get_documents_directory():
             ctypes.byref(path_pointer)
         )
 
-
         if result != 0:
             raise Exception(
-                "Unable to locate Documents folder"
+                "Unable to locate Documents folder."
             )
-
 
         documents = Path(
             path_pointer.value
         )
 
-
         ctypes.windll.ole32.CoTaskMemFree(
             path_pointer
         )
 
-
         return documents
-
 
     except Exception:
 
         return (
             Path.home()
-            /
-            "Documents"
+            / "Documents"
         )
 
 
 # ==========================================================
-# APPLICATION ROOT DIRECTORY
+# APPLICATION DIRECTORY
 # ==========================================================
 
 def get_application_directory():
     """
-    Returns:
+    Return the main GeoMaka POS data directory.
 
-    Documents
-        |
-        POS System
+    Example:
+
+        Documents/
+            POS System/
     """
 
     return (
         get_documents_directory()
-        /
-        APP_NAME
+        / APP_NAME
     )
 
 
 # ==========================================================
-# APPLICATION DATA DIRECTORIES
+# DATABASE
 # ==========================================================
 
 def get_database_path():
+    """
+    Return the SQLite database path.
+
+    Example:
+
+        Documents/
+            POS System/
+                pos.db
+    """
 
     return (
         get_application_directory()
-        /
-        "pos.db"
+        / "pos.db"
     )
 
+
+# ==========================================================
+# BACKUPS
+# ==========================================================
 
 def get_backup_directory():
+    """
+    Return the database backup directory.
+    """
 
     return (
         get_application_directory()
-        /
-        "backups"
+        / "backups"
     )
 
+
+# ==========================================================
+# RECEIPTS
+# ==========================================================
 
 def get_receipts_directory():
+    """
+    Return the receipt storage directory.
+    """
 
     return (
         get_application_directory()
-        /
-        "receipts"
+        / "receipts"
     )
+
+
+# ==========================================================
+# REPORTS
+# ==========================================================
 
 def get_reports_directory():
+    """
+    Return the reports directory.
+    """
 
     return (
         get_application_directory()
-        /
-        "reports"
+        / "reports"
     )
+
+
+# ==========================================================
+# AUDIT LOGS
+# ==========================================================
 
 def get_audit_directory():
+    """
+    Return the audit log directory.
+    """
 
     return (
         get_application_directory()
-        /
-        "audit_logs"
-    )
-
-def get_settings_path():
-
-    return (
-        get_application_directory()
-        /
-        "settings.json"
+        / "audit_logs"
     )
 
 
@@ -186,34 +199,13 @@ def get_settings_path():
 
 def initialize_application_directories():
     """
-    Creates all required application folders.
+    Create all required application data directories.
 
-    Safe to run every time the program starts.
+    Safe to call every time the application starts.
     """
-
 
     application_directory = (
         get_application_directory()
-    )
-
-
-    backup_directory = (
-        get_backup_directory()
-    )
-
-
-    receipts_directory = (
-        get_receipts_directory()
-    )
-
-    reports_directory = (
-        get_reports_directory()
-    )
-
-   
-
-    audit_directory = (
-        get_audit_directory()
     )
 
     application_directory.mkdir(
@@ -221,24 +213,19 @@ def initialize_application_directories():
         exist_ok=True
     )
 
-
-    backup_directory.mkdir(
+    get_backup_directory().mkdir(
         exist_ok=True
     )
 
-
-    receipts_directory.mkdir(
+    get_receipts_directory().mkdir(
         exist_ok=True
     )
 
-    reports_directory.mkdir(
+    get_reports_directory().mkdir(
         exist_ok=True
     )
 
-
-
-    audit_directory.mkdir(
+    get_audit_directory().mkdir(
         exist_ok=True
     )
-
     
