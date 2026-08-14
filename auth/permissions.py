@@ -1,3 +1,4 @@
+
 # auth/permissions.py
 
 
@@ -8,10 +9,10 @@
 def get_role(user):
 
     if not user:
+
         return None
 
     return user.get("role")
-
 
 
 def is_system_admin(user):
@@ -19,11 +20,9 @@ def is_system_admin(user):
     return get_role(user) == "System Admin"
 
 
-
 def is_default_admin(user):
 
     return get_role(user) == "Default Admin"
-
 
 
 def is_admin(user):
@@ -31,13 +30,9 @@ def is_admin(user):
     return get_role(user) == "Admin"
 
 
-
 def is_cashier(user):
 
     return get_role(user) == "Cashier"
-
-
-
 
 
 # =====================================================
@@ -53,13 +48,9 @@ def can_access_admin_dashboard(user):
     )
 
 
-
 def can_access_cashier_dashboard(user):
 
     return is_cashier(user)
-
-
-
 
 
 # =====================================================
@@ -68,17 +59,14 @@ def can_access_cashier_dashboard(user):
 
 def can_view_user(viewer, target_role):
 
-
     if is_system_admin(viewer):
 
         return True
 
 
-
     if is_default_admin(viewer):
 
         return target_role != "System Admin"
-
 
 
     if is_admin(viewer):
@@ -89,11 +77,7 @@ def can_view_user(viewer, target_role):
         ]
 
 
-
     return False
-
-
-
 
 
 # =====================================================
@@ -101,7 +85,6 @@ def can_view_user(viewer, target_role):
 # =====================================================
 
 def can_create_user(creator, new_role):
-
 
     if is_system_admin(creator):
 
@@ -112,7 +95,6 @@ def can_create_user(creator, new_role):
         ]
 
 
-
     if is_default_admin(creator):
 
         return new_role in [
@@ -121,17 +103,12 @@ def can_create_user(creator, new_role):
         ]
 
 
-
     if is_admin(creator):
 
         return new_role == "Cashier"
 
 
-
     return False
-
-
-
 
 
 # =====================================================
@@ -140,9 +117,7 @@ def can_create_user(creator, new_role):
 
 def can_edit_user(editor, target_user):
 
-
     target_role = target_user.get("role")
-
 
 
     # System Admin is locked
@@ -150,7 +125,6 @@ def can_edit_user(editor, target_user):
     if target_role == "System Admin":
 
         return False
-
 
 
     # Cannot edit yourself
@@ -164,11 +138,9 @@ def can_edit_user(editor, target_user):
         return False
 
 
-
     if is_system_admin(editor):
 
         return True
-
 
 
     if is_default_admin(editor):
@@ -180,7 +152,6 @@ def can_edit_user(editor, target_user):
         ]
 
 
-
     if is_admin(editor):
 
         return target_role in [
@@ -189,11 +160,7 @@ def can_edit_user(editor, target_user):
         ]
 
 
-
     return False
-
-
-
 
 
 # =====================================================
@@ -202,9 +169,7 @@ def can_edit_user(editor, target_user):
 
 def can_change_role(editor, target_user, new_role):
 
-
     target_role = target_user.get("role")
-
 
 
     # System Admin cannot change
@@ -212,7 +177,6 @@ def can_change_role(editor, target_user, new_role):
     if target_role == "System Admin":
 
         return False
-
 
 
     # Cannot change own role
@@ -226,7 +190,6 @@ def can_change_role(editor, target_user, new_role):
         return False
 
 
-
     # System Admin
 
     if is_system_admin(editor):
@@ -236,7 +199,6 @@ def can_change_role(editor, target_user, new_role):
             "Admin",
             "Cashier"
         ]
-
 
 
     # Default Admin
@@ -256,7 +218,6 @@ def can_change_role(editor, target_user, new_role):
         ]
 
 
-
     # Admin
 
     if is_admin(editor):
@@ -271,11 +232,7 @@ def can_change_role(editor, target_user, new_role):
         return new_role == "Cashier"
 
 
-
     return False
-
-
-
 
 
 # =====================================================
@@ -284,15 +241,12 @@ def can_change_role(editor, target_user, new_role):
 
 def can_delete_user(deleter, target_user):
 
-
     target_role = target_user.get("role")
-
 
 
     if target_role == "System Admin":
 
         return False
-
 
 
     if is_system_admin(deleter):
@@ -304,7 +258,6 @@ def can_delete_user(deleter, target_user):
         ]
 
 
-
     if is_default_admin(deleter):
 
         return target_role in [
@@ -313,17 +266,12 @@ def can_delete_user(deleter, target_user):
         ]
 
 
-
     if is_admin(deleter):
 
         return target_role == "Cashier"
 
 
-
     return False
-
-
-
 
 
 # =====================================================
@@ -332,9 +280,7 @@ def can_delete_user(deleter, target_user):
 
 def can_reset_password(resetter, target_user):
 
-
     target_role = target_user.get("role")
-
 
 
     # System Admin can reset own password only
@@ -348,11 +294,9 @@ def can_reset_password(resetter, target_user):
         )
 
 
-
     if is_system_admin(resetter):
 
         return True
-
 
 
     if is_default_admin(resetter):
@@ -364,7 +308,6 @@ def can_reset_password(resetter, target_user):
         ]
 
 
-
     if is_admin(resetter):
 
         return target_role in [
@@ -373,11 +316,7 @@ def can_reset_password(resetter, target_user):
         ]
 
 
-
     return False
-
-
-
 
 
 # =====================================================
@@ -392,6 +331,7 @@ def can_manage_settings(user):
         is_default_admin(user)
     )
 
+
 # =====================================================
 # AUDIT LOGS
 # =====================================================
@@ -405,6 +345,40 @@ def can_view_audit_logs(user):
     )
 
 
+# =====================================================
+# EXPENSES
+# =====================================================
+
+def can_manage_expenses(user):
+
+    """
+    Determines whether the logged-in user can
+    manage business expenses.
+
+    Expense permissions:
+
+        System Admin -> Add/Edit/Delete/View
+        Default Admin -> Add/Edit/Delete/View
+        Admin -> Add/Edit/Delete/View
+        Cashier -> No access
+
+    Returns:
+
+        True:
+            User can manage expenses.
+
+        False:
+            User cannot manage expenses.
+    """
+
+    return (
+        is_system_admin(user)
+        or
+        is_default_admin(user)
+        or
+        is_admin(user)
+    )
+
 
 # =====================================================
 # MODULE ACCESS
@@ -415,11 +389,9 @@ def can_manage_products(user):
     return not is_cashier(user)
 
 
-
 def can_manage_suppliers(user):
 
     return not is_cashier(user)
-
 
 
 def can_manage_reports(user):
@@ -427,7 +399,7 @@ def can_manage_reports(user):
     return not is_cashier(user)
 
 
-
 def can_manage_sales(user):
 
     return user is not None
+

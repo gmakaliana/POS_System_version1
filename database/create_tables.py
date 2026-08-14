@@ -1,3 +1,32 @@
+
+"""
+GeoMaka POS Database Table Creation
+
+File:
+database/create_tables.py
+
+Purpose:
+Create all database tables required by the
+GeoMaka POS standalone application.
+
+Responsibilities:
+
+- Create users table.
+- Create suppliers table.
+- Create products table.
+- Create sales table.
+- Create sales transactions table.
+- Create settings table.
+- Create audit logs table.
+- Create expenses table.
+- Create default System Admin.
+- Create default settings.
+- Handle required table migrations.
+
+Company:
+GeoMaka Technologies
+"""
+
 from database.db import get_connection
 from auth.password_utils import hash_password
 from datetime import datetime
@@ -52,9 +81,7 @@ def create_tables():
     system_admin = cursor.fetchone()
 
 
-
     if not system_admin:
-
 
         cursor.execute("""
             INSERT INTO users
@@ -90,9 +117,7 @@ def create_tables():
 
         ))
 
-
         conn.commit()
-
 
 
     # =====================================
@@ -114,7 +139,6 @@ def create_tables():
     """)
 
     conn.commit()
-
 
 
     # =====================================
@@ -151,7 +175,6 @@ def create_tables():
     conn.commit()
 
 
-
     # =====================================
     # SALES TABLE
     # =====================================
@@ -180,7 +203,6 @@ def create_tables():
     """)
 
     conn.commit()
-
 
 
     # =====================================
@@ -218,7 +240,6 @@ def create_tables():
     conn.commit()
 
 
-
     # =====================================
     # SALES TRANSACTIONS MIGRATION
     # =====================================
@@ -242,7 +263,6 @@ def create_tables():
         """)
 
         conn.commit()
-
 
 
     # =====================================
@@ -299,7 +319,6 @@ def create_tables():
     """)
 
     conn.commit()
-
 
 
     # =====================================
@@ -382,7 +401,9 @@ def create_tables():
 
             5,
 
-            datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            datetime.now().strftime(
+                "%Y-%m-%d %H:%M:%S"
+            ),
 
             1,
 
@@ -405,6 +426,7 @@ def create_tables():
         ))
 
         conn.commit()
+
 
     # =====================================
     # AUDIT LOGS TABLE
@@ -440,5 +462,69 @@ def create_tables():
     conn.commit()
 
 
+    # =====================================
+    # EXPENSES TABLE
+    # =====================================
+    #
+    # Stores business operating expenses.
+    #
+    # expense_id:
+    #   Internal database identifier.
+    #   It will NOT be displayed in the
+    #   Expense Management GUI.
+    #
+    # expense_name:
+    #   Name/title of the expense.
+    #
+    # description:
+    #   Additional information about the expense.
+    #
+    # cost_amount:
+    #   Amount paid for the expense.
+    #
+    # expense_date:
+    #   Date the expense was recorded.
+    #
+    # created_at:
+    #   Exact date and time the record was created.
+    #
+    # entered_by:
+    #   User ID of the logged-in user who
+    #   entered the expense.
+    #
+    # =====================================
+
+    cursor.execute("""
+    CREATE TABLE IF NOT EXISTS expenses (
+
+        expense_id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+        expense_name TEXT NOT NULL,
+
+        description TEXT,
+
+        cost_amount REAL NOT NULL,
+
+        expense_date TEXT NOT NULL,
+
+        created_at TEXT NOT NULL,
+
+        entered_by INTEGER,
+
+
+        FOREIGN KEY (entered_by)
+
+        REFERENCES users(user_id)
+
+    )
+    """)
+
+    conn.commit()
+
+
+    # =====================================
+    # CLOSE DATABASE CONNECTION
+    # =====================================
 
     conn.close()
+
