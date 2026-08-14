@@ -17,21 +17,38 @@ Responsibilities:
 - Delete expenses.
 - Retrieve daily expenses.
 - Retrieve monthly expenses.
-- Record expense activities in the audit log.
-- Use the currently logged-in user as the expense creator.
+- Display the exact username of the user who entered an expense.
+- Use the currently logged-in user ID internally when creating expenses.
 - Store expense dates in YYYY-MM-DD format.
 - Store creation timestamps in YYYY-MM-DD HH:MM:SS format.
+- Record expense activities in the audit log.
 - Prevent audit failures from interrupting expense operations.
+
+Important:
+
+- expense_id remains stored and used internally.
+- entered_by stores the user's ID in the expenses table.
+- Expense retrieval joins the users table so the GUI receives
+  the exact username instead of the user ID.
+- This is a standalone POS using the local database.
 
 Company:
 GeoMaka Technologies
 """
 
+
 from datetime import datetime
 
-from database.db import get_connection
 
-from auth.session import get_session_user
+from database.db import (
+    get_connection
+)
+
+
+from auth.session import (
+    get_session_user
+)
+
 
 from modules.audit.audit_logs import (
     log_activity
@@ -42,7 +59,9 @@ from modules.audit.audit_logs import (
 # DATE FORMAT
 # ==========================================================
 
-def _format_expense_date(value):
+def _format_expense_date(
+    value
+):
     """
     Converts an expense date to:
 
@@ -61,7 +80,9 @@ def _format_expense_date(value):
         )
 
 
-    value = str(value)
+    value = str(
+        value
+    )
 
 
     # ------------------------------------------------------
@@ -131,10 +152,27 @@ def get_all_expenses():
     """
     Retrieves all expenses.
 
+    The expense ID is included in the returned database record
+    for internal operations such as editing and deleting.
+
+    The entered_by field is resolved to the exact username
+    from the users table.
+
+    Returned structure:
+
+        (
+            expense_id,
+            expense_name,
+            description,
+            cost_amount,
+            expense_date,
+            created_at,
+            username
+        )
+
     Returns:
 
-        List of expense records ordered from
-        newest to oldest.
+        List of expense records ordered from newest to oldest.
 
     If the database operation fails,
     an empty list is returned.
@@ -157,22 +195,34 @@ def get_all_expenses():
         # ==================================================
         # GET EXPENSES
         # ==================================================
+        #
+        # entered_by contains the user ID.
+        #
+        # JOIN users to retrieve the exact username.
+        #
+        # LEFT JOIN is used so an expense remains visible
+        # even if its original user record no longer exists.
+        #
+        # ==================================================
 
         cursor.execute(
             """
             SELECT
-                expense_id,
-                expense_name,
-                description,
-                cost_amount,
-                expense_date,
-                created_at,
-                entered_by
+                e.expense_id,
+                e.expense_name,
+                e.description,
+                e.cost_amount,
+                e.expense_date,
+                e.created_at,
+                u.username
 
-            FROM expenses
+            FROM expenses e
+
+            LEFT JOIN users u
+                ON e.entered_by = u.user_id
 
             ORDER BY
-                expense_id DESC
+                e.expense_id DESC
             """
         )
 
@@ -215,10 +265,8 @@ def get_expense_by_id(
     """
     Retrieves a single expense by expense ID.
 
-    Parameters:
-
-        expense_id:
-            ID of the expense to retrieve.
+    The returned entered_by field contains the exact
+    username instead of the internal user ID.
 
     Returns:
 
@@ -249,17 +297,20 @@ def get_expense_by_id(
         cursor.execute(
             """
             SELECT
-                expense_id,
-                expense_name,
-                description,
-                cost_amount,
-                expense_date,
-                created_at,
-                entered_by
+                e.expense_id,
+                e.expense_name,
+                e.description,
+                e.cost_amount,
+                e.expense_date,
+                e.created_at,
+                u.username
 
-            FROM expenses
+            FROM expenses e
 
-            WHERE expense_id = ?
+            LEFT JOIN users u
+                ON e.entered_by = u.user_id
+
+            WHERE e.expense_id = ?
 
             """,
 
@@ -306,19 +357,11 @@ def add_expense(
     """
     Adds a new expense.
 
-    Parameters:
+    The currently logged-in user's ID is stored in
+    the entered_by column.
 
-        expense_name:
-            Name/type of the expense.
-
-        description:
-            Short description of the expense.
-
-        cost_amount:
-            Expense amount.
-
-    Expense date and creation timestamp are generated
-    automatically by the system.
+    The username is resolved through the users table
+    whenever the expense is retrieved.
 
     Returns:
 
@@ -424,7 +467,7 @@ def add_expense(
         except Exception:
 
             # --------------------------------------------------
-            # Audit failure must not affect the completed
+            # Audit failure must never affect the completed
             # expense operation.
             # --------------------------------------------------
 
@@ -740,10 +783,7 @@ def get_daily_expenses(
     """
     Retrieves all expenses for a specific date.
 
-    Parameters:
-
-        expense_date:
-            Date in YYYY-MM-DD format.
+    The entered_by field contains the exact username.
 
     Returns:
 
@@ -776,20 +816,23 @@ def get_daily_expenses(
         cursor.execute(
             """
             SELECT
-                expense_id,
-                expense_name,
-                description,
-                cost_amount,
-                expense_date,
-                created_at,
-                entered_by
+                e.expense_id,
+                e.expense_name,
+                e.description,
+                e.cost_amount,
+                e.expense_date,
+                e.created_at,
+                u.username
 
-            FROM expenses
+            FROM expenses e
 
-            WHERE expense_date = ?
+            LEFT JOIN users u
+                ON e.entered_by = u.user_id
+
+            WHERE e.expense_date = ?
 
             ORDER BY
-                expense_id DESC
+                e.expense_id DESC
 
             """,
 
@@ -834,6 +877,8 @@ def get_monthly_expenses(
     """
     Retrieves all expenses for a specified month.
 
+    The entered_by field contains the exact username.
+
     Parameters:
 
         month:
@@ -870,24 +915,27 @@ def get_monthly_expenses(
         cursor.execute(
             """
             SELECT
-                expense_id,
-                expense_name,
-                description,
-                cost_amount,
-                expense_date,
-                created_at,
-                entered_by
+                e.expense_id,
+                e.expense_name,
+                e.description,
+                e.cost_amount,
+                e.expense_date,
+                e.created_at,
+                u.username
 
-            FROM expenses
+            FROM expenses e
+
+            LEFT JOIN users u
+                ON e.entered_by = u.user_id
 
             WHERE substr(
-                expense_date,
+                e.expense_date,
                 1,
                 7
             ) = ?
 
             ORDER BY
-                expense_id DESC
+                e.expense_id DESC
 
             """,
 
@@ -920,3 +968,4 @@ def get_monthly_expenses(
             except Exception:
 
                 pass
+

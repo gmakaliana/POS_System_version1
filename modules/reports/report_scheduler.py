@@ -1,8 +1,48 @@
+
+"""
+GeoMaka POS Report Scheduler
+
+File:
+modules/reports/report_scheduler.py
+
+Purpose:
+Automatically generate scheduled sales and stock reports.
+
+Responsibilities:
+
+- Generate daily sales reports.
+- Generate daily stock books.
+- Generate monthly sales reports.
+- Generate monthly stock books.
+- Include gross profit in scheduled sales reports.
+- Include operating expenses in scheduled sales reports.
+- Include net profit/loss in scheduled sales reports.
+- Respect automatic report settings.
+- Prevent duplicate daily reports.
+- Prevent duplicate monthly reports.
+- Run the scheduler in a background thread.
+- Update the last generated report dates.
+- Handle scheduler errors safely.
+
+Company:
+GeoMaka Technologies
+"""
+
+
 import threading
 import time
-from datetime import datetime, date
+
+from datetime import (
+    datetime,
+    date
+)
+
 import calendar
 
+
+# ==========================================================
+# REPORT SCHEDULER SETTINGS
+# ==========================================================
 
 from modules.settings.settings import (
     get_report_scheduler_settings,
@@ -10,6 +50,10 @@ from modules.settings.settings import (
     update_last_monthly_report_month
 )
 
+
+# ==========================================================
+# REPORT MANAGEMENT
+# ==========================================================
 
 from modules.reports.reports import (
     get_daily_sales,
@@ -19,13 +63,16 @@ from modules.reports.reports import (
 )
 
 
+# ==========================================================
+# REPORT EXPORT
+# ==========================================================
+
 from modules.reports.report_export import (
     save_daily_sales_report,
     save_monthly_sales_report,
     save_daily_stock_report,
     save_monthly_stock_report
 )
-
 
 
 # ==========================================================
@@ -35,39 +82,65 @@ from modules.reports.report_export import (
 scheduler_running = False
 
 
-
 # ==========================================================
 # CHECK IF LAST DAY OF MONTH
 # ==========================================================
 
 def is_last_day_of_month():
+    """
+    Determines whether today is the last day of the month.
+
+    Returns:
+
+        True
+            if today is the last day.
+
+        False
+            otherwise.
+    """
 
     today = date.today()
+
 
     last_day = calendar.monthrange(
         today.year,
         today.month
     )[1]
 
-    return today.day == last_day
 
-
+    return (
+        today.day == last_day
+    )
 
 
 # ==========================================================
-# GENERATE DAILY REPORTS
+# GENERATE DAILY SALES REPORT
 # ==========================================================
 
-def generate_daily_reports():
+def generate_daily_sales_report():
+    """
+    Generates and exports the daily sales report.
 
-    print("Generating daily reports...")
+    The report includes:
+
+    - Total Products Sold
+    - Total Quantity Sold
+    - Gross Sales
+    - Discounts
+    - Net Sales
+    - Cost of Goods Sold
+    - Gross Profit
+    - Operating Expenses
+    - Net Profit/Loss
+    """
+
+    print(
+        "Generating daily sales report..."
+    )
 
 
-    today = str(date.today())
-
-
-    rows, summary = get_daily_sales(
-        today
+    today = str(
+        date.today()
     )
 
 
@@ -76,7 +149,19 @@ def generate_daily_reports():
     )
 
 
-    save_daily_sales_report(
+    rows, summary = get_daily_sales(
+        today
+    )
+
+
+    # ------------------------------------------------------
+    # Export report.
+    #
+    # report_export.py receives the complete summary
+    # returned by reports.py.
+    # ------------------------------------------------------
+
+    file_path = save_daily_sales_report(
         today,
         generated,
         rows,
@@ -84,40 +169,173 @@ def generate_daily_reports():
     )
 
 
+    print(
+        "Daily sales report saved:",
+        file_path
+    )
 
-    stock_rows = get_daily_stock_report(
+
+    return file_path
+
+
+# ==========================================================
+# GENERATE DAILY STOCK REPORT
+# ==========================================================
+
+def generate_daily_stock_report():
+    """
+    Generates and exports the daily stock book.
+    """
+
+    print(
+        "Generating daily stock book..."
+    )
+
+
+    today = str(
+        date.today()
+    )
+
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+    rows = get_daily_stock_report(
         today
     )
 
 
-    save_daily_stock_report(
+    file_path = save_daily_stock_report(
         today,
         generated,
-        stock_rows
+        rows
     )
 
+
+    print(
+        "Daily stock book saved:",
+        file_path
+    )
+
+
+    return file_path
+
+
+# ==========================================================
+# GENERATE ALL DAILY REPORTS
+# ==========================================================
+
+def generate_daily_reports():
+    """
+    Generates all daily reports.
+
+    Reports:
+
+    1. Daily Sales Report
+    2. Daily Stock Book
+
+    The sales report includes the complete financial
+    summary returned by reports.py.
+    """
+
+    print(
+        "Generating daily reports..."
+    )
+
+
+    today = str(
+        date.today()
+    )
+
+
+    try:
+
+        generate_daily_sales_report()
+
+    except Exception as error:
+
+        print(
+            "Daily Sales Report Error:",
+            error
+        )
+
+
+        # --------------------------------------------------
+        # Do not continue pretending the complete daily
+        # report generation succeeded.
+        # --------------------------------------------------
+
+        return False
+
+
+    try:
+
+        generate_daily_stock_report()
+
+    except Exception as error:
+
+        print(
+            "Daily Stock Book Error:",
+            error
+        )
+
+
+        return False
+
+
+    # ------------------------------------------------------
+    # Only mark the daily report as generated when both
+    # daily reports were successfully exported.
+    # ------------------------------------------------------
 
     update_last_daily_report_date(
         today
     )
 
 
-    print("Daily reports completed.")
+    print(
+        "Daily reports completed."
+    )
 
 
+    return True
 
 
 # ==========================================================
-# GENERATE MONTHLY REPORTS
+# GENERATE MONTHLY SALES REPORT
 # ==========================================================
 
-def generate_monthly_reports():
+def generate_monthly_sales_report():
+    """
+    Generates and exports the monthly sales report.
 
-    print("Generating monthly reports...")
+    The report includes:
+
+    - Total Products Sold
+    - Total Quantity Sold
+    - Gross Sales
+    - Discounts
+    - Net Sales
+    - Cost of Goods Sold
+    - Gross Profit
+    - Operating Expenses
+    - Net Profit/Loss
+    """
+
+    print(
+        "Generating monthly sales report..."
+    )
 
 
     month = datetime.now().strftime(
         "%Y-%m"
+    )
+
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
     )
 
 
@@ -126,12 +344,7 @@ def generate_monthly_reports():
     )
 
 
-    generated = datetime.now().strftime(
-        "%d %B %Y | %H:%M"
-    )
-
-
-    save_monthly_sales_report(
+    file_path = save_monthly_sales_report(
         month,
         generated,
         rows,
@@ -139,27 +352,133 @@ def generate_monthly_reports():
     )
 
 
+    print(
+        "Monthly sales report saved:",
+        file_path
+    )
 
-    stock_rows = get_monthly_stock_report(
+
+    return file_path
+
+
+# ==========================================================
+# GENERATE MONTHLY STOCK REPORT
+# ==========================================================
+
+def generate_monthly_stock_report():
+    """
+    Generates and exports the monthly stock book.
+    """
+
+    print(
+        "Generating monthly stock book..."
+    )
+
+
+    month = datetime.now().strftime(
+        "%Y-%m"
+    )
+
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+    rows = get_monthly_stock_report(
         month
     )
 
 
-    save_monthly_stock_report(
+    file_path = save_monthly_stock_report(
         month,
         generated,
-        stock_rows
+        rows
     )
 
+
+    print(
+        "Monthly stock book saved:",
+        file_path
+    )
+
+
+    return file_path
+
+
+# ==========================================================
+# GENERATE ALL MONTHLY REPORTS
+# ==========================================================
+
+def generate_monthly_reports():
+    """
+    Generates all monthly reports.
+
+    Reports:
+
+    1. Monthly Sales Report
+    2. Monthly Stock Book
+
+    The sales report includes the complete financial
+    summary returned by reports.py.
+    """
+
+    print(
+        "Generating monthly reports..."
+    )
+
+
+    month = datetime.now().strftime(
+        "%Y-%m"
+    )
+
+
+    try:
+
+        generate_monthly_sales_report()
+
+    except Exception as error:
+
+        print(
+            "Monthly Sales Report Error:",
+            error
+        )
+
+
+        return False
+
+
+    try:
+
+        generate_monthly_stock_report()
+
+    except Exception as error:
+
+        print(
+            "Monthly Stock Book Error:",
+            error
+        )
+
+
+        return False
+
+
+    # ------------------------------------------------------
+    # Only mark the monthly report as generated when both
+    # monthly reports were successfully exported.
+    # ------------------------------------------------------
 
     update_last_monthly_report_month(
         month
     )
 
 
-    print("Monthly reports completed.")
+    print(
+        "Monthly reports completed."
+    )
 
 
+    return True
 
 
 # ==========================================================
@@ -167,17 +486,44 @@ def generate_monthly_reports():
 # ==========================================================
 
 def report_scheduler_loop():
+    """
+    Background report scheduler.
+
+    Checks the report settings every 60 seconds.
+
+    Daily reports:
+
+        Generated when:
+            - automatic daily reports are enabled.
+            - current time matches daily_report_time.
+            - today's report has not already been generated.
+
+    Monthly reports:
+
+        Generated when:
+            - automatic monthly reports are enabled.
+            - today is the last day of the month.
+            - current time matches monthly_report_time.
+            - this month's report has not already been generated.
+    """
 
     global scheduler_running
+
 
     while scheduler_running:
 
         try:
-            settings = get_report_scheduler_settings()
+
+            settings = (
+                get_report_scheduler_settings()
+            )
+
 
             if settings:
 
-                # sqlite Row conversion
+                # ==================================================
+                # READ SETTINGS
+                # ==================================================
 
                 daily_enabled = settings[
                     "automatic_daily_report_enabled"
@@ -208,9 +554,15 @@ def report_scheduler_loop():
                     "last_monthly_report_month"
                 ]
 
+
+                # ==================================================
+                # CURRENT DATE / TIME
+                # ==================================================
+
                 current_time = datetime.now().strftime(
                     "%H:%M"
                 )
+
 
                 today = str(
                     date.today()
@@ -221,9 +573,10 @@ def report_scheduler_loop():
                     "%Y-%m"
                 )
 
-                # =====================================
+
+                # ==================================================
                 # DAILY REPORT CHECK
-                # =====================================
+                # ==================================================
 
                 if (
 
@@ -241,9 +594,10 @@ def report_scheduler_loop():
 
                     generate_daily_reports()
 
-                # =====================================
+
+                # ==================================================
                 # MONTHLY REPORT CHECK
-                # =====================================
+                # ==================================================
 
                 if (
 
@@ -265,23 +619,35 @@ def report_scheduler_loop():
 
                     generate_monthly_reports()
 
-        except Exception as error:
 
+        except Exception as error:
 
             print(
                 "Report Scheduler Error:",
                 error
             )
 
-        # Check every 60 seconds
 
-        time.sleep(60)
+        # ==================================================
+        # WAIT BEFORE NEXT CHECK
+        # ==================================================
+
+        time.sleep(
+            60
+        )
+
 
 # ==========================================================
 # START SCHEDULER
 # ==========================================================
 
 def start_report_scheduler():
+    """
+    Starts the report scheduler in a daemon thread.
+
+    If the scheduler is already running, this function
+    does nothing.
+    """
 
     global scheduler_running
 
@@ -291,9 +657,7 @@ def start_report_scheduler():
         return
 
 
-
     scheduler_running = True
-
 
 
     thread = threading.Thread(
@@ -305,15 +669,17 @@ def start_report_scheduler():
     thread.start()
 
 
-
-
 # ==========================================================
 # STOP SCHEDULER
 # ==========================================================
 
 def stop_report_scheduler():
+    """
+    Stops the background report scheduler.
+    """
 
     global scheduler_running
 
 
     scheduler_running = False
+

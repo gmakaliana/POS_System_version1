@@ -1,61 +1,176 @@
+
+"""
+GeoMaka POS Reports Dashboard
+
+File:
+gui/report_window.py
+
+Purpose:
+Display GeoMaka POS reports.
+
+Responsibilities:
+
+- Display daily sales reports.
+- Display monthly sales reports.
+- Display daily stock book.
+- Display monthly stock book.
+- Display daily expense reports.
+- Display monthly expense reports.
+- Display operating expenses in profit/loss reports.
+- Display gross profit.
+- Display net profit/loss.
+- Export reports.
+- Handle report window navigation.
+
+Company:
+GeoMaka Technologies
+"""
+
+
 import tkinter as tk
-from tkinter import ttk, messagebox
-from datetime import datetime, date
+
+from tkinter import (
+    ttk,
+    messagebox
+)
+
+from datetime import (
+    datetime,
+    date
+)
+
+
+# ==========================================================
+# REPORT MANAGEMENT
+# ==========================================================
 
 from modules.reports.reports import (
     get_daily_sales,
     get_monthly_sales,
+    get_daily_expenses,
+    get_monthly_expenses,
     get_daily_stock_report,
-    get_monthly_stock_report 
+    get_monthly_stock_report
 )
+
+
+# ==========================================================
+# REPORT EXPORT
+# ==========================================================
 
 from modules.reports.report_export import (
     save_daily_sales_report,
     save_monthly_sales_report,
     save_daily_stock_report,
-    save_monthly_stock_report
+    save_monthly_stock_report,
+    save_daily_expenses_report,
+    save_monthly_expenses_report
 )
+
 
 # ==========================================================
 # CENTER WINDOW
 # ==========================================================
-def center_window(window, width, height):
 
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
+def center_window(
+    window,
+    width,
+    height
+):
+    """
+    Centers a Tkinter window on the screen.
+    """
 
-    x = (screen_width // 2) - (width // 2)
-    y = (screen_height // 2) - (height // 2)
+    screen_width = (
+        window.winfo_screenwidth()
+    )
 
-    window.geometry(f"{width}x{height}+{x}+{y}")
+    screen_height = (
+        window.winfo_screenheight()
+    )
+
+    x = (
+        screen_width // 2
+        -
+        width // 2
+    )
+
+    y = (
+        screen_height // 2
+        -
+        height // 2
+    )
+
+    window.geometry(
+        f"{width}x{height}+{x}+{y}"
+    )
 
 
 # ==========================================================
 # DASHBOARD
 # ==========================================================
-def open_reports_dashboard(admin_root):
+
+def open_reports_dashboard(
+    admin_root
+):
+    """
+    Opens the Reports Dashboard.
+    """
 
     if admin_root:
         admin_root.withdraw()
 
+
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
+
     root = tk.Toplevel()
 
-    root.title("REPORTS DASHBOARD")
+    root.title(
+        "REPORTS DASHBOARD"
+    )
 
-    center_window(root, 900, 450)
+    root.resizable(
+        True,
+        True
+    )
 
+    center_window(
+        root,
+        950,
+        600
+    )
+
+
+    # ======================================================
+    # RESTORE ADMIN DASHBOARD
+    # ======================================================
 
     def safe_restore():
 
-        if admin_root and admin_root.winfo_exists():
+        if (
+            admin_root
+            and
+            admin_root.winfo_exists()
+        ):
             admin_root.deiconify()
 
+
+    # ======================================================
+    # CLOSE
+    # ======================================================
 
     def close_window():
 
         root.destroy()
+
         safe_restore()
 
+
+    # ======================================================
+    # MAIN FRAME
+    # ======================================================
 
     main = tk.Frame(
         root,
@@ -63,21 +178,37 @@ def open_reports_dashboard(admin_root):
         pady=20
     )
 
-    main.pack(expand=True)
+    main.pack(
+        expand=True
+    )
 
+
+    # ======================================================
+    # TITLE
+    # ======================================================
 
     tk.Label(
         main,
         text="REPORTS DASHBOARD",
-        font=("Arial", 18, "bold")
-    ).pack(pady=10)
+        font=(
+            "Arial",
+            18,
+            "bold"
+        )
+    ).pack(
+        pady=10
+    )
 
 
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
 
-    btn = tk.Frame(main)
+    btn = tk.Frame(
+        main
+    )
 
     btn.pack()
-
 
 
     style = {
@@ -86,6 +217,9 @@ def open_reports_dashboard(admin_root):
     }
 
 
+    # ======================================================
+    # DAILY SALES
+    # ======================================================
 
     tk.Button(
         btn,
@@ -93,8 +227,8 @@ def open_reports_dashboard(admin_root):
         bg="#3498db",
         fg="white",
         **style,
-        command=lambda: open_daily_sales(root)
-
+        command=lambda:
+            open_daily_sales(root)
     ).grid(
         row=0,
         column=0,
@@ -103,6 +237,9 @@ def open_reports_dashboard(admin_root):
     )
 
 
+    # ======================================================
+    # MONTHLY SALES
+    # ======================================================
 
     tk.Button(
         btn,
@@ -110,8 +247,8 @@ def open_reports_dashboard(admin_root):
         bg="#16a085",
         fg="white",
         **style,
-        command=lambda: open_monthly_sales(root)
-
+        command=lambda:
+            open_monthly_sales(root)
     ).grid(
         row=0,
         column=1,
@@ -120,15 +257,18 @@ def open_reports_dashboard(admin_root):
     )
 
 
+    # ======================================================
+    # DAILY EXPENSES
+    # ======================================================
 
     tk.Button(
         btn,
-        text="Daily Stock Book",
-        bg="#2ecc71",
+        text="Daily Expenses",
+        bg="#e67e22",
         fg="white",
         **style,
-        command=lambda: open_daily_stock(root)
-
+        command=lambda:
+            open_daily_expenses(root)
     ).grid(
         row=1,
         column=0,
@@ -137,15 +277,18 @@ def open_reports_dashboard(admin_root):
     )
 
 
+    # ======================================================
+    # MONTHLY EXPENSES
+    # ======================================================
 
     tk.Button(
         btn,
-        text="Monthly Stock Book",
-        bg="#8e44ad",
+        text="Monthly Expenses",
+        bg="#d35400",
         fg="white",
         **style,
-        command=lambda: open_monthly_stock(root)
-
+        command=lambda:
+            open_monthly_expenses(root)
     ).grid(
         row=1,
         column=1,
@@ -154,6 +297,49 @@ def open_reports_dashboard(admin_root):
     )
 
 
+    # ======================================================
+    # DAILY STOCK
+    # ======================================================
+
+    tk.Button(
+        btn,
+        text="Daily Stock Book",
+        bg="#2ecc71",
+        fg="white",
+        **style,
+        command=lambda:
+            open_daily_stock(root)
+    ).grid(
+        row=2,
+        column=0,
+        padx=10,
+        pady=10
+    )
+
+
+    # ======================================================
+    # MONTHLY STOCK
+    # ======================================================
+
+    tk.Button(
+        btn,
+        text="Monthly Stock Book",
+        bg="#8e44ad",
+        fg="white",
+        **style,
+        command=lambda:
+            open_monthly_stock(root)
+    ).grid(
+        row=2,
+        column=1,
+        padx=10,
+        pady=10
+    )
+
+
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
 
     tk.Button(
         main,
@@ -162,39 +348,70 @@ def open_reports_dashboard(admin_root):
         fg="white",
         width=15,
         command=close_window
-
     ).pack(
         pady=15
     )
 
 
+    # ======================================================
+    # WINDOW CLOSE EVENT
+    # ======================================================
 
     root.protocol(
         "WM_DELETE_WINDOW",
         close_window
     )
 
+    return root
 
 
 # ==========================================================
 # DAILY SALES REPORT
 # ==========================================================
-def open_daily_sales(parent):
+
+def open_daily_sales(
+    parent
+):
+    """
+    Displays the Daily Sales Report including:
+
+    - Gross Sales
+    - Discounts
+    - Net Sales
+    - Cost of Goods Sold
+    - Gross Profit
+    - Operating Expenses
+    - Net Profit/Loss
+    """
 
     parent.withdraw()
 
 
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
+
     win = tk.Toplevel()
 
-    win.title("DAILY SALES REPORT")
+    win.title(
+        "DAILY SALES REPORT"
+    )
+
+    win.resizable(
+        True,
+        True
+    )
 
     center_window(
         win,
         1250,
-        700
+        760
     )
 
 
+    # ======================================================
+    # CLOSE
+    # ======================================================
 
     def close():
 
@@ -204,31 +421,51 @@ def open_daily_sales(parent):
             parent.deiconify()
 
 
+    # ======================================================
+    # REPORT INFORMATION
+    # ======================================================
 
-    report_date = str(date.today())
+    report_date = str(
+        date.today()
+    )
 
     generated = datetime.now().strftime(
         "%d %B %Y | %H:%M"
     )
 
 
+    # ======================================================
+    # TITLE
+    # ======================================================
 
     tk.Label(
         win,
         text="DAILY SALES REPORT",
-        font=("Arial", 16, "bold")
+        font=(
+            "Arial",
+            16,
+            "bold"
+        )
     ).pack()
-
-
 
     tk.Label(
         win,
         text=f"Report Generated: {generated}"
     ).pack()
 
+    tk.Label(
+        win,
+        text=f"Report Date: {report_date}"
+    ).pack()
 
 
-    frame = tk.Frame(win)
+    # ======================================================
+    # TABLE FRAME
+    # ======================================================
+
+    frame = tk.Frame(
+        win
+    )
 
     frame.pack(
         fill="both",
@@ -238,9 +475,11 @@ def open_daily_sales(parent):
     )
 
 
+    # ======================================================
+    # SALES COLUMNS
+    # ======================================================
 
     columns = (
-
         "Product",
         "Barcode",
         "Unit Cost(M)",
@@ -250,19 +489,19 @@ def open_daily_sales(parent):
         "Gross Sales(M)",
         "Discount(M)",
         "Net Sales(M)",
-        "Profit/Loss(M)"
-
+        "Gross Profit(M)"
     )
 
 
+    # ======================================================
+    # TREEVIEW
+    # ======================================================
 
     tree = ttk.Treeview(
         frame,
         columns=columns,
         show="headings"
     )
-
-
 
     for column in columns:
 
@@ -273,10 +512,9 @@ def open_daily_sales(parent):
 
         tree.column(
             column,
-            width=120
+            width=120,
+            minwidth=100
         )
-
-
 
     tree.pack(
         side="left",
@@ -285,6 +523,9 @@ def open_daily_sales(parent):
     )
 
 
+    # ======================================================
+    # SCROLLBAR
+    # ======================================================
 
     scroll = ttk.Scrollbar(
         frame,
@@ -301,17 +542,45 @@ def open_daily_sales(parent):
     )
 
 
+    # ======================================================
+    # GET REPORT DATA
+    # ======================================================
 
-    rows, summary = get_daily_sales(report_date)
+    rows, summary = get_daily_sales(
+        report_date
+    )
 
 
+    # ======================================================
+    # DISPLAY SALES
+    # ======================================================
 
     for row in rows:
 
         row = list(row)
 
-        # Profit/Loss column is the last column
-        row[-1] = f"M{float(row[-1]):.2f}"
+        for index in (
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9
+        ):
+
+            try:
+
+                row[index] = (
+                    f"M{float(row[index] or 0):.2f}"
+                )
+
+            except (
+                TypeError,
+                ValueError
+            ):
+
+                row[index] = "M0.00"
 
         tree.insert(
             "",
@@ -320,12 +589,13 @@ def open_daily_sales(parent):
         )
 
 
+    # ======================================================
+    # SUMMARY FRAME
+    # ======================================================
 
-    # ==========================
-    # SUMMARY
-    # ==========================
-
-    sum_frame = tk.Frame(win)
+    sum_frame = tk.Frame(
+        win
+    )
 
     sum_frame.pack(
         fill="x",
@@ -333,85 +603,175 @@ def open_daily_sales(parent):
         pady=10
     )
 
-
     tk.Label(
         sum_frame,
-        text="DAILY SALES SUMMARY",
-        font=("Arial", 12, "bold")
+        text="DAILY PROFIT/LOSS SUMMARY",
+        font=(
+            "Arial",
+            12,
+            "bold"
+        )
     ).pack(
         anchor="w"
     )
 
 
+    # ======================================================
+    # SUMMARY TABLE
+    # ======================================================
 
     sum_tree = ttk.Treeview(
         sum_frame,
-        columns=("Description", "Amount"),
+        columns=(
+            "Description",
+            "Amount"
+        ),
         show="headings",
-        height=7
+        height=9
     )
-
-
 
     sum_tree.heading(
         "Description",
         text="Description"
     )
 
-
     sum_tree.heading(
         "Amount",
         text="Amount"
     )
 
+    sum_tree.column(
+        "Description",
+        width=400
+    )
 
+    sum_tree.column(
+        "Amount",
+        width=250
+    )
 
     sum_tree.pack(
         fill="x"
     )
 
 
+    # ======================================================
+    # FINANCIAL VALUES
+    # ======================================================
+
+    gross_sales = float(
+        summary.get(
+            "gross_sales",
+            0
+        ) or 0
+    )
+
+    discount = float(
+        summary.get(
+            "discount",
+            0
+        ) or 0
+    )
+
+    net_sales = float(
+        summary.get(
+            "net_sales",
+            0
+        ) or 0
+    )
+
+    cost = float(
+        summary.get(
+            "cost",
+            0
+        ) or 0
+    )
+
+    gross_profit = float(
+        summary.get(
+            "gross_profit",
+            summary.get(
+                "profit",
+                0
+            )
+        ) or 0
+    )
+
+    total_expenses = float(
+        summary.get(
+            "total_expenses",
+            summary.get(
+                "expenses",
+                0
+            )
+        ) or 0
+    )
+
+    net_profit = float(
+        summary.get(
+            "net_profit",
+            summary.get(
+                "net_profit_loss",
+                gross_profit - total_expenses
+            )
+        ) or 0
+    )
+
+
+    # ======================================================
+    # SUMMARY ROWS
+    # ======================================================
 
     summary_rows = [
 
         (
             "Total Products Sold",
-            summary["products"]
+            summary.get(
+                "products",
+                0
+            )
         ),
 
         (
             "Total Quantity Sold",
-            f'{summary["quantity"]} Units'
-        ),
-
-        (
-            "Total Cost of Goods Sold",
-            f'M{summary["cost"]:.2f}'
+            f'{summary.get("quantity", 0)} Units'
         ),
 
         (
             "Gross Sales",
-            f'M{summary["gross_sales"]:.2f}'
+            f"M{gross_sales:.2f}"
         ),
 
         (
             "Total Discount",
-            f'M{summary["discount"]:.2f}'
+            f"M{discount:.2f}"
         ),
 
         (
             "Net Sales",
-            f'M{summary["net_sales"]:.2f}'
+            f"M{net_sales:.2f}"
         ),
 
         (
-            "Profit/Loss",
-            f'M{summary["profit"]:.2f}'
+            "Cost of Goods Sold",
+            f"M{cost:.2f}"
+        ),
+
+        (
+            "Gross Profit",
+            f"M{gross_profit:.2f}"
+        ),
+
+        (
+            "Total Operating Expenses",
+            f"M{total_expenses:.2f}"
+        ),
+
+        (
+            "Net Profit/Loss",
+            f"M{net_profit:.2f}"
         )
-
     ]
-
-
 
     for item in summary_rows:
 
@@ -422,30 +782,90 @@ def open_daily_sales(parent):
         )
 
 
+    # ======================================================
+    # PROFIT / LOSS STATUS
+    # ======================================================
 
-    button_frame = tk.Frame(win)
+    if net_profit >= 0:
+
+        result_text = (
+            f"NET PROFIT: M{net_profit:.2f}"
+        )
+
+    else:
+
+        result_text = (
+            f"NET LOSS: M{abs(net_profit):.2f}"
+        )
+
+    tk.Label(
+        sum_frame,
+        text=result_text,
+        font=(
+            "Arial",
+            13,
+            "bold"
+        )
+    ).pack(
+        anchor="e",
+        pady=(5, 0)
+    )
+
+
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
+
+    button_frame = tk.Frame(
+        win
+    )
 
     button_frame.pack(
         pady=10
     )
 
 
+    # ======================================================
+    # SAVE REPORT
+    # ======================================================
+
     def save_report():
 
-        file_path = save_daily_sales_report(
-            report_date,
-            generated,
-            rows,
-            summary
-        )
+        try:
+
+            file_path = save_daily_sales_report(
+                report_date,
+                generated,
+                rows,
+                summary
+            )
+
+            messagebox.showinfo(
+                "Report Saved",
+                (
+                    "Daily Sales Report saved "
+                    "successfully.\n\n"
+                    f"Saved File:\n{file_path}"
+                ),
+                parent=win
+            )
+
+        except Exception as error:
+
+            messagebox.showerror(
+                "Report Export Error",
+                (
+                    "The Daily Sales Report "
+                    "could not be saved.\n\n"
+                    f"Error:\n{error}"
+                ),
+                parent=win
+            )
 
 
-        messagebox.showinfo(
-            "Report Saved",
-            f"Daily Sales Report saved:\n\n{file_path}",parent=win
-        )
-
-
+    # ======================================================
+    # SAVE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -454,13 +874,15 @@ def open_daily_sales(parent):
         bg="#27ae60",
         fg="white",
         command=save_report
-
     ).pack(
         side="left",
         padx=5
     )
 
 
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -469,13 +891,10 @@ def open_daily_sales(parent):
         bg="#7f8c8d",
         fg="white",
         command=close
-
     ).pack(
         side="left",
         padx=5
     )
-
-
 
     win.protocol(
         "WM_DELETE_WINDOW",
@@ -483,25 +902,53 @@ def open_daily_sales(parent):
     )
 
 
-
 # ==========================================================
 # MONTHLY SALES REPORT
 # ==========================================================
-def open_monthly_sales(parent):
+
+def open_monthly_sales(
+    parent
+):
+    """
+    Displays the Monthly Sales Report including:
+
+    - Gross Sales
+    - Discounts
+    - Net Sales
+    - Cost of Goods Sold
+    - Gross Profit
+    - Operating Expenses
+    - Net Profit/Loss
+    """
 
     parent.withdraw()
 
 
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
+
     win = tk.Toplevel()
 
-    win.title("MONTHLY SALES REPORT")
+    win.title(
+        "MONTHLY SALES REPORT"
+    )
+
+    win.resizable(
+        True,
+        True
+    )
 
     center_window(
         win,
         1250,
-        700
+        760
     )
 
+
+    # ======================================================
+    # CLOSE
+    # ======================================================
 
     def close():
 
@@ -511,29 +958,37 @@ def open_monthly_sales(parent):
             parent.deiconify()
 
 
+    # ======================================================
+    # REPORT INFORMATION
+    # ======================================================
 
-    month = datetime.now().strftime("%Y-%m")
+    month = datetime.now().strftime(
+        "%Y-%m"
+    )
 
     generated = datetime.now().strftime(
         "%d %B %Y | %H:%M"
     )
 
 
+    # ======================================================
+    # TITLE
+    # ======================================================
 
     tk.Label(
         win,
         text="MONTHLY SALES REPORT",
-        font=("Arial", 16, "bold")
+        font=(
+            "Arial",
+            16,
+            "bold"
+        )
     ).pack()
-
-
 
     tk.Label(
         win,
         text=f"Report Generated: {generated}"
     ).pack()
-
-
 
     tk.Label(
         win,
@@ -541,8 +996,13 @@ def open_monthly_sales(parent):
     ).pack()
 
 
+    # ======================================================
+    # TABLE FRAME
+    # ======================================================
 
-    frame = tk.Frame(win)
+    frame = tk.Frame(
+        win
+    )
 
     frame.pack(
         fill="both",
@@ -552,8 +1012,11 @@ def open_monthly_sales(parent):
     )
 
 
-    columns = (
+    # ======================================================
+    # COLUMNS
+    # ======================================================
 
+    columns = (
         "Product",
         "Barcode",
         "Unit Cost(M)",
@@ -563,18 +1026,14 @@ def open_monthly_sales(parent):
         "Gross Sales(M)",
         "Discount(M)",
         "Net Sales(M)",
-        "Profit/Loss(M)"
-
+        "Gross Profit(M)"
     )
-
 
     tree = ttk.Treeview(
         frame,
         columns=columns,
         show="headings"
     )
-
-
 
     for column in columns:
 
@@ -585,9 +1044,9 @@ def open_monthly_sales(parent):
 
         tree.column(
             column,
-            width=120
+            width=120,
+            minwidth=100
         )
-
 
     tree.pack(
         side="left",
@@ -596,17 +1055,18 @@ def open_monthly_sales(parent):
     )
 
 
+    # ======================================================
+    # SCROLLBAR
+    # ======================================================
 
     scroll = ttk.Scrollbar(
         frame,
         command=tree.yview
     )
 
-
     tree.configure(
         yscrollcommand=scroll.set
     )
-
 
     scroll.pack(
         side="right",
@@ -614,16 +1074,45 @@ def open_monthly_sales(parent):
     )
 
 
-    rows, summary = get_monthly_sales(month)
+    # ======================================================
+    # GET DATA
+    # ======================================================
+
+    rows, summary = get_monthly_sales(
+        month
+    )
 
 
+    # ======================================================
+    # DISPLAY DATA
+    # ======================================================
 
     for row in rows:
 
         row = list(row)
 
-        # Profit/Loss column is the last column
-        row[-1] = f"M{float(row[-1]):.2f}"
+        for index in (
+            2,
+            3,
+            5,
+            6,
+            7,
+            8,
+            9
+        ):
+
+            try:
+
+                row[index] = (
+                    f"M{float(row[index] or 0):.2f}"
+                )
+
+            except (
+                TypeError,
+                ValueError
+            ):
+
+                row[index] = "M0.00"
 
         tree.insert(
             "",
@@ -632,9 +1121,13 @@ def open_monthly_sales(parent):
         )
 
 
+    # ======================================================
     # SUMMARY
+    # ======================================================
 
-    sum_frame = tk.Frame(win)
+    sum_frame = tk.Frame(
+        win
+    )
 
     sum_frame.pack(
         fill="x",
@@ -642,81 +1135,170 @@ def open_monthly_sales(parent):
         pady=10
     )
 
-
     tk.Label(
         sum_frame,
-        text="MONTHLY SALES SUMMARY",
-        font=("Arial", 12, "bold")
+        text="MONTHLY PROFIT/LOSS SUMMARY",
+        font=(
+            "Arial",
+            12,
+            "bold"
+        )
     ).pack(
         anchor="w"
     )
 
-
     sum_tree = ttk.Treeview(
         sum_frame,
-        columns=("Description", "Amount"),
+        columns=(
+            "Description",
+            "Amount"
+        ),
         show="headings",
-        height=7
+        height=9
     )
-
 
     sum_tree.heading(
         "Description",
         text="Description"
     )
 
-
     sum_tree.heading(
         "Amount",
         text="Amount"
     )
 
+    sum_tree.column(
+        "Description",
+        width=400
+    )
+
+    sum_tree.column(
+        "Amount",
+        width=250
+    )
 
     sum_tree.pack(
         fill="x"
     )
 
 
+    # ======================================================
+    # FINANCIAL VALUES
+    # ======================================================
+
+    gross_sales = float(
+        summary.get(
+            "gross_sales",
+            0
+        ) or 0
+    )
+
+    discount = float(
+        summary.get(
+            "discount",
+            0
+        ) or 0
+    )
+
+    net_sales = float(
+        summary.get(
+            "net_sales",
+            0
+        ) or 0
+    )
+
+    cost = float(
+        summary.get(
+            "cost",
+            0
+        ) or 0
+    )
+
+    gross_profit = float(
+        summary.get(
+            "gross_profit",
+            summary.get(
+                "profit",
+                0
+            )
+        ) or 0
+    )
+
+    total_expenses = float(
+        summary.get(
+            "total_expenses",
+            summary.get(
+                "expenses",
+                0
+            )
+        ) or 0
+    )
+
+    net_profit = float(
+        summary.get(
+            "net_profit",
+            summary.get(
+                "net_profit_loss",
+                gross_profit - total_expenses
+            )
+        ) or 0
+    )
+
+
+    # ======================================================
+    # SUMMARY ROWS
+    # ======================================================
+
     summary_rows = [
 
         (
             "Total Products Sold",
-            summary["products"]
+            summary.get(
+                "products",
+                0
+            )
         ),
 
         (
             "Total Quantity Sold",
-            f'{summary["quantity"]} Units'
-        ),
-
-        (
-            "Total Cost of Goods Sold",
-            f'M{summary["cost"]:.2f}'
+            f'{summary.get("quantity", 0)} Units'
         ),
 
         (
             "Gross Sales",
-            f'M{summary["gross_sales"]:.2f}'
+            f"M{gross_sales:.2f}"
         ),
 
         (
             "Total Discount",
-            f'M{summary["discount"]:.2f}'
+            f"M{discount:.2f}"
         ),
 
         (
             "Net Sales",
-            f'M{summary["net_sales"]:.2f}'
+            f"M{net_sales:.2f}"
         ),
 
         (
-            "Profit/Loss",
-            f'M{summary["profit"]:.2f}'
+            "Cost of Goods Sold",
+            f"M{cost:.2f}"
+        ),
+
+        (
+            "Gross Profit",
+            f"M{gross_profit:.2f}"
+        ),
+
+        (
+            "Total Operating Expenses",
+            f"M{total_expenses:.2f}"
+        ),
+
+        (
+            "Net Profit/Loss",
+            f"M{net_profit:.2f}"
         )
-
     ]
-
-
 
     for item in summary_rows:
 
@@ -727,30 +1309,90 @@ def open_monthly_sales(parent):
         )
 
 
-    button_frame = tk.Frame(win)
+    # ======================================================
+    # PROFIT / LOSS STATUS
+    # ======================================================
+
+    if net_profit >= 0:
+
+        result_text = (
+            f"NET PROFIT: M{net_profit:.2f}"
+        )
+
+    else:
+
+        result_text = (
+            f"NET LOSS: M{abs(net_profit):.2f}"
+        )
+
+    tk.Label(
+        sum_frame,
+        text=result_text,
+        font=(
+            "Arial",
+            13,
+            "bold"
+        )
+    ).pack(
+        anchor="e",
+        pady=(5, 0)
+    )
+
+
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
+
+    button_frame = tk.Frame(
+        win
+    )
 
     button_frame.pack(
         pady=10
     )
 
 
+    # ======================================================
+    # SAVE REPORT
+    # ======================================================
 
     def save_report():
 
-        file_path = save_monthly_sales_report(
-            month,
-            generated,
-            rows,
-            summary
-        )
+        try:
+
+            file_path = save_monthly_sales_report(
+                month,
+                generated,
+                rows,
+                summary
+            )
+
+            messagebox.showinfo(
+                "Report Saved",
+                (
+                    "Monthly Sales Report saved "
+                    "successfully.\n\n"
+                    f"Saved File:\n{file_path}"
+                ),
+                parent=win
+            )
+
+        except Exception as error:
+
+            messagebox.showerror(
+                "Report Export Error",
+                (
+                    "The Monthly Sales Report "
+                    "could not be saved.\n\n"
+                    f"Error:\n{error}"
+                ),
+                parent=win
+            )
 
 
-        messagebox.showinfo(
-            "Report Saved",
-            f"Monthly Sales Report saved:\n\n{file_path}",parent=win
-        )
-
-
+    # ======================================================
+    # SAVE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -759,13 +1401,15 @@ def open_monthly_sales(parent):
         bg="#27ae60",
         fg="white",
         command=save_report
-
     ).pack(
         side="left",
         padx=5
     )
 
 
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -774,13 +1418,10 @@ def open_monthly_sales(parent):
         bg="#7f8c8d",
         fg="white",
         command=close
-
     ).pack(
         side="left",
         padx=5
     )
-
-
 
     win.protocol(
         "WM_DELETE_WINDOW",
@@ -788,17 +1429,761 @@ def open_monthly_sales(parent):
     )
 
 
-    # ==========================================================
-# DAILY STOCK BOOK
 # ==========================================================
-def open_daily_stock(parent):
+# DAILY EXPENSES
+# ==========================================================
+
+def open_daily_expenses(
+    parent
+):
+    """
+    Displays expenses recorded for today.
+
+    Expense ID is intentionally NOT displayed.
+
+    Report row structure from reports.py:
+
+        index 0 = Expense Name
+        index 1 = Description
+        index 2 = Amount
+        index 3 = Expense Date
+        index 4 = Created At
+        index 5 = Exact Username
+        index 6 = Expense ID
+
+    The GUI displays indexes 0 through 5 only.
+
+    Expense ID remains available internally at index 6.
+    """
 
     parent.withdraw()
 
 
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
+
     win = tk.Toplevel()
 
-    win.title("DAILY STOCK BOOK")
+    win.title(
+        "DAILY EXPENSES"
+    )
+
+    win.resizable(
+        True,
+        True
+    )
+
+    center_window(
+        win,
+        1050,
+        600
+    )
+
+
+    # ======================================================
+    # CLOSE
+    # ======================================================
+
+    def close():
+
+        win.destroy()
+
+        if parent.winfo_exists():
+            parent.deiconify()
+
+
+    # ======================================================
+    # REPORT INFORMATION
+    # ======================================================
+
+    today = str(
+        date.today()
+    )
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+    # ======================================================
+    # TITLE
+    # ======================================================
+
+    tk.Label(
+        win,
+        text="DAILY EXPENSES",
+        font=(
+            "Arial",
+            16,
+            "bold"
+        )
+    ).pack()
+
+    tk.Label(
+        win,
+        text=f"Report Date: {today}"
+    ).pack()
+
+    tk.Label(
+        win,
+        text=f"Report Generated: {generated}"
+    ).pack()
+
+
+    # ======================================================
+    # TABLE FRAME
+    # ======================================================
+
+    frame = tk.Frame(
+        win
+    )
+
+    frame.pack(
+        fill="both",
+        expand=True,
+        padx=10,
+        pady=10
+    )
+
+
+    # ======================================================
+    # EXPENSE COLUMNS
+    #
+    # Expense ID intentionally removed.
+    # ======================================================
+
+    columns = (
+        "Expense Name",
+        "Description",
+        "Amount(M)",
+        "Expense Date",
+        "Created At",
+        "Entered By"
+    )
+
+    tree = ttk.Treeview(
+        frame,
+        columns=columns,
+        show="headings"
+    )
+
+    widths = (
+        170,
+        250,
+        120,
+        130,
+        160,
+        160
+    )
+
+    for column, width in zip(
+        columns,
+        widths
+    ):
+
+        tree.heading(
+            column,
+            text=column
+        )
+
+        tree.column(
+            column,
+            width=width,
+            minwidth=100
+        )
+
+    tree.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+
+    # ======================================================
+    # SCROLLBAR
+    # ======================================================
+
+    scroll = ttk.Scrollbar(
+        frame,
+        command=tree.yview
+    )
+
+    tree.configure(
+        yscrollcommand=scroll.set
+    )
+
+    scroll.pack(
+        side="right",
+        fill="y"
+    )
+
+
+    # ======================================================
+    # GET EXPENSE DATA
+    # ======================================================
+
+    rows = get_daily_expenses(
+        today
+    )
+
+    total_expenses = 0
+
+
+    # ======================================================
+    # DISPLAY EXPENSES
+    # ======================================================
+
+    for row in rows:
+
+        # --------------------------------------------------
+        # Structure:
+        #
+        # 0 = Expense Name
+        # 1 = Description
+        # 2 = Amount
+        # 3 = Expense Date
+        # 4 = Created At
+        # 5 = Exact Username
+        # 6 = Expense ID
+        #
+        # Expense ID is retained internally but NEVER
+        # displayed by this GUI.
+        # --------------------------------------------------
+
+        try:
+
+            amount = float(
+                row[2] or 0
+            )
+
+            total_expenses += amount
+
+            amount_display = (
+                f"M{amount:.2f}"
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            amount_display = "M0.00"
+
+
+        display_row = (
+            row[0],
+            row[1],
+            amount_display,
+            row[3],
+            row[4],
+            row[5]
+        )
+
+        tree.insert(
+            "",
+            "end",
+            values=display_row
+        )
+
+
+    # ======================================================
+    # TOTAL
+    # ======================================================
+
+    tree.insert(
+        "",
+        "end",
+        values=(
+            "TOTAL",
+            "",
+            f"M{total_expenses:.2f}",
+            "",
+            "",
+            ""
+        )
+    )
+
+
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
+
+    button_frame = tk.Frame(
+        win
+    )
+
+    button_frame.pack(
+        pady=10
+    )
+
+
+    # ======================================================
+    # SAVE REPORT
+    # ======================================================
+
+    def save_report():
+
+        try:
+
+            file_path = save_daily_expenses_report(
+                today,
+                generated,
+                rows
+            )
+
+            messagebox.showinfo(
+                "Report Saved",
+                (
+                    "Daily Expenses Report saved "
+                    "successfully.\n\n"
+                    f"Saved File:\n{file_path}"
+                ),
+                parent=win
+            )
+
+        except Exception as error:
+
+            messagebox.showerror(
+                "Report Export Error",
+                (
+                    "The Daily Expenses Report "
+                    "could not be saved.\n\n"
+                    f"Error:\n{error}"
+                ),
+                parent=win
+            )
+
+
+    # ======================================================
+    # SAVE BUTTON
+    # ======================================================
+
+    tk.Button(
+        button_frame,
+        text="Save",
+        width=14,
+        bg="#27ae60",
+        fg="white",
+        command=save_report
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
+
+    tk.Button(
+        button_frame,
+        text="Close",
+        width=14,
+        bg="#7f8c8d",
+        fg="white",
+        command=close
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+    win.protocol(
+        "WM_DELETE_WINDOW",
+        close
+    )
+
+
+# ==========================================================
+# MONTHLY EXPENSES
+# ==========================================================
+
+def open_monthly_expenses(
+    parent
+):
+    """
+    Displays expenses recorded during the current month.
+
+    Expense ID is intentionally NOT displayed.
+
+    Report row structure from reports.py:
+
+        index 0 = Expense Name
+        index 1 = Description
+        index 2 = Amount
+        index 3 = Expense Date
+        index 4 = Created At
+        index 5 = Exact Username
+        index 6 = Expense ID
+
+    The GUI displays indexes 0 through 5 only.
+
+    Expense ID remains available internally at index 6.
+    """
+
+    parent.withdraw()
+
+
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
+
+    win = tk.Toplevel()
+
+    win.title(
+        "MONTHLY EXPENSES"
+    )
+
+    win.resizable(
+        True,
+        True
+    )
+
+    center_window(
+        win,
+        1050,
+        600
+    )
+
+
+    # ======================================================
+    # CLOSE
+    # ======================================================
+
+    def close():
+
+        win.destroy()
+
+        if parent.winfo_exists():
+            parent.deiconify()
+
+
+    # ======================================================
+    # REPORT INFORMATION
+    # ======================================================
+
+    month = datetime.now().strftime(
+        "%Y-%m"
+    )
+
+    generated = datetime.now().strftime(
+        "%d %B %Y | %H:%M"
+    )
+
+
+    # ======================================================
+    # TITLE
+    # ======================================================
+
+    tk.Label(
+        win,
+        text="MONTHLY EXPENSES",
+        font=(
+            "Arial",
+            16,
+            "bold"
+        )
+    ).pack()
+
+    tk.Label(
+        win,
+        text=f"Period: {month}"
+    ).pack()
+
+    tk.Label(
+        win,
+        text=f"Report Generated: {generated}"
+    ).pack()
+
+
+    # ======================================================
+    # TABLE FRAME
+    # ======================================================
+
+    frame = tk.Frame(
+        win
+    )
+
+    frame.pack(
+        fill="both",
+        expand=True,
+        padx=10,
+        pady=10
+    )
+
+
+    # ======================================================
+    # EXPENSE COLUMNS
+    #
+    # Expense ID intentionally removed.
+    # ======================================================
+
+    columns = (
+        "Expense Name",
+        "Description",
+        "Amount(M)",
+        "Expense Date",
+        "Created At",
+        "Entered By"
+    )
+
+    tree = ttk.Treeview(
+        frame,
+        columns=columns,
+        show="headings"
+    )
+
+    widths = (
+        170,
+        250,
+        120,
+        130,
+        160,
+        160
+    )
+
+    for column, width in zip(
+        columns,
+        widths
+    ):
+
+        tree.heading(
+            column,
+            text=column
+        )
+
+        tree.column(
+            column,
+            width=width,
+            minwidth=100
+        )
+
+    tree.pack(
+        side="left",
+        fill="both",
+        expand=True
+    )
+
+
+    # ======================================================
+    # SCROLLBAR
+    # ======================================================
+
+    scroll = ttk.Scrollbar(
+        frame,
+        command=tree.yview
+    )
+
+    tree.configure(
+        yscrollcommand=scroll.set
+    )
+
+    scroll.pack(
+        side="right",
+        fill="y"
+    )
+
+
+    # ======================================================
+    # GET EXPENSE DATA
+    # ======================================================
+
+    rows = get_monthly_expenses(
+        month
+    )
+
+    total_expenses = 0
+
+
+    # ======================================================
+    # DISPLAY EXPENSES
+    # ======================================================
+
+    for row in rows:
+
+        # --------------------------------------------------
+        # Structure:
+        #
+        # 0 = Expense Name
+        # 1 = Description
+        # 2 = Amount
+        # 3 = Expense Date
+        # 4 = Created At
+        # 5 = Exact Username
+        # 6 = Expense ID
+        #
+        # Expense ID is retained internally but NEVER
+        # displayed by this GUI.
+        # --------------------------------------------------
+
+        try:
+
+            amount = float(
+                row[2] or 0
+            )
+
+            total_expenses += amount
+
+            amount_display = (
+                f"M{amount:.2f}"
+            )
+
+        except (
+            TypeError,
+            ValueError
+        ):
+
+            amount_display = "M0.00"
+
+
+        display_row = (
+            row[0],
+            row[1],
+            amount_display,
+            row[3],
+            row[4],
+            row[5]
+        )
+
+        tree.insert(
+            "",
+            "end",
+            values=display_row
+        )
+
+
+    # ======================================================
+    # TOTAL
+    # ======================================================
+
+    tree.insert(
+        "",
+        "end",
+        values=(
+            "TOTAL",
+            "",
+            f"M{total_expenses:.2f}",
+            "",
+            "",
+            ""
+        )
+    )
+
+
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
+
+    button_frame = tk.Frame(
+        win
+    )
+
+    button_frame.pack(
+        pady=10
+    )
+
+
+    # ======================================================
+    # SAVE REPORT
+    # ======================================================
+
+    def save_report():
+
+        try:
+
+            file_path = save_monthly_expenses_report(
+                month,
+                generated,
+                rows
+            )
+
+            messagebox.showinfo(
+                "Report Saved",
+                (
+                    "Monthly Expenses Report saved "
+                    "successfully.\n\n"
+                    f"Saved File:\n{file_path}"
+                ),
+                parent=win
+            )
+
+        except Exception as error:
+
+            messagebox.showerror(
+                "Report Export Error",
+                (
+                    "The Monthly Expenses Report "
+                    "could not be saved.\n\n"
+                    f"Error:\n{error}"
+                ),
+                parent=win
+            )
+
+
+    # ======================================================
+    # SAVE BUTTON
+    # ======================================================
+
+    tk.Button(
+        button_frame,
+        text="Save",
+        width=14,
+        bg="#27ae60",
+        fg="white",
+        command=save_report
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
+
+    tk.Button(
+        button_frame,
+        text="Close",
+        width=14,
+        bg="#7f8c8d",
+        fg="white",
+        command=close
+    ).pack(
+        side="left",
+        padx=5
+    )
+
+    win.protocol(
+        "WM_DELETE_WINDOW",
+        close
+    )
+
+
+# ==========================================================
+# DAILY STOCK BOOK
+# ==========================================================
+
+def open_daily_stock(
+    parent
+):
+
+    parent.withdraw()
+
+
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
+
+    win = tk.Toplevel()
+
+    win.title(
+        "DAILY STOCK BOOK"
+    )
+
+    win.resizable(
+        True,
+        True
+    )
 
     center_window(
         win,
@@ -807,6 +2192,10 @@ def open_daily_stock(parent):
     )
 
 
+    # ======================================================
+    # CLOSE
+    # ======================================================
+
     def close():
 
         win.destroy()
@@ -815,28 +2204,51 @@ def open_daily_stock(parent):
             parent.deiconify()
 
 
+    # ======================================================
+    # REPORT INFORMATION
+    # ======================================================
 
     generated = datetime.now().strftime(
         "%d %B %Y | %H:%M"
     )
 
+    today = str(
+        date.today()
+    )
+
+
+    # ======================================================
+    # TITLE
+    # ======================================================
 
     tk.Label(
         win,
         text="DAILY STOCK BOOK",
-        font=("Arial", 16, "bold")
+        font=(
+            "Arial",
+            16,
+            "bold"
+        )
     ).pack()
-
-
 
     tk.Label(
         win,
         text=f"Report Generated: {generated}"
     ).pack()
 
+    tk.Label(
+        win,
+        text=f"Report Date: {today}"
+    ).pack()
 
 
-    frame = tk.Frame(win)
+    # ======================================================
+    # TABLE FRAME
+    # ======================================================
+
+    frame = tk.Frame(
+        win
+    )
 
     frame.pack(
         fill="both",
@@ -846,25 +2258,22 @@ def open_daily_stock(parent):
     )
 
 
+    # ======================================================
+    # COLUMNS
+    # ======================================================
 
     columns = (
-
         "Product",
         "Opening Stock",
         "Quantity Sold",
         "Closing Stock"
-
     )
-
-
 
     tree = ttk.Treeview(
         frame,
         columns=columns,
         show="headings"
     )
-
-
 
     for column in columns:
 
@@ -878,8 +2287,6 @@ def open_daily_stock(parent):
             width=180
         )
 
-
-
     tree.pack(
         side="left",
         fill="both",
@@ -887,17 +2294,18 @@ def open_daily_stock(parent):
     )
 
 
+    # ======================================================
+    # SCROLLBAR
+    # ======================================================
 
     scroll = ttk.Scrollbar(
         frame,
         command=tree.yview
     )
 
-
     tree.configure(
         yscrollcommand=scroll.set
     )
-
 
     scroll.pack(
         side="right",
@@ -905,23 +2313,26 @@ def open_daily_stock(parent):
     )
 
 
+    # ======================================================
+    # GET DATA
+    # ======================================================
 
-    today = str(date.today())
-
-    rows = get_daily_stock_report(today)
-
-
+    rows = get_daily_stock_report(
+        today
+    )
 
     total_open = 0
     total_sold = 0
     total_close = 0
 
 
+    # ======================================================
+    # DISPLAY DATA
+    # ======================================================
 
     for row in rows:
 
         product, sold, closing, opening = row
-
 
         tree.insert(
             "",
@@ -934,16 +2345,22 @@ def open_daily_stock(parent):
             )
         )
 
+        total_open += (
+            opening or 0
+        )
 
-        total_open += opening
+        total_sold += (
+            sold or 0
+        )
 
-        total_sold += sold
+        total_close += (
+            closing or 0
+        )
 
-        total_close += closing
 
-
-
-    # TOTAL ROW
+    # ======================================================
+    # TOTAL
+    # ======================================================
 
     tree.insert(
         "",
@@ -957,30 +2374,59 @@ def open_daily_stock(parent):
     )
 
 
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
 
-    button_frame = tk.Frame(win)
+    button_frame = tk.Frame(
+        win
+    )
 
     button_frame.pack(
         pady=10
     )
 
 
+    # ======================================================
+    # SAVE REPORT
+    # ======================================================
 
     def save_report():
 
-        file_path = save_daily_stock_report(
-            today,
-            generated,
-            rows
-        )
+        try:
+
+            file_path = save_daily_stock_report(
+                today,
+                generated,
+                rows
+            )
+
+            messagebox.showinfo(
+                "Report Saved",
+                (
+                    "Daily Stock Book saved "
+                    "successfully.\n\n"
+                    f"Saved File:\n{file_path}"
+                ),
+                parent=win
+            )
+
+        except Exception as error:
+
+            messagebox.showerror(
+                "Report Export Error",
+                (
+                    "The Daily Stock Book "
+                    "could not be saved.\n\n"
+                    f"Error:\n{error}"
+                ),
+                parent=win
+            )
 
 
-        messagebox.showinfo(
-            "Report Saved",
-            f"Daily Stock Book saved:\n\n{file_path}",parent=win
-        )
-
-
+    # ======================================================
+    # SAVE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -989,13 +2435,15 @@ def open_daily_stock(parent):
         bg="#27ae60",
         fg="white",
         command=save_report
-
     ).pack(
         side="left",
         padx=5
     )
 
 
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -1004,13 +2452,10 @@ def open_daily_stock(parent):
         bg="#7f8c8d",
         fg="white",
         command=close
-
     ).pack(
         side="left",
         padx=5
     )
-
-
 
     win.protocol(
         "WM_DELETE_WINDOW",
@@ -1018,20 +2463,31 @@ def open_daily_stock(parent):
     )
 
 
-
 # ==========================================================
 # MONTHLY STOCK BOOK
 # ==========================================================
-def open_monthly_stock(parent):
+
+def open_monthly_stock(
+    parent
+):
 
     parent.withdraw()
 
 
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
 
     win = tk.Toplevel()
 
-    win.title("MONTHLY STOCK BOOK")
+    win.title(
+        "MONTHLY STOCK BOOK"
+    )
 
+    win.resizable(
+        True,
+        True
+    )
 
     center_window(
         win,
@@ -1040,6 +2496,9 @@ def open_monthly_stock(parent):
     )
 
 
+    # ======================================================
+    # CLOSE
+    # ======================================================
 
     def close():
 
@@ -1049,32 +2508,37 @@ def open_monthly_stock(parent):
             parent.deiconify()
 
 
+    # ======================================================
+    # REPORT INFORMATION
+    # ======================================================
 
     generated = datetime.now().strftime(
         "%d %B %Y | %H:%M"
     )
-
 
     month = datetime.now().strftime(
         "%Y-%m"
     )
 
 
+    # ======================================================
+    # TITLE
+    # ======================================================
 
     tk.Label(
         win,
         text="MONTHLY STOCK BOOK",
-        font=("Arial", 16, "bold")
+        font=(
+            "Arial",
+            16,
+            "bold"
+        )
     ).pack()
-
-
 
     tk.Label(
         win,
         text=f"Report Generated: {generated}"
     ).pack()
-
-
 
     tk.Label(
         win,
@@ -1082,8 +2546,13 @@ def open_monthly_stock(parent):
     ).pack()
 
 
+    # ======================================================
+    # TABLE FRAME
+    # ======================================================
 
-    frame = tk.Frame(win)
+    frame = tk.Frame(
+        win
+    )
 
     frame.pack(
         fill="both",
@@ -1093,25 +2562,22 @@ def open_monthly_stock(parent):
     )
 
 
+    # ======================================================
+    # COLUMNS
+    # ======================================================
 
     columns = (
-
         "Product",
         "Opening Stock",
         "Quantity Sold",
         "Closing Stock"
-
     )
-
-
 
     tree = ttk.Treeview(
         frame,
         columns=columns,
         show="headings"
     )
-
-
 
     for column in columns:
 
@@ -1120,13 +2586,10 @@ def open_monthly_stock(parent):
             text=column
         )
 
-
         tree.column(
             column,
             width=180
         )
-
-
 
     tree.pack(
         side="left",
@@ -1135,18 +2598,18 @@ def open_monthly_stock(parent):
     )
 
 
+    # ======================================================
+    # SCROLLBAR
+    # ======================================================
 
     scroll = ttk.Scrollbar(
         frame,
         command=tree.yview
     )
 
-
-
     tree.configure(
         yscrollcommand=scroll.set
     )
-
 
     scroll.pack(
         side="right",
@@ -1154,24 +2617,26 @@ def open_monthly_stock(parent):
     )
 
 
+    # ======================================================
+    # GET DATA
+    # ======================================================
 
-    rows = get_monthly_stock_report(month)
-
-
+    rows = get_monthly_stock_report(
+        month
+    )
 
     total_open = 0
-
     total_sold = 0
-
     total_close = 0
 
 
+    # ======================================================
+    # DISPLAY DATA
+    # ======================================================
 
     for row in rows:
 
         product, sold, closing, opening = row
-
-
 
         tree.insert(
             "",
@@ -1184,16 +2649,22 @@ def open_monthly_stock(parent):
             )
         )
 
+        total_open += (
+            opening or 0
+        )
 
-        total_open += opening
+        total_sold += (
+            sold or 0
+        )
 
-        total_sold += sold
+        total_close += (
+            closing or 0
+        )
 
-        total_close += closing
 
-
-
-    # TOTAL ROW
+    # ======================================================
+    # TOTAL
+    # ======================================================
 
     tree.insert(
         "",
@@ -1207,30 +2678,59 @@ def open_monthly_stock(parent):
     )
 
 
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
 
-    button_frame = tk.Frame(win)
+    button_frame = tk.Frame(
+        win
+    )
 
     button_frame.pack(
         pady=10
     )
 
 
+    # ======================================================
+    # SAVE REPORT
+    # ======================================================
 
     def save_report():
 
-        file_path = save_monthly_stock_report(
-            month,
-            generated,
-            rows
-        )
+        try:
+
+            file_path = save_monthly_stock_report(
+                month,
+                generated,
+                rows
+            )
+
+            messagebox.showinfo(
+                "Report Saved",
+                (
+                    "Monthly Stock Book saved "
+                    "successfully.\n\n"
+                    f"Saved File:\n{file_path}"
+                ),
+                parent=win
+            )
+
+        except Exception as error:
+
+            messagebox.showerror(
+                "Report Export Error",
+                (
+                    "The Monthly Stock Book "
+                    "could not be saved.\n\n"
+                    f"Error:\n{error}"
+                ),
+                parent=win
+            )
 
 
-        messagebox.showinfo(
-            "Report Saved",
-            f"Monthly Stock Book saved:\n\n{file_path}",parent=win
-        )
-
-
+    # ======================================================
+    # SAVE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -1239,13 +2739,15 @@ def open_monthly_stock(parent):
         bg="#27ae60",
         fg="white",
         command=save_report
-
     ).pack(
         side="left",
         padx=5
     )
 
 
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
 
     tk.Button(
         button_frame,
@@ -1254,7 +2756,6 @@ def open_monthly_stock(parent):
         bg="#7f8c8d",
         fg="white",
         command=close
-
     ).pack(
         side="left",
         padx=5
@@ -1264,3 +2765,4 @@ def open_monthly_stock(parent):
         "WM_DELETE_WINDOW",
         close
     )
+

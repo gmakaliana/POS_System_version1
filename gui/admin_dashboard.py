@@ -1,55 +1,149 @@
-# gui/admin_dashboard.py
+
+"""
+GeoMaka POS Admin Dashboard
+
+File:
+gui/admin_dashboard.py
+
+Purpose:
+Provide the main dashboard interface for
+GeoMaka POS administrative users.
+
+Responsibilities:
+
+- Display admin dashboard.
+- Display available modules.
+- Check UI permissions.
+- Open management windows.
+- Handle logout process.
+- Provide access to Expense Management.
+
+Company:
+GeoMaka Technologies
+"""
 
 import tkinter as tk
 from tkinter import messagebox
 
+
+# ==========================================================
+# AUTHENTICATION
+# ==========================================================
+
 from auth.logout import logout_user
 from auth.session import get_session_user
-from auth.permissions import can_access_admin_dashboard
 
-from gui.user_management_window import open_user_management_window
-from gui.supplier_management_window import open_supplier_management_window
-from gui.product_management_window import open_product_management_window
-from gui.report_window import open_reports_dashboard
-from gui.settings_window import open_settings_window
 
-from modules.inventory.stock_alerts import show_low_stock_alert
+# ==========================================================
+# PERMISSIONS
+# ==========================================================
 
 from auth.permissions import (
+    can_access_admin_dashboard,
     can_manage_settings,
-    can_view_audit_logs
+    can_view_audit_logs,
+    can_manage_expenses
 )
-from gui.audit_logs_window import open_audit_logs_window
 
 
-def center_window(window, width, height):
+# ==========================================================
+# GUI WINDOWS
+# ==========================================================
 
-    screen_width = window.winfo_screenwidth()
+from gui.user_management_window import (
+    open_user_management_window
+)
 
-    screen_height = window.winfo_screenheight()
+from gui.supplier_management_window import (
+    open_supplier_management_window
+)
+
+from gui.product_management_window import (
+    open_product_management_window
+)
+
+from gui.report_window import (
+    open_reports_dashboard
+)
+
+from gui.settings_window import (
+    open_settings_window
+)
+
+from gui.audit_logs_window import (
+    open_audit_logs_window
+)
+
+from gui.expense_management_window import (
+    open_expense_management_window
+)
 
 
-    x = (screen_width // 2) - (width // 2)
+# ==========================================================
+# INVENTORY
+# ==========================================================
 
-    y = (screen_height // 2) - (height // 2)
+from modules.inventory.stock_alerts import (
+    show_low_stock_alert
+)
 
+
+# ==========================================================
+# CENTER WINDOW
+# ==========================================================
+
+def center_window(
+    window,
+    width,
+    height
+):
+    """
+    Centers a Tkinter window on the screen.
+    """
+
+    screen_width = (
+        window.winfo_screenwidth()
+    )
+
+    screen_height = (
+        window.winfo_screenheight()
+    )
+
+    x = (
+        screen_width // 2
+        -
+        width // 2
+    )
+
+    y = (
+        screen_height // 2
+        -
+        height // 2
+    )
 
     window.geometry(
         f"{width}x{height}+{x}+{y}"
     )
 
 
+# ==========================================================
+# OPEN ADMIN DASHBOARD
+# ==========================================================
 
 def open_admin_dashboard(parent):
+    """
+    Opens the Admin Dashboard.
 
+    Only System Admin, Default Admin and Admin
+    users are allowed to access this dashboard.
+    """
 
     user = get_session_user()
 
 
-
-    # =====================================
+    # ======================================================
     # SECURITY CHECK
-    # =====================================
+    # ======================================================
 
     if not user:
 
@@ -60,7 +154,6 @@ def open_admin_dashboard(parent):
         )
 
         return
-
 
 
     if not can_access_admin_dashboard(user):
@@ -74,8 +167,13 @@ def open_admin_dashboard(parent):
         return
 
 
+    # ======================================================
+    # CREATE DASHBOARD WINDOW
+    # ======================================================
 
-    root = tk.Toplevel(parent)
+    root = tk.Toplevel(
+        parent
+    )
 
     root.title(
         "ADMIN DASHBOARD"
@@ -90,10 +188,13 @@ def open_admin_dashboard(parent):
     center_window(
         root,
         800,
-        550
+        650
     )
 
 
+    # ======================================================
+    # FONTS
+    # ======================================================
 
     title_font = (
         "Arial",
@@ -108,16 +209,18 @@ def open_admin_dashboard(parent):
     )
 
 
+    # ======================================================
+    # CURRENT USER
+    # ======================================================
 
     user_id = user["user_id"]
 
     role = user["role"]
 
 
-
-    # =====================================
+    # ======================================================
     # LOW STOCK ALERT
-    # =====================================
+    # ======================================================
 
     root.after(
         800,
@@ -125,10 +228,9 @@ def open_admin_dashboard(parent):
     )
 
 
-
-    # =====================================
+    # ======================================================
     # LOGOUT
-    # =====================================
+    # ======================================================
 
     def logout():
 
@@ -137,23 +239,26 @@ def open_admin_dashboard(parent):
         root.destroy()
 
 
-        if parent and parent.winfo_exists():
+        if (
+            parent
+            and
+            parent.winfo_exists()
+        ):
 
             parent.deiconify()
 
 
-
-    # =====================================
+    # ======================================================
     # SALES
-    # =====================================
+    # ======================================================
 
     def open_sales():
 
-        from gui.sales_window import open_sales_window
-
+        from gui.sales_window import (
+            open_sales_window
+        )
 
         root.withdraw()
-
 
         open_sales_window(
             user_id=user_id,
@@ -162,10 +267,9 @@ def open_admin_dashboard(parent):
         )
 
 
-
-    # =====================================
+    # ======================================================
     # REPORTS
-    # =====================================
+    # ======================================================
 
     def open_reports():
 
@@ -173,18 +277,37 @@ def open_admin_dashboard(parent):
 
             if root.winfo_exists():
 
-                open_reports_dashboard(root)
-
+                open_reports_dashboard(
+                    root
+                )
 
         except tk.TclError:
 
             return
 
 
+    # ======================================================
+    # EXPENSES
+    # ======================================================
 
-    # =====================================
-    # CLOSE
-    # =====================================
+    def open_expenses():
+
+        try:
+
+            if root.winfo_exists():
+
+                open_expense_management_window(
+                    root
+                )
+
+        except tk.TclError:
+
+            return
+
+
+    # ======================================================
+    # CLOSE WINDOW
+    # ======================================================
 
     root.protocol(
         "WM_DELETE_WINDOW",
@@ -192,10 +315,9 @@ def open_admin_dashboard(parent):
     )
 
 
-
-    # =====================================
-    # UI
-    # =====================================
+    # ======================================================
+    # MAIN FRAME
+    # ======================================================
 
     main_frame = tk.Frame(
         root,
@@ -208,16 +330,22 @@ def open_admin_dashboard(parent):
     )
 
 
+    # ======================================================
+    # TITLE
+    # ======================================================
 
     tk.Label(
         main_frame,
         text=f"ADMIN DASHBOARD\n({role})",
         font=title_font
     ).pack(
-        pady=(0,25)
+        pady=(0, 25)
     )
 
 
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
 
     btn_frame = tk.Frame(
         main_frame
@@ -226,14 +354,14 @@ def open_admin_dashboard(parent):
     btn_frame.pack()
 
 
-
     button_width = 18
 
     button_height = 2
 
 
-
+    # ======================================================
     # SALES
+    # ======================================================
 
     tk.Button(
         btn_frame,
@@ -252,8 +380,9 @@ def open_admin_dashboard(parent):
     )
 
 
-
+    # ======================================================
     # PRODUCTS
+    # ======================================================
 
     tk.Button(
         btn_frame,
@@ -273,8 +402,9 @@ def open_admin_dashboard(parent):
     )
 
 
-
+    # ======================================================
     # SUPPLIERS
+    # ======================================================
 
     tk.Button(
         btn_frame,
@@ -294,8 +424,9 @@ def open_admin_dashboard(parent):
     )
 
 
-
+    # ======================================================
     # REPORTS
+    # ======================================================
 
     tk.Button(
         btn_frame,
@@ -314,8 +445,9 @@ def open_admin_dashboard(parent):
     )
 
 
-
+    # ======================================================
     # USERS
+    # ======================================================
 
     tk.Button(
         btn_frame,
@@ -335,8 +467,47 @@ def open_admin_dashboard(parent):
     )
 
 
+    # ======================================================
+    # EXPENSES
+    #
+    # System Admin:
+    #     Access
+    #
+    # Default Admin:
+    #     Access
+    #
+    # Admin:
+    #     Access
+    #
+    # Cashier:
+    #     No Admin Dashboard access
+    #
+    # Therefore the permission check is still performed
+    # explicitly here.
+    # ======================================================
 
+    if can_manage_expenses(user):
+
+        tk.Button(
+            btn_frame,
+            text="Expenses",
+            width=button_width,
+            height=button_height,
+            bg="#e67e22",
+            fg="white",
+            font=button_font,
+            command=open_expenses
+        ).grid(
+            row=1,
+            column=2,
+            padx=10,
+            pady=10
+        )
+
+
+    # ======================================================
     # SETTINGS
+    # ======================================================
 
     if can_manage_settings(user):
 
@@ -348,15 +519,19 @@ def open_admin_dashboard(parent):
             bg="#34495e",
             fg="white",
             font=button_font,
-            command=lambda: open_settings_window(root)
+            command=lambda:
+                open_settings_window(root)
         ).grid(
-            row=1,
-            column=2,
+            row=2,
+            column=0,
             padx=10,
             pady=10
         )
 
-        # AUDIT LOGS
+
+    # ======================================================
+    # AUDIT LOGS
+    # ======================================================
 
     if can_view_audit_logs(user):
 
@@ -368,16 +543,19 @@ def open_admin_dashboard(parent):
             bg="#8e44ad",
             fg="white",
             font=button_font,
-            command=lambda: open_audit_logs_window(root)
-
+            command=lambda:
+                open_audit_logs_window(root)
         ).grid(
             row=2,
-            column=0,
+            column=1,
             padx=10,
             pady=10
         )
 
-    # LOGOUT
+
+    # ======================================================
+    # LOGOUT BUTTON
+    # ======================================================
 
     tk.Button(
         main_frame,
@@ -392,5 +570,9 @@ def open_admin_dashboard(parent):
     )
 
 
+    # ======================================================
+    # RETURN DASHBOARD WINDOW
+    # ======================================================
 
     return root
+
