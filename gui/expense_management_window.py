@@ -23,6 +23,10 @@ Responsibilities:
 - Allow authorized users to edit expenses.
 - Allow authorized users to delete expenses.
 - Refresh the expense list after changes.
+- Keep the Expense Management window open
+  while Add/Edit windows are open.
+- Prevent interaction with Expense Management
+  while Add/Edit windows are open.
 - Handle database errors safely.
 - Restore the parent window when closed.
 
@@ -42,7 +46,6 @@ Important:
 Company:
 GeoMaka Technologies
 """
-
 
 import tkinter as tk
 
@@ -244,7 +247,7 @@ def _get_entered_by_username(
     # ------------------------------------------------------
     # Preferred dictionary / Row field
     #
-    # Supports the explicit alias:
+    # Supports:
     #
     #     entered_by_username
     # ------------------------------------------------------
@@ -274,9 +277,6 @@ def _get_entered_by_username(
     # Also support:
     #
     #     username
-    #
-    # This matches the SELECT u.username used by
-    # expense_management.py.
     # ------------------------------------------------------
 
     try:
@@ -389,21 +389,47 @@ def open_expense_management_window(
 
         Cashier:
             No access.
+
+    Important:
+
+        The Expense Management window remains
+        open when Add Expense or Edit Expense
+        windows are opened.
+
+        Add/Edit windows are modal child windows.
+        The Expense Management window remains
+        underneath them and cannot be interacted
+        with until the child window is closed.
     """
 
     # ======================================================
     # GET CURRENT USER
     # ======================================================
 
-    user = get_session_user()
+    current_user = get_session_user()
 
 
     # ======================================================
-    # CHECK PERMISSION
+    # CHECK SESSION
+    # ======================================================
+
+    if not current_user:
+
+        messagebox.showerror(
+            "Error",
+            "Session expired.",
+            parent=parent
+        )
+
+        return None
+
+
+    # ======================================================
+    # CHECK EXPENSE PERMISSION
     # ======================================================
 
     if not can_manage_expenses(
-        user
+        current_user
     ):
 
         messagebox.showerror(
@@ -432,7 +458,7 @@ def open_expense_management_window(
 
 
     # ======================================================
-    # CREATE WINDOW
+    # CREATE EXPENSE MANAGEMENT WINDOW
     # ======================================================
 
     root = tk.Toplevel(
@@ -448,6 +474,7 @@ def open_expense_management_window(
         True
     )
 
+
     center_window(
         root,
         1100,
@@ -456,7 +483,7 @@ def open_expense_management_window(
 
 
     # ======================================================
-    # CLOSE WINDOW
+    # CLOSE EXPENSE MANAGEMENT WINDOW
     # ======================================================
 
     def close_window():
@@ -507,10 +534,8 @@ def open_expense_management_window(
 
     # ======================================================
     # TABLE COLUMNS
-    # ======================================================
     #
     # Expense ID is deliberately NOT included.
-    #
     # ======================================================
 
     columns = (
@@ -709,7 +734,7 @@ def open_expense_management_window(
     # - Expense ID to remain available for deletion.
     # - Expense ID to remain available for editing.
     #
-    # Expense ID is never inserted into the Treeview.
+    # Expense ID is never displayed.
     #
     # ======================================================
 
@@ -731,6 +756,13 @@ def open_expense_management_window(
             tree.delete(
                 item
             )
+
+
+        # --------------------------------------------------
+        # CLEAR INTERNAL DATA
+        # --------------------------------------------------
+
+        expenses_data.clear()
 
 
         # --------------------------------------------------
@@ -761,13 +793,8 @@ def open_expense_management_window(
 
 
         # --------------------------------------------------
-        # STORE CURRENT EXPENSES
-        #
-        # Complete database records are retained internally.
-        #
+        # STORE COMPLETE RECORDS
         # --------------------------------------------------
-
-        expenses_data.clear()
 
         expenses_data.extend(
             expenses
@@ -812,12 +839,9 @@ def open_expense_management_window(
 
 
             # --------------------------------------------------
-            # IMPORTANT:
+            # Display exact username.
             #
-            # Display the exact username returned by the
-            # expense management module.
-            #
-            # Never display the internal user ID.
+            # Never display entered_by user ID.
             # --------------------------------------------------
 
             entered_by_username = (
@@ -909,7 +933,7 @@ def open_expense_management_window(
 
 
         # --------------------------------------------------
-        # Determine row position
+        # Determine row position.
         # --------------------------------------------------
 
         children = tree.get_children()
@@ -927,7 +951,7 @@ def open_expense_management_window(
 
 
         # --------------------------------------------------
-        # Prevent selection of empty message
+        # Prevent selection of empty message.
         # --------------------------------------------------
 
         if row_index >= len(
@@ -954,6 +978,16 @@ def open_expense_management_window(
 
     def add_new_expense():
 
+        # --------------------------------------------------
+        # IMPORTANT:
+        #
+        # Do NOT withdraw or destroy the Expense
+        # Management window.
+        #
+        # The Add Expense window is opened as a
+        # modal child window.
+        # --------------------------------------------------
+
         open_expense_add_window(
 
             root,
@@ -977,33 +1011,25 @@ def open_expense_management_window(
             return
 
 
+        # --------------------------------------------------
+        # IMPORTANT:
+        #
+        # Do NOT withdraw or destroy the Expense
+        # Management window.
+        #
+        # The Edit Expense window is opened as a
+        # modal child window.
+        # --------------------------------------------------
+
         open_expense_edit_window(
 
             root,
 
-            expense
+            expense,
+
+            on_saved=load_expenses
 
         )
-
-
-        # --------------------------------------------------
-        # Refresh when edit window closes.
-        # --------------------------------------------------
-
-        try:
-
-            if root.winfo_children():
-
-                root.wait_window(
-                    root.winfo_children()[-1]
-                )
-
-        except Exception:
-
-            pass
-
-
-        load_expenses()
 
 
     # ======================================================
@@ -1141,6 +1167,8 @@ def open_expense_management_window(
     )
 
     button_frame.pack(
+        fill="x",
+        padx=10,
         pady=10
     )
 
@@ -1246,7 +1274,7 @@ def open_expense_management_window(
 
     ).pack(
 
-        side="left",
+        side="right",
 
         padx=5
 

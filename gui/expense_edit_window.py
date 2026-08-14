@@ -1,3 +1,5 @@
+# GeoMaka POS Expense Edit Window
+
 
 """
 GeoMaka POS Expense Edit Window
@@ -14,15 +16,37 @@ Responsibilities:
 - Allow authorized users to edit expense information.
 - Validate expense input.
 - Update the expense through the expense management module.
+- Refresh the Expense Management window after saving.
+- Keep the Expense Management window visible.
+- Prevent interaction with the Expense Management window
+  until this window is closed.
 - Display success and error messages.
-- Close the window safely.
+- Close the edit window safely.
+
+Important:
+
+- The parent Expense Management window is NOT hidden.
+- The parent Expense Management window remains visible
+  while this window is displayed.
+- The Edit Expense window is modal relative to the
+  Expense Management window.
+- The Expense Management window cannot be interacted
+  with until the Edit Expense window is closed.
+- The on_saved callback is called after a successful
+  expense update.
+- Expense ID is used internally only.
+- Expense ID is never displayed.
 
 Company:
 GeoMaka Technologies
 """
 
 import tkinter as tk
-from tkinter import messagebox
+
+from tkinter import (
+    messagebox
+)
+
 
 # ==========================================================
 # EXPENSE MANAGEMENT
@@ -72,7 +96,7 @@ def center_window(
 
 
 # ==========================================================
-# FORMAT EXPENSE VALUE
+# GET EXPENSE VALUE
 # ==========================================================
 
 def _get_expense_value(
@@ -85,9 +109,27 @@ def _get_expense_value(
 
     Supports:
 
-    1. Dictionary-style records
-    2. SQLite tuple/list records
+    1. Dictionary-style records.
+    2. SQLite tuple/list records.
+
+    Current tuple structure:
+
+        (
+            expense_id,
+            expense_name,
+            description,
+            cost_amount,
+            expense_date,
+            created_at,
+            username
+        )
+
+    Expense ID is used internally only.
     """
+
+    # ------------------------------------------------------
+    # Dictionary / SQLite Row
+    # ------------------------------------------------------
 
     try:
 
@@ -100,6 +142,11 @@ def _get_expense_value(
     ):
 
         pass
+
+
+    # ------------------------------------------------------
+    # Tuple / List
+    # ------------------------------------------------------
 
     try:
 
@@ -119,7 +166,8 @@ def _get_expense_value(
 
 def open_expense_edit_window(
     parent,
-    expense
+    expense,
+    on_saved=None
 ):
     """
     Opens the Edit Expense window.
@@ -127,15 +175,40 @@ def open_expense_edit_window(
     Parameters:
 
         parent:
-            Parent Tkinter window.
+            Parent Expense Management window.
 
         expense:
             Existing expense record.
 
+        on_saved:
+            Optional callback executed after a successful
+            expense update.
+
     Returns:
 
         Tkinter Toplevel window.
+
+    Important:
+
+        The parent Expense Management window remains
+        visible while this window is displayed.
+
+        The parent cannot be interacted with until
+        this Edit Expense window is closed.
     """
+
+    # ======================================================
+    # VALIDATE PARENT
+    # ======================================================
+
+    if (
+        parent is None
+        or
+        not parent.winfo_exists()
+    ):
+
+        return None
+
 
     # ======================================================
     # VALIDATE EXPENSE
@@ -198,34 +271,31 @@ def open_expense_edit_window(
 
 
     # ======================================================
-    # HIDE PARENT
+    # CREATE EDIT WINDOW
     # ======================================================
-
-    if (
-        parent
-        and
-        parent.winfo_exists()
-    ):
-
-        parent.withdraw()
-
-
-    # ======================================================
-    # CREATE WINDOW
+    #
+    # IMPORTANT:
+    #
+    # The parent Expense Management window is NOT
+    # withdrawn.
+    #
     # ======================================================
 
     root = tk.Toplevel(
         parent
     )
 
+
     root.title(
         "EDIT EXPENSE"
     )
+
 
     root.resizable(
         False,
         False
     )
+
 
     center_window(
         root,
@@ -235,20 +305,74 @@ def open_expense_edit_window(
 
 
     # ======================================================
+    # KEEP EDIT WINDOW ASSOCIATED WITH PARENT
+    # ======================================================
+
+    root.transient(
+        parent
+    )
+
+
+    # ======================================================
+    # MAKE EDIT WINDOW MODAL
+    # ======================================================
+    #
+    # The Expense Management window remains visible,
+    # but the user cannot interact with it while the
+    # Edit Expense window is open.
+    #
+    # The user must close this window first.
+    #
+    # ======================================================
+
+    root.grab_set()
+
+
+    # ======================================================
     # CLOSE WINDOW
     # ======================================================
 
     def close_window():
 
-        root.destroy()
+        # --------------------------------------------------
+        # Release modal grab safely.
+        # --------------------------------------------------
 
-        if (
-            parent
-            and
-            parent.winfo_exists()
-        ):
+        try:
 
-            parent.deiconify()
+            if root.grab_current() == root:
+
+                root.grab_release()
+
+        except Exception:
+
+            pass
+
+
+        # --------------------------------------------------
+        # Destroy only the Edit Expense window.
+        # --------------------------------------------------
+
+        if root.winfo_exists():
+
+            root.destroy()
+
+
+        # --------------------------------------------------
+        # Return focus to Expense Management.
+        # --------------------------------------------------
+
+        try:
+
+            if parent.winfo_exists():
+
+                parent.lift()
+
+                parent.focus_set()
+
+        except Exception:
+
+            pass
 
 
     # ======================================================
@@ -275,6 +399,7 @@ def open_expense_edit_window(
     form_frame = tk.Frame(
         root
     )
+
 
     form_frame.pack(
         padx=20,
@@ -303,6 +428,7 @@ def open_expense_edit_window(
         width=35
     )
 
+
     name_entry.grid(
         row=0,
         column=1,
@@ -313,7 +439,11 @@ def open_expense_edit_window(
 
     name_entry.insert(
         0,
-        str(expense_name)
+        str(
+            expense_name
+            if expense_name is not None
+            else ""
+        )
     )
 
 
@@ -338,6 +468,7 @@ def open_expense_edit_window(
         width=35
     )
 
+
     description_entry.grid(
         row=1,
         column=1,
@@ -348,7 +479,11 @@ def open_expense_edit_window(
 
     description_entry.insert(
         0,
-        str(description)
+        str(
+            description
+            if description is not None
+            else ""
+        )
     )
 
 
@@ -373,6 +508,7 @@ def open_expense_edit_window(
         width=35
     )
 
+
     amount_entry.grid(
         row=2,
         column=1,
@@ -381,9 +517,31 @@ def open_expense_edit_window(
     )
 
 
+    # ------------------------------------------------------
+    # Format existing amount safely.
+    # ------------------------------------------------------
+
+    try:
+
+        formatted_amount = (
+            f"{float(cost_amount):.2f}"
+        )
+
+    except (
+        TypeError,
+        ValueError
+    ):
+
+        formatted_amount = str(
+            cost_amount
+            if cost_amount is not None
+            else ""
+        )
+
+
     amount_entry.insert(
         0,
-        str(cost_amount)
+        formatted_amount
     )
 
 
@@ -397,13 +555,19 @@ def open_expense_edit_window(
         # GET INPUT
         # --------------------------------------------------
 
-        new_name = name_entry.get().strip()
+        new_name = (
+            name_entry
+            .get()
+            .strip()
+        )
+
 
         new_description = (
             description_entry
             .get()
             .strip()
         )
+
 
         new_amount = (
             amount_entry
@@ -424,7 +588,24 @@ def open_expense_edit_window(
                 parent=root
             )
 
-            name_entry.focus()
+            name_entry.focus_set()
+
+            return
+
+
+        # --------------------------------------------------
+        # VALIDATE DESCRIPTION
+        # --------------------------------------------------
+
+        if not new_description:
+
+            messagebox.showwarning(
+                "Invalid Expense",
+                "Please enter the expense description.",
+                parent=root
+            )
+
+            description_entry.focus_set()
 
             return
 
@@ -441,10 +622,14 @@ def open_expense_edit_window(
                 parent=root
             )
 
-            amount_entry.focus()
+            amount_entry.focus_set()
 
             return
 
+
+        # --------------------------------------------------
+        # CONVERT AMOUNT
+        # --------------------------------------------------
 
         try:
 
@@ -452,7 +637,10 @@ def open_expense_edit_window(
                 new_amount
             )
 
-        except ValueError:
+        except (
+            TypeError,
+            ValueError
+        ):
 
             messagebox.showwarning(
                 "Invalid Amount",
@@ -460,7 +648,7 @@ def open_expense_edit_window(
                 parent=root
             )
 
-            amount_entry.focus()
+            amount_entry.focus_set()
 
             return
 
@@ -477,7 +665,7 @@ def open_expense_edit_window(
                 parent=root
             )
 
-            amount_entry.focus()
+            amount_entry.focus_set()
 
             return
 
@@ -499,12 +687,16 @@ def open_expense_edit_window(
         try:
 
             result = update_expense(
-                expense_id,
-                new_name,
-                new_description,
-                amount
-            )
 
+                expense_id,
+
+                new_name,
+
+                new_description,
+
+                amount
+
+            )
 
         except Exception as error:
 
@@ -536,6 +728,37 @@ def open_expense_edit_window(
 
 
         # ==================================================
+        # REFRESH PARENT
+        # ==================================================
+        #
+        # Refresh the Expense Management Treeview while
+        # keeping the management window open.
+        #
+        # ==================================================
+
+        if callable(
+            on_saved
+        ):
+
+            try:
+
+                on_saved()
+
+            except Exception as error:
+
+                messagebox.showerror(
+                    "Refresh Error",
+                    (
+                        "The expense was updated successfully, "
+                        "but the expense list could not be "
+                        "refreshed.\n\n"
+                        f"Error:\n{error}"
+                    ),
+                    parent=root
+                )
+
+
+        # ==================================================
         # SUCCESS
         # ==================================================
 
@@ -547,7 +770,11 @@ def open_expense_edit_window(
 
 
         # ==================================================
-        # CLOSE WINDOW
+        # CLOSE EDIT WINDOW ONLY
+        # ==================================================
+        #
+        # Expense Management remains open.
+        #
         # ==================================================
 
         close_window()
@@ -560,6 +787,7 @@ def open_expense_edit_window(
     button_frame = tk.Frame(
         root
     )
+
 
     button_frame.pack(
         pady=20
@@ -608,6 +836,30 @@ def open_expense_edit_window(
         "WM_DELETE_WINDOW",
         close_window
     )
+
+
+    # ======================================================
+    # ENTER = UPDATE
+    # ======================================================
+
+    root.bind(
+        "<Return>",
+        lambda event: save_changes()
+    )
+
+
+    # ======================================================
+    # INITIAL FOCUS
+    # ======================================================
+
+    name_entry.focus_set()
+
+
+    # ======================================================
+    # KEEP WINDOW ABOVE PARENT
+    # ======================================================
+
+    root.lift()
 
 
     return root
