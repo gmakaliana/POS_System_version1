@@ -187,8 +187,8 @@ def open_admin_dashboard(parent):
 
     center_window(
         root,
-        800,
-        650
+        700,
+        500
     )
 
 

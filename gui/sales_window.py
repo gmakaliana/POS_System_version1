@@ -98,29 +98,42 @@ from modules.hardware.receipt_printer import (
 
 
 # ==========================================================
-# CENTER WINDOW
+# WINDOW POSITIONING
 # ==========================================================
 
-def center_window(
+def position_sales_window(
     window,
     width,
     height
 ):
     """
-    Centers a Tkinter window on the screen.
+    Positions the Sales window horizontally centered
+    and near the top of the screen.
+
+    This gives the POS window a consistent opening
+    position instead of placing it vertically in the
+    middle of the screen.
     """
 
+    screen_width = (
+        window.winfo_screenwidth()
+    )
+
+    # ------------------------------------------------------
+    # Horizontal center
+    # ------------------------------------------------------
+
     x = (
-        window.winfo_screenwidth() // 2
+        screen_width // 2
         -
         width // 2
     )
 
-    y = (
-        window.winfo_screenheight() // 2
-        -
-        height // 2
-    )
+    # ------------------------------------------------------
+    # Small top margin
+    # ------------------------------------------------------
+
+    y = 40
 
     window.geometry(
         f"{width}x{height}+{x}+{y}"
@@ -204,6 +217,25 @@ def open_sales_window(
     )
 
     # ======================================================
+    # WINDOW SIZE / POSITION
+    # ======================================================
+
+    # The window is intentionally wide enough for the
+    # barcode/search area and totals section.
+    #
+    # The height is reduced so there is no large unused
+    # area below the PAY / EXIT buttons.
+
+    SALES_WIDTH = 1100
+    SALES_HEIGHT = 610
+
+    position_sales_window(
+        root,
+        SALES_WIDTH,
+        SALES_HEIGHT
+    )
+
+    # ======================================================
     # RESIZABLE WINDOW
     # ======================================================
 
@@ -213,22 +245,12 @@ def open_sales_window(
     )
 
     # ======================================================
-    # INITIAL WINDOW SIZE
-    # ======================================================
-
-    center_window(
-        root,
-        1200,
-        800
-    )
-
-    # ======================================================
     # MINIMUM WINDOW SIZE
     # ======================================================
 
     root.minsize(
-        950,
-        650
+        900,
+        580
     )
 
     # ======================================================
@@ -237,50 +259,46 @@ def open_sales_window(
 
     FONT_LABEL = (
         "Arial",
-        12
+        10
     )
 
     FONT_ENTRY = (
         "Arial",
-        14
+        11
     )
 
     FONT_BUTTON = (
         "Arial",
-        12,
+        10,
         "bold"
     )
 
-    # ------------------------------------------------------
-    # CART TABLE FONT
-    # ------------------------------------------------------
-
     FONT_TABLE = (
         "Arial",
-        14
+        10
     )
 
     FONT_TABLE_HEADING = (
         "Arial",
-        14,
+        10,
         "bold"
     )
 
     FONT_TOTAL_LABEL = (
         "Arial",
-        13,
+        11,
         "bold"
     )
 
     FONT_TOTAL_VALUE = (
         "Arial",
-        15,
+        12,
         "bold"
     )
 
     FONT_TITLE = (
         "Arial",
-        22,
+        17,
         "bold"
     )
 
@@ -297,13 +315,13 @@ def open_sales_window(
         style.configure(
             "Sales.Treeview",
             font=FONT_TABLE,
-            rowheight=38
+            rowheight=25
         )
 
         style.configure(
             "Sales.Treeview.Heading",
             font=FONT_TABLE_HEADING,
-            padding=6
+            padding=3
         )
 
     except Exception:
@@ -776,7 +794,7 @@ def open_sales_window(
             return
 
         # ==================================================
-        # SALE IS NOW COMPLETED
+        # SALE COMPLETED
         # ==================================================
 
         receipt_result = None
@@ -955,7 +973,7 @@ def open_sales_window(
         text="SALES",
         font=FONT_TITLE
     ).pack(
-        pady=8
+        pady=(8, 6)
     )
 
     # ======================================================
@@ -967,9 +985,9 @@ def open_sales_window(
     )
 
     main_frame.pack(
-        fill="both",
-        expand=True,
-        padx=15
+        fill="x",
+        padx=10,
+        pady=(0, 2)
     )
 
     # ======================================================
@@ -982,7 +1000,7 @@ def open_sales_window(
 
     input_frame.pack(
         fill="x",
-        pady=8
+        pady=(2, 8)
     )
 
     # ======================================================
@@ -1000,7 +1018,7 @@ def open_sales_window(
     )
 
     # ======================================================
-    # BARCODE LABEL
+    # BARCODE
     # ======================================================
 
     tk.Label(
@@ -1010,27 +1028,23 @@ def open_sales_window(
     ).grid(
         row=0,
         column=0,
-        padx=(5, 8),
-        pady=5
+        padx=(3, 5),
+        pady=3
     )
-
-    # ======================================================
-    # BARCODE INPUT
-    # ======================================================
 
     barcode_entry = tk.Entry(
         input_frame,
         textvariable=barcode_var,
-        width=28,
+        width=20,
         font=FONT_ENTRY
     )
 
     barcode_entry.grid(
         row=0,
         column=1,
-        padx=5,
-        pady=5,
-        ipady=8,
+        padx=3,
+        pady=3,
+        ipady=4,
         sticky="ew"
     )
 
@@ -1050,49 +1064,45 @@ def open_sales_window(
         fg="white",
         font=FONT_BUTTON,
         command=add_by_barcode,
-        width=8,
+        width=5,
         height=1
     ).grid(
         row=0,
         column=2,
-        padx=(5, 20),
-        pady=5,
-        ipadx=5,
-        ipady=5
+        padx=(3, 18),
+        pady=3,
+        ipadx=2,
+        ipady=2
     )
 
     # ======================================================
-    # PRODUCT SEARCH LABEL
+    # SEARCH
     # ======================================================
 
     tk.Label(
         input_frame,
-        text="Search Product:",
+        text="Search:",
         font=FONT_LABEL
     ).grid(
         row=0,
         column=3,
-        padx=(5, 8),
-        pady=5
+        padx=(3, 5),
+        pady=3
     )
-
-    # ======================================================
-    # PRODUCT SEARCH INPUT
-    # ======================================================
 
     search_entry = tk.Entry(
         input_frame,
         textvariable=search_var,
-        width=28,
+        width=20,
         font=FONT_ENTRY
     )
 
     search_entry.grid(
         row=0,
         column=4,
-        padx=5,
-        pady=5,
-        ipady=8,
+        padx=3,
+        pady=3,
+        ipady=4,
         sticky="ew"
     )
 
@@ -1102,7 +1112,7 @@ def open_sales_window(
     )
 
     # ======================================================
-    # PRODUCT SEARCH ADD BUTTON
+    # SEARCH ADD BUTTON
     # ======================================================
 
     tk.Button(
@@ -1112,19 +1122,19 @@ def open_sales_window(
         fg="white",
         font=FONT_BUTTON,
         command=search_and_add,
-        width=8,
+        width=5,
         height=1
     ).grid(
         row=0,
         column=5,
-        padx=(5, 5),
-        pady=5,
-        ipadx=5,
-        ipady=5
+        padx=(3, 3),
+        pady=3,
+        ipadx=2,
+        ipady=2
     )
 
     # ======================================================
-    # CART TABLE CONTAINER
+    # CART TABLE
     # ======================================================
 
     table_frame = tk.Frame(
@@ -1133,12 +1143,8 @@ def open_sales_window(
 
     table_frame.pack(
         fill="x",
-        pady=5
+        pady=(2, 6)
     )
-
-    # ======================================================
-    # CART TABLE
-    # ======================================================
 
     tree = ttk.Treeview(
         table_frame,
@@ -1149,7 +1155,7 @@ def open_sales_window(
             "Subtotal"
         ),
         show="headings",
-        height=6,
+        height=8,
         style="Sales.Treeview"
     )
 
@@ -1183,32 +1189,32 @@ def open_sales_window(
 
     tree.column(
         "Product",
-        width=430,
-        minwidth=250,
+        width=390,
+        minwidth=220,
         anchor="w",
         stretch=True
     )
 
     tree.column(
         "Qty",
-        width=110,
-        minwidth=80,
+        width=80,
+        minwidth=60,
         anchor="center",
         stretch=False
     )
 
     tree.column(
         "Price",
-        width=170,
-        minwidth=120,
+        width=130,
+        minwidth=100,
         anchor="e",
         stretch=False
     )
 
     tree.column(
         "Subtotal",
-        width=190,
-        minwidth=140,
+        width=150,
+        minwidth=110,
         anchor="e",
         stretch=False
     )
@@ -1239,26 +1245,26 @@ def open_sales_window(
     )
 
     # ======================================================
-    # REMOVE BUTTON
+    # REMOVE SELECTED
     # ======================================================
 
     tk.Button(
         main_frame,
-        text="REMOVE SELECTED PRODUCT",
+        text="REMOVE SELECTED",
         bg="#f39c12",
         fg="white",
         font=FONT_BUTTON,
         command=remove_selected,
-        width=28,
+        width=20,
         height=1
     ).pack(
-        pady=(12, 14),
-        ipadx=5,
-        ipady=5
+        pady=(8, 0),
+        ipadx=3,
+        ipady=4
     )
 
     # ======================================================
-    # SEPARATOR
+    # HORIZONTAL LINE BELOW REMOVE SELECTED
     # ======================================================
 
     ttk.Separator(
@@ -1266,22 +1272,27 @@ def open_sales_window(
         orient="horizontal"
     ).pack(
         fill="x",
-        padx=15,
-        pady=6
+        padx=5,
+        pady=(14, 10)
     )
 
     # ======================================================
-    # TOTAL SECTION
+    # TOTAL / DISCOUNT / FINAL TOTAL
     # ======================================================
 
-    total_frame = tk.Frame(
+    total_center = tk.Frame(
         main_frame
     )
 
-    total_frame.pack(
-        fill="x",
-        pady=(10, 12)
+    total_center.pack(
+        pady=0
     )
+
+    total_frame = tk.Frame(
+        total_center
+    )
+
+    total_frame.pack()
 
     # ======================================================
     # TOTAL
@@ -1294,24 +1305,24 @@ def open_sales_window(
     ).grid(
         row=0,
         column=0,
-        padx=(15, 10),
-        pady=8
+        padx=(10, 8),
+        pady=5
     )
 
     total_label = tk.Label(
         total_frame,
-        width=16,
+        width=12,
         relief="solid",
         font=FONT_TOTAL_VALUE,
         anchor="e",
-        padx=8
+        padx=6
     )
 
     total_label.grid(
         row=0,
         column=1,
-        padx=(0, 45),
-        ipady=7
+        padx=(0, 35),
+        ipady=4
     )
 
     # ======================================================
@@ -1325,14 +1336,14 @@ def open_sales_window(
     ).grid(
         row=0,
         column=2,
-        padx=(10, 10),
-        pady=8
+        padx=(5, 8),
+        pady=5
     )
 
     discount_entry = tk.Entry(
         total_frame,
         textvariable=discount_var,
-        width=16,
+        width=12,
         font=FONT_ENTRY,
         justify="right"
     )
@@ -1340,8 +1351,8 @@ def open_sales_window(
     discount_entry.grid(
         row=0,
         column=3,
-        padx=(0, 45),
-        ipady=7
+        padx=(0, 35),
+        ipady=4
     )
 
     discount_entry.config(
@@ -1360,28 +1371,28 @@ def open_sales_window(
     ).grid(
         row=0,
         column=4,
-        padx=(10, 10),
-        pady=8
+        padx=(5, 8),
+        pady=5
     )
 
     final_label = tk.Label(
         total_frame,
-        width=16,
+        width=12,
         relief="solid",
         font=FONT_TOTAL_VALUE,
         anchor="e",
-        padx=8
+        padx=6
     )
 
     final_label.grid(
         row=0,
         column=5,
-        padx=(0, 15),
-        ipady=7
+        padx=(0, 10),
+        ipady=4
     )
 
     # ======================================================
-    # PAYMENT SEPARATOR
+    # HORIZONTAL LINE BELOW TOTAL SECTION
     # ======================================================
 
     ttk.Separator(
@@ -1389,22 +1400,27 @@ def open_sales_window(
         orient="horizontal"
     ).pack(
         fill="x",
-        padx=15,
-        pady=6
+        padx=5,
+        pady=(14, 10)
     )
 
     # ======================================================
-    # PAYMENT SECTION
+    # AMOUNT PAID / CHANGE
     # ======================================================
 
-    pay_frame = tk.Frame(
+    pay_center = tk.Frame(
         main_frame
     )
 
-    pay_frame.pack(
-        fill="x",
-        pady=(10, 12)
+    pay_center.pack(
+        pady=0
     )
+
+    pay_frame = tk.Frame(
+        pay_center
+    )
+
+    pay_frame.pack()
 
     # ======================================================
     # AMOUNT PAID
@@ -1417,14 +1433,14 @@ def open_sales_window(
     ).grid(
         row=0,
         column=0,
-        padx=(15, 12),
-        pady=8
+        padx=(10, 8),
+        pady=5
     )
 
     paid_entry = tk.Entry(
         pay_frame,
         textvariable=paid_var,
-        width=25,
+        width=14,
         font=FONT_ENTRY,
         justify="right"
     )
@@ -1432,8 +1448,8 @@ def open_sales_window(
     paid_entry.grid(
         row=0,
         column=1,
-        padx=(0, 80),
-        ipady=8
+        padx=(0, 25),
+        ipady=4
     )
 
     paid_entry.config(
@@ -1452,28 +1468,28 @@ def open_sales_window(
     ).grid(
         row=0,
         column=2,
-        padx=(10, 12),
-        pady=8
+        padx=(5, 8),
+        pady=5
     )
 
     change_label = tk.Label(
         pay_frame,
-        width=20,
+        width=14,
         relief="solid",
         font=FONT_TOTAL_VALUE,
         anchor="e",
-        padx=8
+        padx=6
     )
 
     change_label.grid(
         row=0,
         column=3,
-        padx=(0, 15),
-        ipady=7
+        padx=(0, 10),
+        ipady=4
     )
 
     # ======================================================
-    # ACTION SEPARATOR
+    # HORIZONTAL LINE ABOVE PAY / EXIT
     # ======================================================
 
     ttk.Separator(
@@ -1481,12 +1497,12 @@ def open_sales_window(
         orient="horizontal"
     ).pack(
         fill="x",
-        padx=15,
-        pady=6
+        padx=5,
+        pady=(16, 10)
     )
 
     # ======================================================
-    # ACTION BUTTONS
+    # PAY / EXIT BUTTONS
     # ======================================================
 
     button_frame = tk.Frame(
@@ -1494,7 +1510,7 @@ def open_sales_window(
     )
 
     button_frame.pack(
-        pady=(14, 10)
+        pady=(0, 0)
     )
 
     # ======================================================
@@ -1508,16 +1524,18 @@ def open_sales_window(
         fg="white",
         font=(
             "Arial",
-            16,
+            12,
             "bold"
         ),
         command=pay,
-        width=18,
-        height=2
+        width=14,
+        height=1
     ).grid(
         row=0,
         column=0,
-        padx=15
+        padx=5,
+        ipadx=3,
+        ipady=4
     )
 
     # ======================================================
@@ -1531,16 +1549,18 @@ def open_sales_window(
         fg="white",
         font=(
             "Arial",
-            16,
+            12,
             "bold"
         ),
         command=exit_sales,
-        width=10,
-        height=2
+        width=8,
+        height=1
     ).grid(
         row=0,
         column=1,
-        padx=15
+        padx=5,
+        ipadx=3,
+        ipady=4
     )
 
     # ======================================================

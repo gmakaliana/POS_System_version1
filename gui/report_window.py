@@ -1,4 +1,3 @@
-
 """
 GeoMaka POS Reports Dashboard
 
@@ -138,8 +137,8 @@ def open_reports_dashboard(
 
     center_window(
         root,
-        950,
-        600
+        900,
+        500
     )
 
 
@@ -382,6 +381,12 @@ def open_daily_sales(
     - Gross Profit
     - Operating Expenses
     - Net Profit/Loss
+
+    The visible sales detail table is limited to 9 rows
+    so that it remains consistent with the 9-row summary.
+
+    The complete sales data remains available to the
+    report export function.
     """
 
     parent.withdraw()
@@ -500,7 +505,8 @@ def open_daily_sales(
     tree = ttk.Treeview(
         frame,
         columns=columns,
-        show="headings"
+        show="headings",
+        height=9
     )
 
     for column in columns:
@@ -553,9 +559,15 @@ def open_daily_sales(
 
     # ======================================================
     # DISPLAY SALES
+    #
+    # Only the first 9 rows are displayed.
+    #
+    # IMPORTANT:
+    # The original "rows" variable is NOT changed.
+    # Therefore the complete report is still exported.
     # ======================================================
 
-    for row in rows:
+    for row in rows[:9]:
 
         row = list(row)
 
@@ -919,6 +931,12 @@ def open_monthly_sales(
     - Gross Profit
     - Operating Expenses
     - Net Profit/Loss
+
+    The visible sales detail table is limited to 9 rows
+    so that it remains consistent with the 9-row summary.
+
+    The complete sales data remains available to the
+    report export function.
     """
 
     parent.withdraw()
@@ -1032,7 +1050,8 @@ def open_monthly_sales(
     tree = ttk.Treeview(
         frame,
         columns=columns,
-        show="headings"
+        show="headings",
+        height=9
     )
 
     for column in columns:
@@ -1085,9 +1104,15 @@ def open_monthly_sales(
 
     # ======================================================
     # DISPLAY DATA
+    #
+    # Only the first 9 rows are displayed.
+    #
+    # IMPORTANT:
+    # The original "rows" variable is NOT changed.
+    # Therefore the complete report is still exported.
     # ======================================================
 
-    for row in rows:
+    for row in rows[:9]:
 
         row = list(row)
 
@@ -1549,8 +1574,6 @@ def open_daily_expenses(
 
     # ======================================================
     # EXPENSE COLUMNS
-    #
-    # Expense ID intentionally removed.
     # ======================================================
 
     columns = (
@@ -1635,21 +1658,6 @@ def open_daily_expenses(
     # ======================================================
 
     for row in rows:
-
-        # --------------------------------------------------
-        # Structure:
-        #
-        # 0 = Expense Name
-        # 1 = Description
-        # 2 = Amount
-        # 3 = Expense Date
-        # 4 = Created At
-        # 5 = Exact Username
-        # 6 = Expense ID
-        #
-        # Expense ID is retained internally but NEVER
-        # displayed by this GUI.
-        # --------------------------------------------------
 
         try:
 
@@ -1805,20 +1813,6 @@ def open_monthly_expenses(
     Displays expenses recorded during the current month.
 
     Expense ID is intentionally NOT displayed.
-
-    Report row structure from reports.py:
-
-        index 0 = Expense Name
-        index 1 = Description
-        index 2 = Amount
-        index 3 = Expense Date
-        index 4 = Created At
-        index 5 = Exact Username
-        index 6 = Expense ID
-
-    The GUI displays indexes 0 through 5 only.
-
-    Expense ID remains available internally at index 6.
     """
 
     parent.withdraw()
@@ -1914,8 +1908,6 @@ def open_monthly_expenses(
 
     # ======================================================
     # EXPENSE COLUMNS
-    #
-    # Expense ID intentionally removed.
     # ======================================================
 
     columns = (
@@ -2000,21 +1992,6 @@ def open_monthly_expenses(
     # ======================================================
 
     for row in rows:
-
-        # --------------------------------------------------
-        # Structure:
-        #
-        # 0 = Expense Name
-        # 1 = Description
-        # 2 = Amount
-        # 3 = Expense Date
-        # 4 = Created At
-        # 5 = Exact Username
-        # 6 = Expense ID
-        #
-        # Expense ID is retained internally but NEVER
-        # displayed by this GUI.
-        # --------------------------------------------------
 
         try:
 
@@ -2766,3 +2743,4 @@ def open_monthly_stock(
         close
     )
 
+    
