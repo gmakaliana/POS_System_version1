@@ -1,4 +1,3 @@
-
 """
 GeoMaka POS Database Table Creation
 
@@ -107,7 +106,10 @@ def create_tables():
 
             "System Admin",
 
-            1,
+            # System Admin must NOT be forced
+            # to change the password after
+            # the first login.
+            0,
 
             1,
 
@@ -527,4 +529,3 @@ def create_tables():
     # =====================================
 
     conn.close()
-
