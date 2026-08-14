@@ -1,8 +1,32 @@
+"""
+GeoMaka POS Audit Log Management
+
+File:
+modules/audit/audit_log.py
+
+Purpose:
+Manage audit log records for GeoMaka POS.
+
+Responsibilities:
+
+- Record user activities.
+- Record system activities.
+- Retrieve audit logs.
+- Support audit log reporting/export.
+- Prevent audit logging failures from interrupting
+  the main POS operation.
+- Store audit timestamps in YYYY-MM-DD HH:MM:SS format.
+- Preserve short audit descriptions supplied by modules.
+
+Company:
+GeoMaka Technologies
+"""
+
 from datetime import datetime
 
 from database.db import get_connection
-from auth.session import get_session_user
 
+from auth.session import get_session_user
 
 
 # ==========================================================
@@ -10,22 +34,51 @@ from auth.session import get_session_user
 # ==========================================================
 
 def log_activity(
-        
-        module,
-        action,
-        description
+    module,
+    action,
+    description
 ):
-
     """
-    Saves an activity into audit_logs table.
+    Saves an activity into the audit_logs table.
+
+    Parameters:
+
+        module:
+            Module where the activity occurred.
+
+        action:
+            Action performed.
+
+        description:
+            Short description of the activity.
 
     Example:
-    log_activity(
-        "Products",
-        "EDIT",
-        "Edited product Coca-Cola 2L"
-    )
+
+        log_activity(
+            "PRODUCTS",
+            "UPDATE",
+            "Product edited"
+        )
+
+    Returns:
+
+        True:
+            Audit log saved successfully.
+
+        False:
+            Audit log could not be saved.
+
+    IMPORTANT:
+
+        This function does not modify the description.
+
+        The calling module is responsible for providing
+        a short audit description.
     """
+
+    # ======================================================
+    # GET CURRENT SESSION USER
+    # ======================================================
 
     user = get_session_user()
 
@@ -33,65 +86,149 @@ def log_activity(
     if user:
 
         user_id = user["user_id"]
+
         username = user["username"]
+
         role = user["role"]
+
 
     else:
 
-        # For system events where no user exists
+        # --------------------------------------------------
+        # SYSTEM EVENT
+        # --------------------------------------------------
 
         user_id = None
+
         username = "SYSTEM"
+
         role = "SYSTEM"
 
 
+    # ======================================================
+    # LOG DATE AND TIME
+    # ======================================================
+    #
+    # Required format:
+    #
+    # YYYY-MM-DD HH:MM:SS
+    #
+    # Example:
+    #
+    # 2026-08-13 14:27:29
+    #
+    # ======================================================
 
     log_datetime = datetime.now().strftime(
         "%Y-%m-%d %H:%M:%S"
     )
 
 
-    conn = get_connection()
-
-    cursor = conn.cursor()
+    conn = None
 
 
-    cursor.execute(
-        """
-        INSERT INTO audit_logs
-        (
-            user_id,
-            username,
-            role,
-            module,
-            action,
-            description,
-            log_datetime
+    try:
+
+        # ==================================================
+        # DATABASE CONNECTION
+        # ==================================================
+
+        conn = get_connection()
+
+        cursor = conn.cursor()
+
+
+        # ==================================================
+        # INSERT AUDIT LOG
+        # ==================================================
+
+        cursor.execute(
+            """
+            INSERT INTO audit_logs
+            (
+                user_id,
+                username,
+                role,
+                module,
+                action,
+                description,
+                log_datetime
+            )
+
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+
+            """,
+
+            (
+                user_id,
+                username,
+                role,
+                module,
+                action,
+                description,
+                log_datetime
+            )
         )
 
-        VALUES (?, ?, ?, ?, ?, ?, ?)
 
-        """,
+        # ==================================================
+        # COMMIT AUDIT LOG
+        # ==================================================
 
-        (
-            user_id,
-            username,
-            role,
-            module,
-            action,
-            description,
-            log_datetime
-        )
-
-    )
+        conn.commit()
 
 
-    conn.commit()
-
-    conn.close()
+        return True
 
 
+    except Exception:
 
+        # ==================================================
+        # AUDIT FAILURE
+        # ==================================================
+        #
+        # Audit logging must NEVER cause the main POS
+        # operation to fail.
+        #
+        # Example:
+        #
+        # Sale completed
+        #       ↓
+        # Audit log fails
+        #       ↓
+        # Sale remains completed
+        #
+        # ==================================================
+
+        if conn:
+
+            try:
+
+                conn.rollback()
+
+            except Exception:
+
+                pass
+
+
+        return False
+
+
+    finally:
+
+        # ==================================================
+        # CLOSE DATABASE CONNECTION
+        # ==================================================
+
+        if conn:
+
+            try:
+
+                conn.close()
+
+            except Exception:
+
+                pass
 
 
 # ==========================================================
@@ -99,36 +236,78 @@ def log_activity(
 # ==========================================================
 
 def get_all_audit_logs():
+    """
+    Retrieves all audit logs.
+
+    Returns:
+
+        List of audit log records ordered from
+        newest to oldest.
+
+    If the database operation fails,
+    an empty list is returned.
+    """
+
+    conn = None
 
 
-    conn = get_connection()
+    try:
 
-    cursor = conn.cursor()
+        # ==================================================
+        # DATABASE CONNECTION
+        # ==================================================
 
+        conn = get_connection()
 
-    cursor.execute(
-        """
-        SELECT
-            audit_id,
-            log_datetime,
-            username,
-            role,
-            module,
-            action,
-            description
-
-        FROM audit_logs
-
-        ORDER BY audit_id DESC
-
-        """
-    )
+        cursor = conn.cursor()
 
 
-    logs = cursor.fetchall()
+        # ==================================================
+        # GET AUDIT LOGS
+        # ==================================================
+
+        cursor.execute(
+            """
+            SELECT
+                audit_id,
+                log_datetime,
+                username,
+                role,
+                module,
+                action,
+                description
+
+            FROM audit_logs
+
+            ORDER BY audit_id DESC
+
+            """
+        )
 
 
-    conn.close()
+        logs = cursor.fetchall()
 
 
-    return logs 
+        return logs
+
+
+    except Exception:
+
+        return []
+
+
+    finally:
+
+        # ==================================================
+        # CLOSE DATABASE CONNECTION
+        # ==================================================
+
+        if conn:
+
+            try:
+
+                conn.close()
+
+            except Exception:
+
+                pass

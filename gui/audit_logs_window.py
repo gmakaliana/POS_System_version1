@@ -1,28 +1,88 @@
+"""
+GeoMaka POS Audit Logs Window
+
+File:
+gui/audit_logs_window.py
+
+Purpose:
+Display GeoMaka POS audit logs and allow authorized
+users to export the displayed audit records.
+
+Responsibilities:
+
+- Display audit logs.
+- Display audit date/time.
+- Display username.
+- Display role.
+- Display module.
+- Display action.
+- Display short description.
+- Export audit logs to a text report.
+- Handle audit loading errors safely.
+- Handle audit export errors safely.
+- Restore the parent window when closed.
+
+Company:
+GeoMaka Technologies
+"""
+
 import tkinter as tk
 from tkinter import ttk, messagebox
 
 from datetime import datetime
 
-from modules.audit.audit_logs import get_all_audit_logs
 
-from modules.audit.audit_export import save_audit_logs_report
+# ==========================================================
+# AUDIT MANAGEMENT
+# ==========================================================
 
+from modules.audit.audit_logs import (
+    get_all_audit_logs
+)
+
+
+# ==========================================================
+# AUDIT EXPORT
+# ==========================================================
+
+from modules.audit.audit_export import (
+    save_audit_logs_report
+)
 
 
 # ==========================================================
 # CENTER WINDOW
 # ==========================================================
 
-def center_window(window, width, height):
+def center_window(
+    window,
+    width,
+    height
+):
+    """
+    Centers a Tkinter window on the screen.
+    """
 
-    screen_width = window.winfo_screenwidth()
+    screen_width = (
+        window.winfo_screenwidth()
+    )
 
-    screen_height = window.winfo_screenheight()
+    screen_height = (
+        window.winfo_screenheight()
+    )
 
 
-    x = (screen_width // 2) - (width // 2)
+    x = (
+        screen_width // 2
+        -
+        width // 2
+    )
 
-    y = (screen_height // 2) - (height // 2)
+    y = (
+        screen_height // 2
+        -
+        height // 2
+    )
 
 
     window.geometry(
@@ -30,21 +90,174 @@ def center_window(window, width, height):
     )
 
 
+# ==========================================================
+# FORMAT AUDIT DATE/TIME
+# ==========================================================
 
+def _format_audit_datetime(value):
+    """
+    Formats an audit date/time as:
+
+        YYYY-MM-DD HH:MM:SS
+
+    Example:
+
+        2026-08-13 14:27:29
+    """
+
+    if not value:
+
+        return ""
+
+
+    # ------------------------------------------------------
+    # Already a datetime object
+    # ------------------------------------------------------
+
+    if isinstance(
+        value,
+        datetime
+    ):
+
+        return value.strftime(
+            "%Y-%m-%d %H:%M:%S"
+        )
+
+
+    value = str(value)
+
+
+    # ------------------------------------------------------
+    # Try common datetime formats
+    # ------------------------------------------------------
+
+    formats = (
+
+        "%Y-%m-%d %H:%M:%S",
+
+        "%Y-%m-%d %H:%M:%S.%f",
+
+        "%d-%m-%Y %H:%M:%S",
+
+        "%d/%m/%Y %H:%M:%S",
+
+        "%Y/%m/%d %H:%M:%S"
+
+    )
+
+
+    for date_format in formats:
+
+        try:
+
+            parsed_datetime = datetime.strptime(
+                value,
+                date_format
+            )
+
+
+            return parsed_datetime.strftime(
+                "%Y-%m-%d %H:%M:%S"
+            )
+
+
+        except ValueError:
+
+            continue
+
+
+    # ------------------------------------------------------
+    # Return original value if parsing fails
+    # ------------------------------------------------------
+
+    return value
+
+
+# ==========================================================
+# GET AUDIT VALUE
+# ==========================================================
+
+def _get_audit_value(
+    log,
+    key,
+    index
+):
+    """
+    Safely gets an audit field.
+
+    Supports:
+
+    1. Dictionary-style rows
+    2. SQLite tuple-style rows
+
+    Returns:
+        Field value or empty string.
+    """
+
+    # ======================================================
+    # DICTIONARY / SQLITE ROW
+    # ======================================================
+
+    try:
+
+        return log[key]
+
+    except (
+        TypeError,
+        KeyError,
+        IndexError
+    ):
+
+        pass
+
+
+    # ======================================================
+    # TUPLE / LIST
+    # ======================================================
+
+    try:
+
+        return log[index]
+
+    except (
+        TypeError,
+        IndexError
+    ):
+
+        return ""
 
 
 # ==========================================================
 # AUDIT LOG WINDOW
 # ==========================================================
 
-def open_audit_logs_window(parent):
+def open_audit_logs_window(
+    parent
+):
+    """
+    Opens the Audit Logs window.
+    """
+
+    # ======================================================
+    # HIDE PARENT
+    # ======================================================
+
+    if (
+        parent
+        and
+        parent.winfo_exists()
+    ):
+
+        parent.withdraw()
 
 
-    parent.withdraw()
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
 
-
-
-    root = tk.Toplevel()
+    root = tk.Toplevel(
+        parent
+    )
 
 
     root.title(
@@ -65,26 +278,27 @@ def open_audit_logs_window(parent):
     )
 
 
-
-    # =====================================
-    # CLOSE
-    # =====================================
+    # ======================================================
+    # CLOSE WINDOW
+    # ======================================================
 
     def close_window():
 
         root.destroy()
 
-        if parent.winfo_exists():
+
+        if (
+            parent
+            and
+            parent.winfo_exists()
+        ):
 
             parent.deiconify()
 
 
-
-
-
-    # =====================================
+    # ======================================================
     # TITLE
-    # =====================================
+    # ======================================================
 
     tk.Label(
         root,
@@ -99,11 +313,13 @@ def open_audit_logs_window(parent):
     )
 
 
+    # ======================================================
+    # GENERATED DATE/TIME
+    # ======================================================
 
     generated = datetime.now().strftime(
-        "%d %B %Y | %H:%M"
+        "%Y-%m-%d %H:%M:%S"
     )
-
 
 
     tk.Label(
@@ -112,12 +328,14 @@ def open_audit_logs_window(parent):
     ).pack()
 
 
-
-    # =====================================
+    # ======================================================
     # TABLE FRAME
-    # =====================================
+    # ======================================================
 
-    table_frame = tk.Frame(root)
+    table_frame = tk.Frame(
+        root
+    )
+
 
     table_frame.pack(
         fill="both",
@@ -127,6 +345,9 @@ def open_audit_logs_window(parent):
     )
 
 
+    # ======================================================
+    # TABLE COLUMNS
+    # ======================================================
 
     columns = (
 
@@ -145,6 +366,9 @@ def open_audit_logs_window(parent):
     )
 
 
+    # ======================================================
+    # TREEVIEW
+    # ======================================================
 
     tree = ttk.Treeview(
 
@@ -157,6 +381,9 @@ def open_audit_logs_window(parent):
     )
 
 
+    # ======================================================
+    # HEADINGS
+    # ======================================================
 
     tree.heading(
         "Date Time",
@@ -194,51 +421,55 @@ def open_audit_logs_window(parent):
     )
 
 
+    # ======================================================
+    # COLUMN WIDTHS
+    # ======================================================
 
     tree.column(
         "Date Time",
-        width=160
+        width=170,
+        minwidth=150
     )
 
 
     tree.column(
         "Username",
-        width=120
+        width=120,
+        minwidth=100
     )
 
 
     tree.column(
         "Role",
-        width=120
+        width=130,
+        minwidth=110
     )
 
 
     tree.column(
         "Module",
-        width=120
+        width=120,
+        minwidth=100
     )
 
 
     tree.column(
         "Action",
-        width=120
+        width=120,
+        minwidth=100
     )
 
 
     tree.column(
         "Description",
-        width=350
+        width=350,
+        minwidth=250
     )
 
 
-
-    tree.pack(
-        side="left",
-        fill="both",
-        expand=True
-    )
-
-
+    # ======================================================
+    # TABLE SCROLLBAR
+    # ======================================================
 
     scrollbar = ttk.Scrollbar(
 
@@ -252,31 +483,134 @@ def open_audit_logs_window(parent):
 
 
     tree.configure(
-
         yscrollcommand=scrollbar.set
+    )
 
+
+    # ======================================================
+    # PACK TABLE
+    # ======================================================
+
+    tree.pack(
+        side="left",
+        fill="both",
+        expand=True
     )
 
 
     scrollbar.pack(
-
         side="right",
-
         fill="y"
-
     )
 
 
+    # ======================================================
+    # LOAD AUDIT LOGS
+    # ======================================================
 
-    # =====================================
-    # LOAD AUDITS
-    # =====================================
-
-    logs = get_all_audit_logs()
+    logs = []
 
 
+    try:
+
+        logs = get_all_audit_logs()
+
+
+        if logs is None:
+
+            logs = []
+
+
+    except Exception as error:
+
+        messagebox.showerror(
+            "Audit Logs Error",
+            (
+                "Unable to load audit logs.\n\n"
+                f"Error:\n{error}"
+            ),
+            parent=root
+        )
+
+
+        logs = []
+
+
+    # ======================================================
+    # DISPLAY AUDIT LOGS
+    # ======================================================
 
     for log in logs:
+
+        # --------------------------------------------------
+        # DATE/TIME
+        # --------------------------------------------------
+
+        log_datetime = _get_audit_value(
+            log,
+            "log_datetime",
+            1
+        )
+
+
+        log_datetime = _format_audit_datetime(
+            log_datetime
+        )
+
+
+        # --------------------------------------------------
+        # USERNAME
+        # --------------------------------------------------
+
+        username = _get_audit_value(
+            log,
+            "username",
+            2
+        )
+
+
+        # --------------------------------------------------
+        # ROLE
+        # --------------------------------------------------
+
+        role = _get_audit_value(
+            log,
+            "role",
+            3
+        )
+
+
+        # --------------------------------------------------
+        # MODULE
+        # --------------------------------------------------
+
+        module = _get_audit_value(
+            log,
+            "module",
+            4
+        )
+
+
+        # --------------------------------------------------
+        # ACTION
+        # --------------------------------------------------
+
+        action = _get_audit_value(
+            log,
+            "action",
+            5
+        )
+
+
+        # --------------------------------------------------
+        # SHORT DESCRIPTION
+        # --------------------------------------------------
+
+        description = _get_audit_value(
+            log,
+            "description",
+            6
+        )
 
 
         tree.insert(
@@ -287,29 +621,61 @@ def open_audit_logs_window(parent):
 
             values=(
 
-                log["log_datetime"],
+                log_datetime,
 
-                log["username"],
+                username,
 
-                log["role"],
+                role,
 
-                log["module"],
+                module,
 
-                log["action"],
+                action,
 
-                log["description"]
+                description
 
             )
 
         )
 
 
+    # ======================================================
+    # NO LOGS MESSAGE
+    # ======================================================
 
-    # =====================================
-    # BUTTONS
-    # =====================================
+    if not logs:
 
-    button_frame = tk.Frame(root)
+        tree.insert(
+
+            "",
+
+            "end",
+
+            values=(
+
+                "",
+
+                "",
+
+                "",
+
+                "",
+
+                "",
+
+                "No audit log records found."
+
+            )
+
+        )
+
+
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
+
+    button_frame = tk.Frame(
+        root
+    )
 
 
     button_frame.pack(
@@ -317,23 +683,74 @@ def open_audit_logs_window(parent):
     )
 
 
+    # ======================================================
+    # SAVE AUDIT REPORT
+    # ======================================================
 
     def save_report():
 
+        # --------------------------------------------------
+        # PREVENT EXPORT WHEN THERE ARE NO LOGS
+        # --------------------------------------------------
 
-        file_path = save_audit_logs_report(
-            generated,
-            logs
-        )
+        if not logs:
 
+            messagebox.showinfo(
+                "Audit Export",
+                (
+                    "There are no audit log records "
+                    "to export."
+                ),
+                parent=root
+            )
+
+            return
+
+
+        # --------------------------------------------------
+        # EXPORT AUDIT REPORT
+        # --------------------------------------------------
+
+        try:
+
+            file_path = save_audit_logs_report(
+                generated,
+                logs
+            )
+
+
+        except Exception as error:
+
+            messagebox.showerror(
+                "Audit Export Error",
+                (
+                    "The audit log report could not "
+                    "be saved.\n\n"
+                    f"Error:\n{error}"
+                ),
+                parent=root
+            )
+
+            return
+
+
+        # --------------------------------------------------
+        # EXPORT SUCCESS
+        # --------------------------------------------------
 
         messagebox.showinfo(
-            "Audit Saved",
-            f"Audit Logs saved:\n\n{file_path}",
+            "Audit Report Saved",
+            (
+                "Audit Logs exported successfully.\n\n"
+                f"Saved File:\n{file_path}"
+            ),
             parent=root
         )
 
 
+    # ======================================================
+    # SAVE BUTTON
+    # ======================================================
 
     tk.Button(
 
@@ -358,6 +775,9 @@ def open_audit_logs_window(parent):
     )
 
 
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
 
     tk.Button(
 
@@ -381,10 +801,15 @@ def open_audit_logs_window(parent):
 
     )
 
+
+    # ======================================================
+    # WINDOW CLOSE EVENT
+    # ======================================================
+
     root.protocol(
-
         "WM_DELETE_WINDOW",
-
         close_window
-
     )
+
+
+    return root
