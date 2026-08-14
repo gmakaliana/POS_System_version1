@@ -17,6 +17,7 @@ Responsibilities:
 - Use YYYY-MM-DD date format for daily reports.
 - Use YYYY-MM date format for monthly reports.
 - Record successful report exports in the audit log.
+- Record the exact report type exported.
 - Never fail a report export because of an audit failure.
 
 Company:
@@ -60,7 +61,6 @@ def _format_report_date(
             "%Y-%m-%d"
         )
 
-
     return str(value)
 
 
@@ -90,9 +90,7 @@ def _format_report_month(
             "%Y-%m"
         )
 
-
     value = str(value)
-
 
     # ------------------------------------------------------
     # If a complete date was supplied, keep only YYYY-MM.
@@ -101,7 +99,6 @@ def _format_report_month(
     if len(value) >= 7:
 
         return value[:7]
-
 
     return value
 
@@ -114,6 +111,12 @@ def _save_text_file(
     filename,
     content
 ):
+    """
+    Saves report content to the reports directory.
+
+    Returns:
+        Path to the saved file.
+    """
 
     reports_directory = (
         get_reports_directory()
@@ -149,11 +152,15 @@ def _save_text_file(
 # AUDIT REPORT EXPORT
 # ==========================================================
 
-def _audit_report_export():
+def _audit_report_export(
+    description
+):
     """
     Records a successful report export.
 
-    Audit logging is non-fatal.
+    Audit logging is non-fatal and will never cause
+    a successfully exported report to be reported
+    as failed.
     """
 
     try:
@@ -161,7 +168,7 @@ def _audit_report_export():
         log_activity(
             module="REPORTS",
             action="EXPORT",
-            description="Report exported"
+            description=description
         )
 
     except Exception:
@@ -439,7 +446,9 @@ def save_daily_sales_report(
     )
 
 
-    _audit_report_export()
+    _audit_report_export(
+        "Exported daily sales report"
+    )
 
 
     return file_path
@@ -565,7 +574,9 @@ def save_monthly_sales_report(
     )
 
 
-    _audit_report_export()
+    _audit_report_export(
+        "Exported monthly sales report"
+    )
 
 
     return file_path
@@ -643,7 +654,9 @@ def save_daily_stock_report(
     )
 
 
-    _audit_report_export()
+    _audit_report_export(
+        "Exported daily stock book"
+    )
 
 
     return file_path
@@ -721,7 +734,9 @@ def save_monthly_stock_report(
     )
 
 
-    _audit_report_export()
+    _audit_report_export(
+        "Exported monthly stock book"
+    )
 
 
     return file_path
