@@ -46,6 +46,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from pathlib import Path
 
+
 # ==========================================================
 # SALES CART
 # ==========================================================
@@ -58,6 +59,7 @@ from modules.sales.cart import (
     clear_cart
 )
 
+
 # ==========================================================
 # PRODUCT MANAGEMENT
 # ==========================================================
@@ -67,6 +69,7 @@ from modules.products.product_management import (
     get_product_by_barcode
 )
 
+
 # ==========================================================
 # SALES MANAGEMENT
 # ==========================================================
@@ -75,6 +78,7 @@ from modules.sales.sales_management import (
     process_sale
 )
 
+
 # ==========================================================
 # RECEIPT GENERATOR
 # ==========================================================
@@ -82,6 +86,7 @@ from modules.sales.sales_management import (
 from modules.sales.receipt_generator import (
     generate_receipt
 )
+
 
 # ==========================================================
 # HARDWARE
@@ -163,7 +168,6 @@ def safe_float(
     Safely converts a value to a non-negative float.
 
     Returns:
-
         float
     """
 
@@ -199,16 +203,112 @@ def open_sales_window(
         "Sales"
     )
 
+    # ======================================================
+    # RESIZABLE WINDOW
+    # ======================================================
+
     root.resizable(
-        False,
-        False
+        True,
+        True
     )
+
+    # ======================================================
+    # INITIAL WINDOW SIZE
+    # ======================================================
 
     center_window(
         root,
+        1200,
+        800
+    )
+
+    # ======================================================
+    # MINIMUM WINDOW SIZE
+    # ======================================================
+
+    root.minsize(
         950,
         650
     )
+
+    # ======================================================
+    # FONT SETTINGS
+    # ======================================================
+
+    FONT_LABEL = (
+        "Arial",
+        12
+    )
+
+    FONT_ENTRY = (
+        "Arial",
+        14
+    )
+
+    FONT_BUTTON = (
+        "Arial",
+        12,
+        "bold"
+    )
+
+    # ------------------------------------------------------
+    # CART TABLE FONT
+    # ------------------------------------------------------
+
+    FONT_TABLE = (
+        "Arial",
+        14
+    )
+
+    FONT_TABLE_HEADING = (
+        "Arial",
+        14,
+        "bold"
+    )
+
+    FONT_TOTAL_LABEL = (
+        "Arial",
+        13,
+        "bold"
+    )
+
+    FONT_TOTAL_VALUE = (
+        "Arial",
+        15,
+        "bold"
+    )
+
+    FONT_TITLE = (
+        "Arial",
+        22,
+        "bold"
+    )
+
+    # ======================================================
+    # TREEVIEW STYLE
+    # ======================================================
+
+    style = ttk.Style(
+        root
+    )
+
+    try:
+
+        style.configure(
+            "Sales.Treeview",
+            font=FONT_TABLE,
+            rowheight=38
+        )
+
+        style.configure(
+            "Sales.Treeview.Heading",
+            font=FONT_TABLE_HEADING,
+            padding=6
+        )
+
+    except Exception:
+
+        pass
 
     # ======================================================
     # VALIDATION SETUP
@@ -339,8 +439,8 @@ def open_sales_window(
                 values=(
                     item["product_name"],
                     item["quantity"],
-                    item["unit_price"],
-                    item["subtotal"]
+                    f"M{float(item['unit_price']):.2f}",
+                    f"M{float(item['subtotal']):.2f}"
                 )
             )
 
@@ -654,16 +754,6 @@ def open_sales_window(
         # ==================================================
         # PROCESS SALE
         # ==================================================
-        #
-        # This is the critical transaction point.
-        #
-        # If process_sale() returns success=True,
-        # the sale is completed.
-        #
-        # Nothing below this point is allowed to
-        # cancel or reverse the sale.
-        #
-        # ==================================================
 
         success, sale_id = process_sale(
             user_id,
@@ -687,16 +777,6 @@ def open_sales_window(
 
         # ==================================================
         # SALE IS NOW COMPLETED
-        # ==================================================
-        #
-        # From this point forward:
-        #
-        # - Receipt failure does NOT cancel sale.
-        # - Printer failure does NOT cancel sale.
-        # - Cash drawer failure does NOT cancel sale.
-        # - Printer error messages are NOT shown.
-        # - Cash drawer error messages are NOT shown.
-        #
         # ==================================================
 
         receipt_result = None
@@ -726,13 +806,6 @@ def open_sales_window(
         # ==================================================
         # RECEIPT GENERATION / SAVING FAILED
         # ==================================================
-        #
-        # This warning is retained because the receipt
-        # file itself could not be generated or saved.
-        #
-        # This is different from a printer warning.
-        #
-        # ==================================================
 
         if receipt_error is not None:
 
@@ -755,22 +828,6 @@ def open_sales_window(
 
         # ==================================================
         # GET SAVED RECEIPT PATH
-        # ==================================================
-        #
-        # The current receipt_generator.py returns:
-        #
-        # {
-        #     "success": True,
-        #     "saved": True,
-        #     "path": "...",
-        #     "receipt_path": "...",
-        #     "receipt_number": ...
-        # }
-        #
-        # We only care about receipt saving here.
-        #
-        # Printer status is deliberately ignored.
-        #
         # ==================================================
 
         receipt_path = None
@@ -832,10 +889,6 @@ def open_sales_window(
         # ==================================================
         # RECEIPT WAS NOT SAVED
         # ==================================================
-        #
-        # Sale remains completed.
-        #
-        # ==================================================
 
         if not receipt_saved:
 
@@ -857,19 +910,6 @@ def open_sales_window(
         # ==================================================
         # CASH DRAWER
         # ==================================================
-        #
-        # The cash drawer is operated AFTER:
-        #
-        # 1. The sale has been committed.
-        # 2. The receipt has been saved.
-        #
-        # IMPORTANT:
-        #
-        # The result is intentionally ignored.
-        #
-        # No drawer warning is displayed.
-        #
-        # ==================================================
 
         try:
 
@@ -887,14 +927,6 @@ def open_sales_window(
 
         # ==================================================
         # SALE COMPLETION MESSAGE
-        # ==================================================
-        #
-        # No printer status.
-        # No printer warning.
-        # No printer error message.
-        # No cash drawer warning.
-        # No cash drawer error message.
-        #
         # ==================================================
 
         result_message = (
@@ -921,13 +953,23 @@ def open_sales_window(
     tk.Label(
         root,
         text="SALES",
-        font=(
-            "Arial",
-            18,
-            "bold"
-        )
+        font=FONT_TITLE
     ).pack(
         pady=8
+    )
+
+    # ======================================================
+    # MAIN CONTENT FRAME
+    # ======================================================
+
+    main_frame = tk.Frame(
+        root
+    )
+
+    main_frame.pack(
+        fill="both",
+        expand=True,
+        padx=15
     )
 
     # ======================================================
@@ -935,35 +977,61 @@ def open_sales_window(
     # ======================================================
 
     input_frame = tk.Frame(
-        root
+        main_frame
     )
 
     input_frame.pack(
-        pady=10
+        fill="x",
+        pady=8
     )
 
     # ======================================================
-    # BARCODE
+    # INPUT GRID CONFIGURATION
+    # ======================================================
+
+    input_frame.columnconfigure(
+        1,
+        weight=1
+    )
+
+    input_frame.columnconfigure(
+        4,
+        weight=1
+    )
+
+    # ======================================================
+    # BARCODE LABEL
     # ======================================================
 
     tk.Label(
         input_frame,
-        text="Barcode:"
+        text="Barcode:",
+        font=FONT_LABEL
     ).grid(
         row=0,
         column=0,
-        padx=5
+        padx=(5, 8),
+        pady=5
     )
+
+    # ======================================================
+    # BARCODE INPUT
+    # ======================================================
 
     barcode_entry = tk.Entry(
         input_frame,
         textvariable=barcode_var,
-        width=25
+        width=28,
+        font=FONT_ENTRY
     )
 
     barcode_entry.grid(
         row=0,
-        column=1
+        column=1,
+        padx=5,
+        pady=5,
+        ipady=8,
+        sticky="ew"
     )
 
     barcode_entry.bind(
@@ -971,39 +1039,61 @@ def open_sales_window(
         lambda e: add_by_barcode()
     )
 
+    # ======================================================
+    # BARCODE ADD BUTTON
+    # ======================================================
+
     tk.Button(
         input_frame,
-        text="Add",
+        text="ADD",
         bg="#3498db",
         fg="white",
-        command=add_by_barcode
+        font=FONT_BUTTON,
+        command=add_by_barcode,
+        width=8,
+        height=1
     ).grid(
         row=0,
-        column=2
+        column=2,
+        padx=(5, 20),
+        pady=5,
+        ipadx=5,
+        ipady=5
     )
 
     # ======================================================
-    # PRODUCT SEARCH
+    # PRODUCT SEARCH LABEL
     # ======================================================
 
     tk.Label(
         input_frame,
-        text="Search Product:"
+        text="Search Product:",
+        font=FONT_LABEL
     ).grid(
         row=0,
         column=3,
-        padx=10
+        padx=(5, 8),
+        pady=5
     )
+
+    # ======================================================
+    # PRODUCT SEARCH INPUT
+    # ======================================================
 
     search_entry = tk.Entry(
         input_frame,
         textvariable=search_var,
-        width=25
+        width=28,
+        font=FONT_ENTRY
     )
 
     search_entry.grid(
         row=0,
-        column=4
+        column=4,
+        padx=5,
+        pady=5,
+        ipady=8,
+        sticky="ew"
     )
 
     search_entry.bind(
@@ -1011,15 +1101,39 @@ def open_sales_window(
         lambda e: search_and_add()
     )
 
+    # ======================================================
+    # PRODUCT SEARCH ADD BUTTON
+    # ======================================================
+
     tk.Button(
         input_frame,
-        text="Add",
+        text="ADD",
         bg="#3498db",
         fg="white",
-        command=search_and_add
+        font=FONT_BUTTON,
+        command=search_and_add,
+        width=8,
+        height=1
     ).grid(
         row=0,
-        column=5
+        column=5,
+        padx=(5, 5),
+        pady=5,
+        ipadx=5,
+        ipady=5
+    )
+
+    # ======================================================
+    # CART TABLE CONTAINER
+    # ======================================================
+
+    table_frame = tk.Frame(
+        main_frame
+    )
+
+    table_frame.pack(
+        fill="x",
+        pady=5
     )
 
     # ======================================================
@@ -1027,7 +1141,7 @@ def open_sales_window(
     # ======================================================
 
     tree = ttk.Treeview(
-        root,
+        table_frame,
         columns=(
             "Product",
             "Qty",
@@ -1035,28 +1149,93 @@ def open_sales_window(
             "Subtotal"
         ),
         show="headings",
-        height=10
+        height=6,
+        style="Sales.Treeview"
     )
 
-    for column in (
+    # ======================================================
+    # TABLE HEADINGS
+    # ======================================================
+
+    tree.heading(
         "Product",
+        text="Product"
+    )
+
+    tree.heading(
         "Qty",
+        text="Quantity"
+    )
+
+    tree.heading(
         "Price",
-        "Subtotal"
-    ):
+        text="Unit Price"
+    )
 
-        tree.heading(
-            column,
-            text=column
-        )
+    tree.heading(
+        "Subtotal",
+        text="Subtotal"
+    )
 
-        tree.column(
-            column,
-            width=180
-        )
+    # ======================================================
+    # TABLE COLUMN CONFIGURATION
+    # ======================================================
+
+    tree.column(
+        "Product",
+        width=430,
+        minwidth=250,
+        anchor="w",
+        stretch=True
+    )
+
+    tree.column(
+        "Qty",
+        width=110,
+        minwidth=80,
+        anchor="center",
+        stretch=False
+    )
+
+    tree.column(
+        "Price",
+        width=170,
+        minwidth=120,
+        anchor="e",
+        stretch=False
+    )
+
+    tree.column(
+        "Subtotal",
+        width=190,
+        minwidth=140,
+        anchor="e",
+        stretch=False
+    )
 
     tree.pack(
-        pady=10
+        side="left",
+        fill="x",
+        expand=True
+    )
+
+    # ======================================================
+    # VERTICAL SCROLLBAR
+    # ======================================================
+
+    tree_scrollbar = ttk.Scrollbar(
+        table_frame,
+        orient="vertical",
+        command=tree.yview
+    )
+
+    tree_scrollbar.pack(
+        side="right",
+        fill="y"
+    )
+
+    tree.configure(
+        yscrollcommand=tree_scrollbar.set
     )
 
     # ======================================================
@@ -1064,22 +1243,31 @@ def open_sales_window(
     # ======================================================
 
     tk.Button(
-        root,
-        text="Remove Selected Product",
+        main_frame,
+        text="REMOVE SELECTED PRODUCT",
         bg="#f39c12",
         fg="white",
-        command=remove_selected
+        font=FONT_BUTTON,
+        command=remove_selected,
+        width=28,
+        height=1
     ).pack(
-        pady=5
+        pady=(12, 14),
+        ipadx=5,
+        ipady=5
     )
 
+    # ======================================================
+    # SEPARATOR
+    # ======================================================
+
     ttk.Separator(
-        root,
+        main_frame,
         orient="horizontal"
     ).pack(
         fill="x",
-        padx=20,
-        pady=10
+        padx=15,
+        pady=6
     )
 
     # ======================================================
@@ -1087,11 +1275,12 @@ def open_sales_window(
     # ======================================================
 
     total_frame = tk.Frame(
-        root
+        main_frame
     )
 
     total_frame.pack(
-        pady=5
+        fill="x",
+        pady=(10, 12)
     )
 
     # ======================================================
@@ -1100,21 +1289,29 @@ def open_sales_window(
 
     tk.Label(
         total_frame,
-        text="Total:"
+        text="Total:",
+        font=FONT_TOTAL_LABEL
     ).grid(
         row=0,
-        column=0
+        column=0,
+        padx=(15, 10),
+        pady=8
     )
 
     total_label = tk.Label(
         total_frame,
-        width=20,
-        relief="solid"
+        width=16,
+        relief="solid",
+        font=FONT_TOTAL_VALUE,
+        anchor="e",
+        padx=8
     )
 
     total_label.grid(
         row=0,
-        column=1
+        column=1,
+        padx=(0, 45),
+        ipady=7
     )
 
     # ======================================================
@@ -1123,20 +1320,28 @@ def open_sales_window(
 
     tk.Label(
         total_frame,
-        text="Discount:"
+        text="Discount:",
+        font=FONT_TOTAL_LABEL
     ).grid(
-        row=1,
-        column=0
+        row=0,
+        column=2,
+        padx=(10, 10),
+        pady=8
     )
 
     discount_entry = tk.Entry(
         total_frame,
-        textvariable=discount_var
+        textvariable=discount_var,
+        width=16,
+        font=FONT_ENTRY,
+        justify="right"
     )
 
     discount_entry.grid(
-        row=1,
-        column=1
+        row=0,
+        column=3,
+        padx=(0, 45),
+        ipady=7
     )
 
     discount_entry.config(
@@ -1150,30 +1355,42 @@ def open_sales_window(
 
     tk.Label(
         total_frame,
-        text="Final Total:"
+        text="Final Total:",
+        font=FONT_TOTAL_LABEL
     ).grid(
-        row=2,
-        column=0
+        row=0,
+        column=4,
+        padx=(10, 10),
+        pady=8
     )
 
     final_label = tk.Label(
         total_frame,
-        width=20,
-        relief="solid"
+        width=16,
+        relief="solid",
+        font=FONT_TOTAL_VALUE,
+        anchor="e",
+        padx=8
     )
 
     final_label.grid(
-        row=2,
-        column=1
+        row=0,
+        column=5,
+        padx=(0, 15),
+        ipady=7
     )
 
+    # ======================================================
+    # PAYMENT SEPARATOR
+    # ======================================================
+
     ttk.Separator(
-        root,
+        main_frame,
         orient="horizontal"
     ).pack(
         fill="x",
-        padx=20,
-        pady=10
+        padx=15,
+        pady=6
     )
 
     # ======================================================
@@ -1181,11 +1398,12 @@ def open_sales_window(
     # ======================================================
 
     pay_frame = tk.Frame(
-        root
+        main_frame
     )
 
     pay_frame.pack(
-        pady=5
+        fill="x",
+        pady=(10, 12)
     )
 
     # ======================================================
@@ -1194,23 +1412,28 @@ def open_sales_window(
 
     tk.Label(
         pay_frame,
-        text="Amount Paid:"
+        text="Amount Paid:",
+        font=FONT_TOTAL_LABEL
     ).grid(
         row=0,
         column=0,
-        padx=10
+        padx=(15, 12),
+        pady=8
     )
 
     paid_entry = tk.Entry(
         pay_frame,
         textvariable=paid_var,
-        width=22
+        width=25,
+        font=FONT_ENTRY,
+        justify="right"
     )
 
     paid_entry.grid(
         row=0,
         column=1,
-        padx=10
+        padx=(0, 80),
+        ipady=8
     )
 
     paid_entry.config(
@@ -1224,32 +1447,42 @@ def open_sales_window(
 
     tk.Label(
         pay_frame,
-        text="Change:"
+        text="Change:",
+        font=FONT_TOTAL_LABEL
     ).grid(
-        row=1,
-        column=0,
-        padx=10
+        row=0,
+        column=2,
+        padx=(10, 12),
+        pady=8
     )
 
     change_label = tk.Label(
         pay_frame,
         width=20,
-        relief="solid"
+        relief="solid",
+        font=FONT_TOTAL_VALUE,
+        anchor="e",
+        padx=8
     )
 
     change_label.grid(
-        row=1,
-        column=1,
-        padx=10
+        row=0,
+        column=3,
+        padx=(0, 15),
+        ipady=7
     )
 
+    # ======================================================
+    # ACTION SEPARATOR
+    # ======================================================
+
     ttk.Separator(
-        root,
+        main_frame,
         orient="horizontal"
     ).pack(
         fill="x",
-        padx=20,
-        pady=10
+        padx=15,
+        pady=6
     )
 
     # ======================================================
@@ -1257,11 +1490,11 @@ def open_sales_window(
     # ======================================================
 
     button_frame = tk.Frame(
-        root
+        main_frame
     )
 
     button_frame.pack(
-        pady=15
+        pady=(14, 10)
     )
 
     # ======================================================
@@ -1275,15 +1508,16 @@ def open_sales_window(
         fg="white",
         font=(
             "Arial",
-            14,
+            16,
             "bold"
         ),
         command=pay,
-        width=15
+        width=18,
+        height=2
     ).grid(
         row=0,
         column=0,
-        padx=10
+        padx=15
     )
 
     # ======================================================
@@ -1297,15 +1531,16 @@ def open_sales_window(
         fg="white",
         font=(
             "Arial",
-            14,
+            16,
             "bold"
         ),
         command=exit_sales,
-        width=8
+        width=10,
+        height=2
     ).grid(
         row=0,
         column=1,
-        padx=10
+        padx=15
     )
 
     # ======================================================
