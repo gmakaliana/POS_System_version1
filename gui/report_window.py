@@ -385,6 +385,9 @@ def open_daily_sales(
     The visible sales detail table is limited to 9 rows
     so that it remains consistent with the 9-row summary.
 
+    The sales detail table is intentionally given a fixed
+    height equal to the 9-row Profit/Loss Summary table.
+
     The complete sales data remains available to the
     report export function.
     """
@@ -410,7 +413,7 @@ def open_daily_sales(
     center_window(
         win,
         1250,
-        760
+        650
     )
 
 
@@ -466,17 +469,27 @@ def open_daily_sales(
 
     # ======================================================
     # TABLE FRAME
+    #
+    # IMPORTANT:
+    # Do NOT use expand=True here.
+    #
+    # The sales table must have the same vertical height
+    # as the 9-row Profit/Loss Summary table below.
     # ======================================================
 
     frame = tk.Frame(
-        win
+        win,
+        height=220
     )
 
     frame.pack(
-        fill="both",
-        expand=True,
+        fill="x",
         padx=10,
         pady=10
+    )
+
+    frame.pack_propagate(
+        False
     )
 
 
@@ -558,7 +571,7 @@ def open_daily_sales(
 
 
     # ======================================================
-    # DISPLAY SALES
+    # DISPLAY SALES DATA
     #
     # Only the first 9 rows are displayed.
     #
@@ -630,6 +643,11 @@ def open_daily_sales(
 
     # ======================================================
     # SUMMARY TABLE
+    #
+    # 9 rows.
+    #
+    # The sales table above uses the same fixed vertical
+    # size so both table areas remain visually aligned.
     # ======================================================
 
     sum_tree = ttk.Treeview(
@@ -935,6 +953,9 @@ def open_monthly_sales(
     The visible sales detail table is limited to 9 rows
     so that it remains consistent with the 9-row summary.
 
+    The sales detail table uses the same fixed height as
+    the Profit/Loss Summary table.
+
     The complete sales data remains available to the
     report export function.
     """
@@ -960,7 +981,7 @@ def open_monthly_sales(
     center_window(
         win,
         1250,
-        760
+        650
     )
 
 
@@ -1016,17 +1037,24 @@ def open_monthly_sales(
 
     # ======================================================
     # TABLE FRAME
+    #
+    # Keep the Monthly Sales table the same size as the
+    # Monthly Profit/Loss Summary table.
     # ======================================================
 
     frame = tk.Frame(
-        win
+        win,
+        height=220
     )
 
     frame.pack(
-        fill="both",
-        expand=True,
+        fill="x",
         padx=10,
         pady=10
+    )
+
+    frame.pack_propagate(
+        False
     )
 
 
@@ -2742,5 +2770,3 @@ def open_monthly_stock(
         "WM_DELETE_WINDOW",
         close
     )
-
-    
