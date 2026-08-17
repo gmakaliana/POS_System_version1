@@ -493,15 +493,37 @@ def open_daily_sales(
         )
     ).pack()
 
-    tk.Label(
-        win,
-        text=f"Report Generated: {generated}"
-    ).pack()
+
+    # ======================================================
+    # REPORT INFORMATION ROW
+    #
+    # Report Generated and Report Date are intentionally
+    # displayed on the same row.
+    # ======================================================
+
+    info_frame = tk.Frame(
+        win
+    )
+
+    info_frame.pack(
+        pady=(0, 5)
+    )
 
     tk.Label(
-        win,
+        info_frame,
+        text=f"Report Generated: {generated}"
+    ).pack(
+        side="left",
+        padx=20
+    )
+
+    tk.Label(
+        info_frame,
         text=f"Report Date: {report_date}"
-    ).pack()
+    ).pack(
+        side="left",
+        padx=20
+    )
 
 
     # ======================================================
@@ -1064,15 +1086,37 @@ def open_monthly_sales(
         )
     ).pack()
 
-    tk.Label(
-        win,
-        text=f"Report Generated: {generated}"
-    ).pack()
+
+    # ======================================================
+    # REPORT INFORMATION ROW
+    #
+    # Report Generated and Period are intentionally
+    # displayed on the same row.
+    # ======================================================
+
+    info_frame = tk.Frame(
+        win
+    )
+
+    info_frame.pack(
+        pady=(0, 5)
+    )
 
     tk.Label(
-        win,
+        info_frame,
+        text=f"Report Generated: {generated}"
+    ).pack(
+        side="left",
+        padx=20
+    )
+
+    tk.Label(
+        info_frame,
         text=f"Period: {month}"
-    ).pack()
+    ).pack(
+        side="left",
+        padx=20
+    )
 
 
     # ======================================================
@@ -2820,5 +2864,4 @@ def open_monthly_stock(
         "WM_DELETE_WINDOW",
         close
     )
-
     
