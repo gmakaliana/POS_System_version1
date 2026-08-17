@@ -49,7 +49,7 @@ def open_manual_backup_window(parent):
     center_window(
         window,
         650,
-        350
+        300
     )
 
 

@@ -18,7 +18,7 @@ def open_add_supplier_window(parent,refresh_callback):
     root.grab_set()
     
     root.title("ADD SUPPLIER")
-    root.geometry("400x280")
+    root.geometry("400x240")
     root.resizable(False, False)
 
     # -----------------------------------

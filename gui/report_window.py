@@ -106,6 +106,40 @@ def center_window(
 
 
 # ==========================================================
+# TOP WINDOW POSITIONING
+# ==========================================================
+
+def position_report_window(
+    window,
+    width,
+    height
+):
+    """
+    Positions a report window horizontally centered
+    and near the top of the screen.
+
+    This matches the positioning used by the
+    Expense Management and Sales windows.
+    """
+
+    screen_width = (
+        window.winfo_screenwidth()
+    )
+
+    x = (
+        screen_width // 2
+        -
+        width // 2
+    )
+
+    y = 40
+
+    window.geometry(
+        f"{width}x{height}+{x}+{y}"
+    )
+
+
+# ==========================================================
 # DASHBOARD
 # ==========================================================
 
@@ -410,7 +444,10 @@ def open_daily_sales(
         True
     )
 
-    center_window(
+    # IMPORTANT:
+    # Daily Sales Report is positioned near the top,
+    # horizontally centered, just like the expense windows.
+    position_report_window(
         win,
         1250,
         650
@@ -978,7 +1015,10 @@ def open_monthly_sales(
         True
     )
 
-    center_window(
+    # IMPORTANT:
+    # Monthly Sales Report is positioned near the top,
+    # horizontally centered, just like the expense windows.
+    position_report_window(
         win,
         1250,
         650
@@ -1527,10 +1567,10 @@ def open_daily_expenses(
         True
     )
 
-    center_window(
+    position_report_window(
         win,
         1050,
-        600
+        400
     )
 
 
@@ -1589,14 +1629,18 @@ def open_daily_expenses(
     # ======================================================
 
     frame = tk.Frame(
-        win
+        win,
+        height=250
     )
 
     frame.pack(
-        fill="both",
-        expand=True,
+        fill="x",
         padx=10,
         pady=10
+    )
+
+    frame.pack_propagate(
+        False
     )
 
 
@@ -1616,7 +1660,8 @@ def open_daily_expenses(
     tree = ttk.Treeview(
         frame,
         columns=columns,
-        show="headings"
+        show="headings",
+        height=9
     )
 
     widths = (
@@ -1861,10 +1906,10 @@ def open_monthly_expenses(
         True
     )
 
-    center_window(
+    position_report_window(
         win,
         1050,
-        600
+        400
     )
 
 
@@ -1923,14 +1968,18 @@ def open_monthly_expenses(
     # ======================================================
 
     frame = tk.Frame(
-        win
+        win,
+        height=250
     )
 
     frame.pack(
-        fill="both",
-        expand=True,
+        fill="x",
         padx=10,
         pady=10
+    )
+
+    frame.pack_propagate(
+        False
     )
 
 
@@ -1950,7 +1999,8 @@ def open_monthly_expenses(
     tree = ttk.Treeview(
         frame,
         columns=columns,
-        show="headings"
+        show="headings",
+        height=9
     )
 
     widths = (
@@ -2190,10 +2240,10 @@ def open_daily_stock(
         True
     )
 
-    center_window(
+    position_report_window(
         win,
         950,
-        550
+        500
     )
 
 
@@ -2494,10 +2544,10 @@ def open_monthly_stock(
         True
     )
 
-    center_window(
+    position_report_window(
         win,
         950,
-        550
+        500
     )
 
 
@@ -2770,3 +2820,5 @@ def open_monthly_stock(
         "WM_DELETE_WINDOW",
         close
     )
+
+    

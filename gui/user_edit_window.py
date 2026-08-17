@@ -42,7 +42,7 @@ def open_edit_user_window(
     )
 
     win.geometry(
-        "320x250"
+        "320x200"
     )
 
     win.resizable(

@@ -1,4 +1,3 @@
-
 """
 GeoMaka POS Expense Management Window
 
@@ -40,8 +39,17 @@ Important:
 - The raw user ID is never displayed.
 - Expense permissions are enforced by the caller and
   the expense management module.
-- Audit logging is handled by the expense management module.
+- Audit logging is handled by the expense management
+  module.
 - This is a standalone POS using the local database.
+
+UI:
+
+- Window opens horizontally centered.
+- Window opens near the top of the screen.
+- Table strictly displays 9 rows.
+- Table height is sized around exactly 9 Treeview rows.
+- No large unused area is left below the table.
 
 Company:
 GeoMaka Technologies
@@ -102,25 +110,32 @@ from gui.expense_edit_window import (
 
 
 # ==========================================================
-# CENTER WINDOW
+# WINDOW POSITIONING
 # ==========================================================
 
-def center_window(
+def position_expense_window(
     window,
     width,
     height
 ):
     """
-    Centers a Tkinter window on the screen.
+    Positions the Expense Management window
+    horizontally centered and near the top
+    of the screen.
+
+    This follows the same positioning style
+    used by the Sales window.
+
+    A small top margin of 40 pixels is used.
     """
 
     screen_width = (
         window.winfo_screenwidth()
     )
 
-    screen_height = (
-        window.winfo_screenheight()
-    )
+    # ------------------------------------------------------
+    # Horizontal center
+    # ------------------------------------------------------
 
     x = (
         screen_width // 2
@@ -128,11 +143,11 @@ def center_window(
         width // 2
     )
 
-    y = (
-        screen_height // 2
-        -
-        height // 2
-    )
+    # ------------------------------------------------------
+    # Small top margin
+    # ------------------------------------------------------
+
+    y = 40
 
     window.geometry(
         f"{width}x{height}+{x}+{y}"
@@ -469,17 +484,124 @@ def open_expense_management_window(
         "EXPENSE MANAGEMENT"
     )
 
+
+    # ======================================================
+    # WINDOW SIZE / POSITION
+    # ======================================================
+    #
+    # The table is intentionally restricted to exactly
+    # 9 Treeview rows.
+    #
+    # Treeview rowheight:
+    #
+    #     28 pixels
+    #
+    # Header:
+    #
+    #     approximately 30 pixels
+    #
+    # Table height:
+    #
+    #     9 rows
+    #
+    # The total window height is kept compact so there
+    # is no unnecessary vertical space.
+    #
+    # ======================================================
+
+    EXPENSE_WIDTH = 1100
+
+    EXPENSE_HEIGHT = 500
+
+    position_expense_window(
+        root,
+        EXPENSE_WIDTH,
+        EXPENSE_HEIGHT
+    )
+
+
+    # ======================================================
+    # RESIZABLE WINDOW
+    # ======================================================
+
     root.resizable(
         True,
         True
     )
 
 
-    center_window(
-        root,
-        1100,
-        600
+    # ======================================================
+    # MINIMUM WINDOW SIZE
+    # ======================================================
+    #
+    # The minimum height still accommodates:
+    #
+    # - Title
+    # - 9 table rows
+    # - Scrollbar
+    # - Buttons
+    #
+    # ======================================================
+
+    root.minsize(
+        950,
+        500
     )
+
+
+    # ======================================================
+    # FONT SETTINGS
+    # ======================================================
+
+    FONT_TITLE = (
+        "Arial",
+        16,
+        "bold"
+    )
+
+    FONT_TABLE = (
+        "Arial",
+        10
+    )
+
+    FONT_TABLE_HEADING = (
+        "Arial",
+        10,
+        "bold"
+    )
+
+    FONT_BUTTON = (
+        "Arial",
+        10,
+        "bold"
+    )
+
+
+    # ======================================================
+    # TREEVIEW STYLE
+    # ======================================================
+
+    style = ttk.Style(
+        root
+    )
+
+    try:
+
+        style.configure(
+            "Expense.Treeview",
+            font=FONT_TABLE,
+            rowheight=28
+        )
+
+        style.configure(
+            "Expense.Treeview.Heading",
+            font=FONT_TABLE_HEADING,
+            padding=3
+        )
+
+    except Exception:
+
+        pass
 
 
     # ======================================================
@@ -506,13 +628,9 @@ def open_expense_management_window(
     tk.Label(
         root,
         text="EXPENSE MANAGEMENT",
-        font=(
-            "Arial",
-            16,
-            "bold"
-        )
+        font=FONT_TITLE
     ).pack(
-        pady=10
+        pady=(8, 6)
     )
 
 
@@ -528,7 +646,7 @@ def open_expense_management_window(
         fill="both",
         expand=True,
         padx=10,
-        pady=10
+        pady=(2, 5)
     )
 
 
@@ -558,6 +676,13 @@ def open_expense_management_window(
     # ======================================================
     # TREEVIEW
     # ======================================================
+    #
+    # STRICTLY 9 ROWS.
+    #
+    # This controls the visible height of the Treeview
+    # independently of the number of expense records.
+    #
+    # ======================================================
 
     tree = ttk.Treeview(
 
@@ -567,7 +692,11 @@ def open_expense_management_window(
 
         show="headings",
 
-        selectmode="browse"
+        selectmode="browse",
+
+        height=9,
+
+        style="Expense.Treeview"
 
     )
 
@@ -614,13 +743,15 @@ def open_expense_management_window(
     tree.column(
         "Expense Name",
         width=180,
-        minwidth=140
+        minwidth=140,
+        anchor="w"
     )
 
     tree.column(
         "Description",
         width=300,
-        minwidth=200
+        minwidth=200,
+        anchor="w"
     )
 
     tree.column(
@@ -633,19 +764,22 @@ def open_expense_management_window(
     tree.column(
         "Expense Date",
         width=130,
-        minwidth=110
+        minwidth=110,
+        anchor="w"
     )
 
     tree.column(
         "Created At",
         width=170,
-        minwidth=140
+        minwidth=140,
+        anchor="w"
     )
 
     tree.column(
         "Entered By",
         width=150,
-        minwidth=120
+        minwidth=120,
+        anchor="w"
     )
 
 
@@ -690,7 +824,7 @@ def open_expense_management_window(
 
 
     # ======================================================
-    # PACK TREE
+    # PACK / GRID TREE
     # ======================================================
 
     tree.grid(
@@ -1169,7 +1303,7 @@ def open_expense_management_window(
     button_frame.pack(
         fill="x",
         padx=10,
-        pady=10
+        pady=(3, 8)
     )
 
 
@@ -1189,13 +1323,19 @@ def open_expense_management_window(
 
         fg="white",
 
+        font=FONT_BUTTON,
+
         command=add_new_expense
 
     ).pack(
 
         side="left",
 
-        padx=5
+        padx=5,
+
+        ipadx=3,
+
+        ipady=3
 
     )
 
@@ -1216,13 +1356,19 @@ def open_expense_management_window(
 
         fg="white",
 
+        font=FONT_BUTTON,
+
         command=edit_selected_expense
 
     ).pack(
 
         side="left",
 
-        padx=5
+        padx=5,
+
+        ipadx=3,
+
+        ipady=3
 
     )
 
@@ -1243,13 +1389,19 @@ def open_expense_management_window(
 
         fg="white",
 
+        font=FONT_BUTTON,
+
         command=delete_selected_expense
 
     ).pack(
 
         side="left",
 
-        padx=5
+        padx=5,
+
+        ipadx=3,
+
+        ipady=3
 
     )
 
@@ -1270,13 +1422,19 @@ def open_expense_management_window(
 
         fg="white",
 
+        font=FONT_BUTTON,
+
         command=close_window
 
     ).pack(
 
         side="right",
 
-        padx=5
+        padx=5,
+
+        ipadx=3,
+
+        ipady=3
 
     )
 
@@ -1298,5 +1456,8 @@ def open_expense_management_window(
     load_expenses()
 
 
-    return root
+    # ======================================================
+    # RETURN WINDOW
+    # ======================================================
 
+    return root

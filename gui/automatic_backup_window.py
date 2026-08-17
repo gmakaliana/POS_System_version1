@@ -55,7 +55,7 @@ def open_automatic_backup_window(parent):
     center_window(
         window,
         700,
-        500
+        450
     )
 
 

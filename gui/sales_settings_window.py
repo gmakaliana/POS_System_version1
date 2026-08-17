@@ -39,7 +39,7 @@ def open_sales_settings(parent):
     center_window(
         window,
         500,
-        300
+        250
     )
 
     title_font = ("Arial", 20, "bold")

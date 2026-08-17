@@ -300,7 +300,7 @@ def open_expense_edit_window(
     center_window(
         root,
         500,
-        360
+        260
     )
 
 

@@ -19,7 +19,7 @@ def open_add_user_window(
     win.grab_set()
 
     win.title("ADD USER")
-    win.geometry("320x320")
+    win.geometry("320x300")
     win.resizable(False, False)
 
 

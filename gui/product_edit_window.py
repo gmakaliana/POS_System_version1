@@ -19,7 +19,7 @@ def open_edit_product_window(product_data, refresh_callback,parent):
     root.grab_set()
 
     root.title("EDIT PRODUCT")
-    root.geometry("420x380")
+    root.geometry("420x330")
 
     product_id = product_data[0]
 

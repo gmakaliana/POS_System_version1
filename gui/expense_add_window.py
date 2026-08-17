@@ -174,7 +174,7 @@ def open_expense_add_window(
     center_window(
         root,
         500,
-        430
+        330
     )
 
 

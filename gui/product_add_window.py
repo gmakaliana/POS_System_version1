@@ -20,7 +20,7 @@ def open_add_product_window(parent,refresh_callback):
     root.grab_set()
 
     root.title("ADD PRODUCT")
-    root.geometry("420x380")
+    root.geometry("420x350")
 
     suppliers = get_all_suppliers()
     supplier_map = {s[1]: s[0] for s in suppliers}

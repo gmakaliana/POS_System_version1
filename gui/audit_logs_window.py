@@ -91,6 +91,43 @@ def center_window(
 
 
 # ==========================================================
+# TOP WINDOW POSITIONING
+# ==========================================================
+
+def position_report_window(
+    window,
+    width,
+    height
+):
+    """
+    Positions the Audit Logs window horizontally centered
+    and near the top of the screen.
+
+    This matches the positioning used by the
+    report windows.
+    """
+
+    screen_width = (
+        window.winfo_screenwidth()
+    )
+
+
+    x = (
+        screen_width // 2
+        -
+        width // 2
+    )
+
+
+    y = 40
+
+
+    window.geometry(
+        f"{width}x{height}+{x}+{y}"
+    )
+
+
+# ==========================================================
 # FORMAT AUDIT DATE/TIME
 # ==========================================================
 
@@ -271,7 +308,11 @@ def open_audit_logs_window(
     )
 
 
-    center_window(
+    # ======================================================
+    # POSITION WINDOW TOWARDS THE TOP
+    # ======================================================
+
+    position_report_window(
         root,
         1100,
         550

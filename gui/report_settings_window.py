@@ -49,7 +49,7 @@ def open_report_settings_window(parent):
     center_window(
         win,
         600,
-        520
+        460
     )
 
 

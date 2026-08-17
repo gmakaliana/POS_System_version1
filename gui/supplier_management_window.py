@@ -14,47 +14,98 @@ from gui.supplier_edit_window import (
     open_edit_supplier_window
 )
 
-def center_window(window, width, height):
 
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
+# ==========================================================
+# TOP WINDOW POSITIONING
+# ==========================================================
 
-    x = (screen_width // 2) - (width // 2)
-    y = (screen_height // 2) - (height // 2)
+def position_window_top(
+    window,
+    width,
+    height
+):
+    """
+    Positions the window horizontally centered
+    and towards the top of the screen.
+    """
 
-    window.geometry(f"{width}x{height}+{x}+{y}")
+    screen_width = (
+        window.winfo_screenwidth()
+    )
 
-def open_supplier_management_window(admin_root):
+    x = (
+        screen_width // 2
+        -
+        width // 2
+    )
+
+    y = 40
+
+    window.geometry(
+        f"{width}x{height}+{x}+{y}"
+    )
+
+
+# ==========================================================
+# SUPPLIER MANAGEMENT WINDOW
+# ==========================================================
+
+def open_supplier_management_window(
+    admin_root
+):
 
     # -----------------------------------
     # HIDE DASHBOARD
     # -----------------------------------
+
     admin_root.withdraw()
+
+
+    # -----------------------------------
+    # CREATE WINDOW
+    # -----------------------------------
 
     root = tk.Toplevel()
 
-    root.title("SUPPLIER MANAGEMENT")
+    root.title(
+        "SUPPLIER MANAGEMENT"
+    )
 
-    root.resizable(True, True)
+    root.resizable(
+        True,
+        True
+    )
 
-    center_window(
+
+    # -----------------------------------
+    # POSITION TOWARDS TOP
+    # -----------------------------------
+
+    position_window_top(
         root,
         800,
         450
     )
 
+
     # -----------------------------------
     # CLOSE
     # -----------------------------------
+
     def close_window():
 
         root.destroy()
+
         admin_root.deiconify()
+
 
     # -----------------------------------
     # TABLE FRAME
     # -----------------------------------
-    table_frame = tk.Frame(root)
+
+    table_frame = tk.Frame(
+        root
+    )
 
     table_frame.pack(
         fill="both",
@@ -62,6 +113,11 @@ def open_supplier_management_window(admin_root):
         padx=10,
         pady=10
     )
+
+
+    # -----------------------------------
+    # SUPPLIER TABLE
+    # -----------------------------------
 
     tree = ttk.Treeview(
         table_frame,
@@ -72,6 +128,11 @@ def open_supplier_management_window(admin_root):
         ),
         show="headings"
     )
+
+
+    # -----------------------------------
+    # TABLE HEADINGS
+    # -----------------------------------
 
     tree.heading(
         "Supplier",
@@ -88,6 +149,11 @@ def open_supplier_management_window(admin_root):
         text="Address"
     )
 
+
+    # -----------------------------------
+    # TABLE COLUMNS
+    # -----------------------------------
+
     tree.column(
         "Supplier",
         width=250
@@ -103,11 +169,21 @@ def open_supplier_management_window(admin_root):
         width=280
     )
 
+
+    # -----------------------------------
+    # PACK TABLE
+    # -----------------------------------
+
     tree.pack(
         side="left",
         fill="both",
         expand=True
     )
+
+
+    # -----------------------------------
+    # SCROLLBAR
+    # -----------------------------------
 
     scrollbar = ttk.Scrollbar(
         table_frame,
@@ -124,19 +200,27 @@ def open_supplier_management_window(admin_root):
         fill="y"
     )
 
+
     # -----------------------------------
     # LOAD SUPPLIERS
     # -----------------------------------
+
     def load_suppliers():
 
         for row in tree.get_children():
-            tree.delete(row)
+
+            tree.delete(
+                row
+            )
+
 
         suppliers = get_all_suppliers()
+
 
         for supplier in suppliers:
 
             supplier_id = supplier[0]
+
 
             tree.insert(
                 "",
@@ -146,41 +230,59 @@ def open_supplier_management_window(admin_root):
                     supplier[2],
                     supplier[3]
                 ),
-                tags=(supplier_id,)
+                tags=(
+                    supplier_id,
+                )
             )
+
 
     # -----------------------------------
     # GET SELECTED ID
     # -----------------------------------
+
     def get_selected_supplier_id():
 
         selected = tree.focus()
 
+
         if not selected:
+
             return None
+
 
         return tree.item(
             selected
         )["tags"][0]
 
+
     # -----------------------------------
     # DELETE
     # -----------------------------------
+
     def delete_selected():
 
-        supplier_id = get_selected_supplier_id()
+        supplier_id = (
+            get_selected_supplier_id()
+        )
+
 
         if not supplier_id:
+
             messagebox.showwarning(
                 "Warning",
-                "Select a supplier.",parent=root
+                "Select a supplier.",
+                parent=root
             )
+
             return
+
 
         confirm = messagebox.askyesno(
             "Confirm",
-            "Delete selected supplier?",parent=root
+            "Delete selected supplier?",
+            parent=root
         )
+
 
         if confirm:
 
@@ -192,57 +294,84 @@ def open_supplier_management_window(admin_root):
 
                 load_suppliers()
 
+
             except Exception as e:
 
                 messagebox.showerror(
                     "Error",
-                    str(e),parent=root
+                    str(e),
+                    parent=root
                 )
+
 
     # -----------------------------------
     # EDIT
     # -----------------------------------
+
     def edit_selected():
 
         selected = tree.focus()
+
 
         if not selected:
 
             messagebox.showwarning(
                 "Warning",
-                "Select a supplier.",parent=root
+                "Select a supplier.",
+                parent=root
             )
 
             return
 
-        supplier_id = get_selected_supplier_id()
+
+        supplier_id = (
+            get_selected_supplier_id()
+        )
+
 
         values = tree.item(
             selected
         )["values"]
 
+
         supplier_data = (
+
             supplier_id,
+
             values[0],
+
             values[1],
+
             values[2]
+
         )
+
 
         open_edit_supplier_window(
             supplier_data,
-            load_suppliers,root
+            load_suppliers,
+            root
         )
+
 
     # -----------------------------------
     # BUTTONS
     # -----------------------------------
-    btn_frame = tk.Frame(root)
+
+    btn_frame = tk.Frame(
+        root
+    )
 
     btn_frame.pack(
         fill="x",
         padx=10,
         pady=10
     )
+
+
+    # -----------------------------------
+    # ADD SUPPLIER
+    # -----------------------------------
 
     tk.Button(
         btn_frame,
@@ -260,6 +389,11 @@ def open_supplier_management_window(admin_root):
         padx=5
     )
 
+
+    # -----------------------------------
+    # EDIT SUPPLIER
+    # -----------------------------------
+
     tk.Button(
         btn_frame,
         text="Edit Supplier",
@@ -271,6 +405,11 @@ def open_supplier_management_window(admin_root):
         side="left",
         padx=5
     )
+
+
+    # -----------------------------------
+    # DELETE SUPPLIER
+    # -----------------------------------
 
     tk.Button(
         btn_frame,
@@ -284,6 +423,11 @@ def open_supplier_management_window(admin_root):
         padx=5
     )
 
+
+    # -----------------------------------
+    # CLOSE
+    # -----------------------------------
+
     tk.Button(
         btn_frame,
         text="Close",
@@ -296,9 +440,18 @@ def open_supplier_management_window(admin_root):
         padx=5
     )
 
+
+    # -----------------------------------
+    # INITIAL LOAD
+    # -----------------------------------
+
     load_suppliers()
 
-    # Handle window X button
+
+    # -----------------------------------
+    # WINDOW CLOSE EVENT
+    # -----------------------------------
+
     root.protocol(
         "WM_DELETE_WINDOW",
         close_window

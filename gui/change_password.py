@@ -26,7 +26,7 @@ def open_change_password(user, parent):
     root.title("CHANGE PASSWORD")
 
     root.geometry(
-        "320x270"
+        "320x170"
     )
 
     root.resizable(

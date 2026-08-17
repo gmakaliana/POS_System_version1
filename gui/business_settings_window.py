@@ -45,7 +45,7 @@ def open_business_settings(parent):
     center_window(
         window,
         800,
-        650
+        600
     )
 
     title_font = ("Arial", 20, "bold")

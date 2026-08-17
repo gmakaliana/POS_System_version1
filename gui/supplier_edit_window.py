@@ -54,7 +54,7 @@ def open_edit_supplier_window(
     center_window(
         root,
         400,
-        320
+        300
     )
 
 

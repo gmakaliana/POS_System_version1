@@ -23,23 +23,56 @@ from gui.user_add_window import open_add_user_window
 from gui.reset_password_window import open_reset_password_window
 
 
+# ==========================================================
+# POSITION WINDOW TOWARDS TOP
+# ==========================================================
 
-def center_window(window, width, height):
+def position_window_top(
+    window,
+    width,
+    height
+):
+    """
+    Positions the window horizontally centered
+    and towards the top of the screen.
+    """
 
-    screen_width = window.winfo_screenwidth()
-    screen_height = window.winfo_screenheight()
+    screen_width = (
+        window.winfo_screenwidth()
+    )
 
-    x = (screen_width // 2) - (width // 2)
-    y = (screen_height // 2) - (height // 2)
+    # ------------------------------------------------------
+    # Horizontal center
+    # ------------------------------------------------------
+
+    x = (
+        screen_width // 2
+        -
+        width // 2
+    )
+
+    # ------------------------------------------------------
+    # Position towards the top
+    # ------------------------------------------------------
+
+    y = 40
 
     window.geometry(
         f"{width}x{height}+{x}+{y}"
     )
 
 
+# ==========================================================
+# OPEN USER MANAGEMENT WINDOW
+# ==========================================================
 
-def open_user_management_window(admin_root):
+def open_user_management_window(
+    admin_root
+):
 
+    # ======================================================
+    # GET CURRENT USER
+    # ======================================================
 
     current_user = get_session_user()
 
@@ -55,6 +88,9 @@ def open_user_management_window(admin_root):
         return
 
 
+    # ======================================================
+    # CASHIER ACCESS CHECK
+    # ======================================================
 
     if current_user["role"] == "Cashier":
 
@@ -67,16 +103,26 @@ def open_user_management_window(admin_root):
         return
 
 
+    # ======================================================
+    # HIDE ADMIN DASHBOARD
+    # ======================================================
 
     admin_root.withdraw()
 
 
+    # ======================================================
+    # CREATE WINDOW
+    # ======================================================
 
-    root = tk.Toplevel(admin_root)
+    root = tk.Toplevel(
+        admin_root
+    )
+
 
     root.title(
         "USER MANAGEMENT"
     )
+
 
     root.resizable(
         True,
@@ -84,33 +130,39 @@ def open_user_management_window(admin_root):
     )
 
 
-    center_window(
+    # ======================================================
+    # POSITION WINDOW TOWARDS TOP
+    # ======================================================
+
+    position_window_top(
         root,
         850,
         450
     )
 
 
-
-    # =====================================
-    # CLOSE
-    # =====================================
+    # ======================================================
+    # CLOSE WINDOW
+    # ======================================================
 
     def close_window():
 
         root.destroy()
+
 
         if admin_root.winfo_exists():
 
             admin_root.deiconify()
 
 
+    # ======================================================
+    # TABLE FRAME
+    # ======================================================
 
-    # =====================================
-    # TABLE
-    # =====================================
+    table_frame = tk.Frame(
+        root
+    )
 
-    table_frame = tk.Frame(root)
 
     table_frame.pack(
         fill="both",
@@ -120,6 +172,9 @@ def open_user_management_window(admin_root):
     )
 
 
+    # ======================================================
+    # USER TABLE
+    # ======================================================
 
     tree = ttk.Treeview(
 
@@ -136,6 +191,9 @@ def open_user_management_window(admin_root):
     )
 
 
+    # ======================================================
+    # TABLE HEADINGS
+    # ======================================================
 
     for col in (
         "Username",
@@ -149,22 +207,31 @@ def open_user_management_window(admin_root):
         )
 
 
+    # ======================================================
+    # TABLE COLUMNS
+    # ======================================================
 
     tree.column(
         "Username",
         width=250
     )
 
+
     tree.column(
         "Role",
         width=170
     )
+
 
     tree.column(
         "Status",
         width=150
     )
 
+
+    # ======================================================
+    # TABLE
+    # ======================================================
 
     tree.pack(
         side="left",
@@ -173,11 +240,18 @@ def open_user_management_window(admin_root):
     )
 
 
+    # ======================================================
+    # SCROLLBAR
+    # ======================================================
 
     scrollbar = ttk.Scrollbar(
+
         table_frame,
+
         orient="vertical",
+
         command=tree.yview
+
     )
 
 
@@ -192,10 +266,9 @@ def open_user_management_window(admin_root):
     )
 
 
-
-    # =====================================
+    # ======================================================
     # LOAD USERS
-    # =====================================
+    # ======================================================
 
     def load_users():
 
@@ -204,42 +277,54 @@ def open_user_management_window(admin_root):
             tree.delete(item)
 
 
-
         users = get_visible_users(
             current_user
         )
 
 
-
         for user in users:
 
-
             status = (
+
                 "Temporary"
+
                 if user["must_change_password"]
+
                 else
+
                 "Changed"
+
             )
 
 
             tree.insert(
+
                 "",
+
                 "end",
+
                 values=(
+
                     user["username"],
+
                     user["role"],
+
                     status
+
                 ),
+
                 tags=(
+
                     user["user_id"],
+
                 )
+
             )
 
 
-
-    # =====================================
-    # SELECT USER
-    # =====================================
+    # ======================================================
+    # GET SELECTED USER ID
+    # ======================================================
 
     def get_selected_user_id():
 
@@ -251,16 +336,16 @@ def open_user_management_window(admin_root):
             return None
 
 
-
         return int(
-            tree.item(selected)["tags"][0]
+            tree.item(
+                selected
+            )["tags"][0]
         )
 
 
-
-    # =====================================
-    # EDIT
-    # =====================================
+    # ======================================================
+    # EDIT USER
+    # ======================================================
 
     def edit_selected():
 
@@ -276,7 +361,6 @@ def open_user_management_window(admin_root):
             )
 
             return
-
 
 
         target_user = get_user_by_id(
@@ -298,7 +382,6 @@ def open_user_management_window(admin_root):
             return
 
 
-
         open_edit_user_window(
             target_user,
             current_user,
@@ -307,10 +390,9 @@ def open_user_management_window(admin_root):
         )
 
 
-
-    # =====================================
+    # ======================================================
     # RESET PASSWORD
-    # =====================================
+    # ======================================================
 
     def reset_selected_password():
 
@@ -326,7 +408,6 @@ def open_user_management_window(admin_root):
             )
 
             return
-
 
 
         target_user = get_user_by_id(
@@ -348,7 +429,6 @@ def open_user_management_window(admin_root):
             return
 
 
-
         open_reset_password_window(
             root,
             current_user,
@@ -357,10 +437,9 @@ def open_user_management_window(admin_root):
         )
 
 
-
-    # =====================================
-    # DELETE
-    # =====================================
+    # ======================================================
+    # DELETE USER
+    # ======================================================
 
     def delete_selected():
 
@@ -376,7 +455,6 @@ def open_user_management_window(admin_root):
             )
 
             return
-
 
 
         target_user = get_user_by_id(
@@ -398,13 +476,11 @@ def open_user_management_window(admin_root):
             return
 
 
-
         confirm = messagebox.askyesno(
             "Confirm",
             "Delete this user?",
             parent=root
         )
-
 
 
         if confirm:
@@ -416,8 +492,8 @@ def open_user_management_window(admin_root):
                     user_id
                 )
 
-                load_users()
 
+                load_users()
 
 
             except Exception as e:
@@ -429,12 +505,14 @@ def open_user_management_window(admin_root):
                 )
 
 
+    # ======================================================
+    # BUTTON FRAME
+    # ======================================================
 
-    # =====================================
-    # BUTTONS
-    # =====================================
+    btn_frame = tk.Frame(
+        root
+    )
 
-    btn_frame = tk.Frame(root)
 
     btn_frame.pack(
         fill="x",
@@ -443,96 +521,183 @@ def open_user_management_window(admin_root):
     )
 
 
+    # ======================================================
+    # ADD USER
+    # ======================================================
 
     if (
-        can_create_user(current_user,"Cashier")
+
+        can_create_user(
+            current_user,
+            "Cashier"
+        )
+
         or
-        can_create_user(current_user,"Admin")
+
+        can_create_user(
+            current_user,
+            "Admin"
+        )
+
         or
-        can_create_user(current_user,"Default Admin")
+
+        can_create_user(
+            current_user,
+            "Default Admin"
+        )
+
     ):
 
-
         tk.Button(
+
             btn_frame,
+
             text="Add User",
+
             width=12,
+
             bg="#3498db",
+
             fg="white",
+
             command=lambda:
             open_add_user_window(
                 root,
                 current_user,
                 load_users
             )
+
         ).pack(
+
             side="left",
+
             padx=5
+
         )
 
 
+    # ======================================================
+    # EDIT USER BUTTON
+    # ======================================================
 
     tk.Button(
+
         btn_frame,
+
         text="Edit User",
+
         width=12,
+
         bg="#f39c12",
+
         fg="white",
+
         command=edit_selected
+
     ).pack(
+
         side="left",
+
         padx=5
+
     )
 
 
+    # ======================================================
+    # RESET PASSWORD BUTTON
+    # ======================================================
 
     tk.Button(
+
         btn_frame,
+
         text="Reset Password",
+
         width=14,
+
         bg="#8e44ad",
+
         fg="white",
+
         command=reset_selected_password
+
     ).pack(
+
         side="left",
+
         padx=5
+
     )
 
 
+    # ======================================================
+    # DELETE USER BUTTON
+    # ======================================================
 
     tk.Button(
+
         btn_frame,
+
         text="Delete User",
+
         width=12,
+
         bg="#e74c3c",
+
         fg="white",
+
         command=delete_selected
+
     ).pack(
+
         side="left",
+
         padx=5
+
     )
 
 
+    # ======================================================
+    # CLOSE BUTTON
+    # ======================================================
 
     tk.Button(
+
         btn_frame,
+
         text="Close",
+
         width=12,
+
         bg="#7f8c8d",
+
         fg="white",
+
         command=close_window
+
     ).pack(
+
         side="right",
+
         padx=5
+
     )
 
 
+    # ======================================================
+    # INITIAL LOAD
+    # ======================================================
 
     load_users()
 
 
+    # ======================================================
+    # WINDOW CLOSE EVENT
+    # ======================================================
 
     root.protocol(
         "WM_DELETE_WINDOW",
         close_window
     )
+
+    
