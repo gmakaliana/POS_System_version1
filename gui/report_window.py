@@ -444,13 +444,10 @@ def open_daily_sales(
         True
     )
 
-    # IMPORTANT:
-    # Daily Sales Report is positioned near the top,
-    # horizontally centered, just like the expense windows.
     position_report_window(
         win,
         1250,
-        650
+        600
     )
 
 
@@ -496,9 +493,6 @@ def open_daily_sales(
 
     # ======================================================
     # REPORT INFORMATION ROW
-    #
-    # Report Generated and Report Date are intentionally
-    # displayed on the same row.
     # ======================================================
 
     info_frame = tk.Frame(
@@ -528,12 +522,6 @@ def open_daily_sales(
 
     # ======================================================
     # TABLE FRAME
-    #
-    # IMPORTANT:
-    # Do NOT use expand=True here.
-    #
-    # The sales table must have the same vertical height
-    # as the 9-row Profit/Loss Summary table below.
     # ======================================================
 
     frame = tk.Frame(
@@ -631,12 +619,6 @@ def open_daily_sales(
 
     # ======================================================
     # DISPLAY SALES DATA
-    #
-    # Only the first 9 rows are displayed.
-    #
-    # IMPORTANT:
-    # The original "rows" variable is NOT changed.
-    # Therefore the complete report is still exported.
     # ======================================================
 
     for row in rows[:9]:
@@ -702,11 +684,6 @@ def open_daily_sales(
 
     # ======================================================
     # SUMMARY TABLE
-    #
-    # 9 rows.
-    #
-    # The sales table above uses the same fixed vertical
-    # size so both table areas remain visually aligned.
     # ======================================================
 
     sum_tree = ttk.Treeview(
@@ -872,6 +849,40 @@ def open_daily_sales(
 
 
     # ======================================================
+    # BOTTOM CONTROL ROW
+    #
+    # Save and Close remain centered.
+    # Net Profit/Loss remains on the right.
+    # Both are placed on the same horizontal row.
+    # ======================================================
+
+    bottom_frame = tk.Frame(
+        win
+    )
+
+    bottom_frame.pack(
+        fill="x",
+        padx=10,
+        pady=5
+    )
+
+
+    # ======================================================
+    # CENTER BUTTON FRAME
+    # ======================================================
+
+    button_frame = tk.Frame(
+        bottom_frame
+    )
+
+    button_frame.place(
+        relx=0.5,
+        rely=0.5,
+        anchor="center"
+    )
+
+
+    # ======================================================
     # PROFIT / LOSS STATUS
     # ======================================================
 
@@ -887,8 +898,9 @@ def open_daily_sales(
             f"NET LOSS: M{abs(net_profit):.2f}"
         )
 
+
     tk.Label(
-        sum_frame,
+        bottom_frame,
         text=result_text,
         font=(
             "Arial",
@@ -896,21 +908,8 @@ def open_daily_sales(
             "bold"
         )
     ).pack(
-        anchor="e",
-        pady=(5, 0)
-    )
-
-
-    # ======================================================
-    # BUTTON FRAME
-    # ======================================================
-
-    button_frame = tk.Frame(
-        win
-    )
-
-    button_frame.pack(
-        pady=10
+        side="right",
+        padx=10
     )
 
 
@@ -1037,13 +1036,10 @@ def open_monthly_sales(
         True
     )
 
-    # IMPORTANT:
-    # Monthly Sales Report is positioned near the top,
-    # horizontally centered, just like the expense windows.
     position_report_window(
         win,
         1250,
-        650
+        600
     )
 
 
@@ -1089,9 +1085,6 @@ def open_monthly_sales(
 
     # ======================================================
     # REPORT INFORMATION ROW
-    #
-    # Report Generated and Period are intentionally
-    # displayed on the same row.
     # ======================================================
 
     info_frame = tk.Frame(
@@ -1121,9 +1114,6 @@ def open_monthly_sales(
 
     # ======================================================
     # TABLE FRAME
-    #
-    # Keep the Monthly Sales table the same size as the
-    # Monthly Profit/Loss Summary table.
     # ======================================================
 
     frame = tk.Frame(
@@ -1216,12 +1206,6 @@ def open_monthly_sales(
 
     # ======================================================
     # DISPLAY DATA
-    #
-    # Only the first 9 rows are displayed.
-    #
-    # IMPORTANT:
-    # The original "rows" variable is NOT changed.
-    # Therefore the complete report is still exported.
     # ======================================================
 
     for row in rows[:9]:
@@ -1447,6 +1431,40 @@ def open_monthly_sales(
 
 
     # ======================================================
+    # BOTTOM CONTROL ROW
+    #
+    # Save and Close remain centered.
+    # Net Profit/Loss remains on the right.
+    # Both are placed on the same horizontal row.
+    # ======================================================
+
+    bottom_frame = tk.Frame(
+        win
+    )
+
+    bottom_frame.pack(
+        fill="x",
+        padx=10,
+        pady=5
+    )
+
+
+    # ======================================================
+    # CENTER BUTTON FRAME
+    # ======================================================
+
+    button_frame = tk.Frame(
+        bottom_frame
+    )
+
+    button_frame.place(
+        relx=0.5,
+        rely=0.5,
+        anchor="center"
+    )
+
+
+    # ======================================================
     # PROFIT / LOSS STATUS
     # ======================================================
 
@@ -1462,8 +1480,9 @@ def open_monthly_sales(
             f"NET LOSS: M{abs(net_profit):.2f}"
         )
 
+
     tk.Label(
-        sum_frame,
+        bottom_frame,
         text=result_text,
         font=(
             "Arial",
@@ -1471,21 +1490,8 @@ def open_monthly_sales(
             "bold"
         )
     ).pack(
-        anchor="e",
-        pady=(5, 0)
-    )
-
-
-    # ======================================================
-    # BUTTON FRAME
-    # ======================================================
-
-    button_frame = tk.Frame(
-        win
-    )
-
-    button_frame.pack(
-        pady=10
+        side="right",
+        padx=10
     )
 
 
@@ -2864,4 +2870,3 @@ def open_monthly_stock(
         "WM_DELETE_WINDOW",
         close
     )
-    
